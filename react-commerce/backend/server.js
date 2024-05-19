@@ -9,6 +9,10 @@ const multer=require("multer");
 const moment=require("moment");
 const path=require("path");
 const jsonwebtoken=require("jsonwebtoken");
+// image process
+const sharp=require("sharp");
+// for file sysytem
+const fs=require("fs");
 const app=express();
 app.use(cors());
 app.use(express.json());
@@ -582,11 +586,52 @@ app.get("/productedit/:id",(req,res)=>{
 })
 
 // insert products
-app.post("/addproducts", upload.single("product_video"), (req, res) => {
+app.post("/addproducts", upload.single("product_video"), async(req, res) => {
   try {
     const {category_id, product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured } = req.body;
     const product_video = req.file ? req.file.filename : null;
     const is_featured_val = is_featured === 'Yes' ? 'Yes' : 'No';
+
+    if(product_video){
+      const inputpath=path.join(__dirname,'uploads/products',product_video);
+
+            // Define the output directories and resolutions
+      const outputdirs={
+        small:'uploads/products/small',
+        medium:'uploads/products/medium',
+        large: 'uploads/products/large'
+      };
+
+      const resolutions={
+        small:{width:320,height:480},
+        medium:{width:480,height:800},
+        large:{width:720,height:1280}
+      };
+
+            // Ensure directories exist
+      for(const dir of Object.values(outputdirs)){ //creates an array of the directory paths
+        if(!fs.existsSync(dir)){ // if this directory not present it create recursively
+          fs.mkdirSync(dir,{recursive:true});
+        }
+      }
+
+      // Object.entries(resolutions) returns an array of [key, value] pairs from the resolutions object.
+      // .map(async ([key, { width, height }]) => { ... }) iterates over each resolution entry. key is the size label (small, medium, large), and width and height are the respective dimensions.
+      // const outputPath = path.join(__dirname, outputDirs[key], product_video); constructs the output path for the resized video.
+      // await sharp(inputPath).resize(width, height).toFile(outputPath); uses sharp to resize the video and save it to the specified output path.
+      // Promise.all(...) ensures that all resizing operations run in parallel and completes when all promises are resolved.
+
+      await Promise.all(
+        Object.entries(resolutions).map(async ([key, { width, height }]) => {
+          const outputPath = path.join(__dirname, outputdirs[key], product_video);
+          await sharp(inputpath)
+            .resize(width, height)
+            .toFile(outputPath);
+        })
+      );
+      
+
+    }
     
     const query = "INSERT INTO products (category_id,product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)";
     
@@ -634,11 +679,13 @@ app.get("/productcolor",(req,res)=>{
   const query="select * from colors";
   db.query(query,(err,data)=>{
     if(err){
-
+      console.error(err);
     }
     res.json(data);
   })
 })
+
+
 
 app.listen(8081,()=>{
     console.log("server listening at port 8081");

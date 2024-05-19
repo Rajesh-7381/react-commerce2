@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
+import ReactImageMagnify from '@blacklab/react-image-magnify';
 
 const AddEditProducts = () => {
     const navigate = useNavigate();
@@ -18,21 +19,10 @@ const AddEditProducts = () => {
 
     const [isFeatured, setIsFeatured] = useState(false); // New state for checkbox
     const [colorname,setcolorname]=useState([]);
-    // const [imageSrc, setImageSrc] = useState(null);
+    const [imageSrc, setImageSrc] = useState(null);
+    // this works when admin choose file but not choosen and they create cancel this time instead of error we shown nothing
+    // const [fileDataURL, setFileDataURL] = useState(null);
 
-    useEffect(() => {
-        // Calculate the final price based on product price and discount
-        const calculatedFinalPrice = productPrice - (productPrice * (productDiscount / 100));
-        setFinalPrice(calculatedFinalPrice.toFixed(2)); // toFixed(2) for two decimal points
-    }, [productPrice, productDiscount]);
-
-    const handlePriceChange = (e) => {
-        setProductPrice(parseFloat(e.target.value) || 0);
-    };
-
-    const handleDiscountChange = (e) => {
-        setProductDiscount(parseFloat(e.target.value) || 0);
-    };
 
     useEffect(() => {
         document.title = "Addeditproduct";
@@ -163,25 +153,45 @@ const AddEditProducts = () => {
     const sleeveArray=['Fullsleeve','Halfsleeve','Shortsleeve','Sleeveless']
     const patternArray=['Checked','Plain','Printed','Self','Solid'];
     const fitArray=['Regular','Slim']
-    const occasionArray=['Casual','Formal']
+    const occasionArray=['Casual','Formal'];
 
-//     const handleImageChange = (e) => {
-//         // Access the first file selected by the user from the file input element
-//     const file = e.target.files[0];
-//         // Create a new FileReader instance to read the file
-//     const reader = new FileReader();
-//         // Define an event handler to be executed when the file reading operation is complete
-//     reader.onload = () => {
-//         // Update the state with the file's data URL
-//     // This will trigger a re-render and display the image
-//         setImageSrc(reader.result);
+    useEffect(() => {
+        // Calculate the final price based on product price and discount
+        const calculatedFinalPrice = productPrice - (productPrice * (productDiscount / 100));
+        setFinalPrice(calculatedFinalPrice.toFixed(2)); // toFixed(2) for two decimal points
+    }, [productPrice, productDiscount]);
 
-//     };
+    const handlePriceChange = (e) => {
+        setProductPrice(parseFloat(e.target.value) || 0);
+    };
 
-//     // Start reading the file as a data URL
-// // This will result in the file data being converted to a base64-encoded string
-//     reader.readAsDataURL(file);
-// };
+    const handleDiscountChange = (e) => {
+        setProductDiscount(parseFloat(e.target.value) || 0);
+    };
+
+    const handleImageChange = (e) => {
+        // Access the first file selected by the user from the file input element
+    const file = e.target.files[0];
+       
+        // this works when admin choose file but not choosen and they create cancel this time instead of error we shown nothing
+   if(file){
+     // Create a new FileReader instance to read the file
+    const reader=new FileReader();
+    // Define an event handler to be executed when the file reading operation is complete
+
+    reader.onload=()=>{
+        // Update the state with the file's data URL
+        // This will trigger a re-render and display the image
+        setImageSrc(reader.result);
+    };
+    // Start reading the file as a data URL
+    // This will result in the file data being converted to a base64-encoded string
+    reader.readAsDataURL(file);
+   }else {
+    // Handle the case where no file is selected (e.g., user cancels the file selection)
+    setImageSrc(null);
+  }
+};
 
     return (
         <div>
@@ -320,7 +330,7 @@ const AddEditProducts = () => {
                                             <div className="col-md-6">
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputProductDiscount">Product Discount <span className='text-danger'>*</span></label>
+                                                        <label htmlFor="exampleInputProductDiscount">Product Discount (%)<span className='text-danger'>*</span></label>
                                                         <input type="text" className="form-control" id="exampleInputProductDiscount product_discount" name='product_discount'  {...register('product_discount', { required: true })} onChange={handleDiscountChange} defaultValue={0}  />
                                                         {errors.product_discount && <span className="text-danger">Product Discount is required </span>}
 
@@ -340,26 +350,41 @@ const AddEditProducts = () => {
                                         </div>
                                         <div className="row">
                                             <div className="col-md-6">
-                                            <div className="card-body">
-                                                <div className="form-group text-start">
-                                                    <label htmlFor="exampleInputProductPrice">Final Price <span className='text-danger'>*</span></label>
-                                                    <input type="text" className="form-control"  id="exampleInputProductPrice final_price" readOnly value={finalPrice} name='final_price' {...register('final_price', { required: true })}   defaultValue={data.final_price}  />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6">
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputProductVideo">Product Video<span className='text-danger'>*</span></label>
-                                                        <input type="file" className="form-control" id="exampleInputProductVideo" name='product_video'   {...register('product_video')} />
-                                                        {errors.product_video && <span className="text-danger">product video is required </span>}
-
+                                                        <label htmlFor="exampleInputProductPrice">Final Price <span className='text-danger'>*</span></label>
+                                                        <input type="text" className="form-control"  id="exampleInputProductPrice final_price" readOnly value={finalPrice} name='final_price' {...register('final_price', { required: true })}   defaultValue={data.final_price}  />
                                                     </div>
                                                 </div>
                                             </div>
-                                    </div>
-                                    
-                                        
+                                            <div className="col-md-6">
+                                                <div className="card-body">
+                                                    <div className="form-group text-start">
+                                                        <label htmlFor="exampleInputProductVideo">Product Video<span className='text-danger'>*</span></label>
+                                                        <input type="file" className="form-control" id="exampleInputProductVideo" name='product_video'   {...register('product_video')} onChange={handleImageChange} />
+                                                        {errors.product_video && <span className="text-danger">product video is required </span>}
+
+                                                    </div>
+                                                    <div style={{ width: '200px', height: '200px', }}>
+                                                    <ReactImageMagnify
+
+                                                    imageProps={{
+                                                        alt: '',
+                                                        isFluidWidth: true,
+                                                        src: imageSrc
+                                                    }}
+                                                    magnifiedImageProps={{
+                                                        src: imageSrc,
+                                                        width: 1200,
+                                                        height: 1800
+                                                    }}
+                                                   
+                                                    />
+                                                  </div>
+                                                
+                                                </div>
+                                            </div>
+                                        </div>                                                                         
                                         <div className="row">
                                             <div className="col-md-6">
                                                 <div className="card-body">

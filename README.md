@@ -45,6 +45,7 @@ install bootstarp icons ->npm install bootstrap-icons add in index.js-> import "
 13. -><npm install react-hook-form>(for form validation and update purpose)
 14. -><npm install chart.js>(for pie chart data shown)
 14. -><npm install react-google-recaptcha>(google captch integration) //r..je..u...7...2@gm....c.m  // domain name->localhost 
+14. -><npm install react-image-magnify> (for image shown large or small size)
 
 abstract::
 =========
@@ -134,6 +135,8 @@ admin can search using particular date and from date to todate
     ->npm i bcrypt (for hashing password using sal and gensalt)
     ->npm i multer (for file uploading)
     ->npm i moment (for date)
+    ->npm i sharp (for image processing and image resizing in diff folder in my project)
+    ->in my system node 18 not compatiable with latest sharp library so we use  (npm install sharp@0.32.0) version  that compatiable with node 18
 
 
 

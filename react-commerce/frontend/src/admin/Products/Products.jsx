@@ -175,7 +175,7 @@ const Products = () => {
                                         {
                                             productdata.slice((currentpage-1) * recordsPerPage , currentpage * recordsPerPage).map((item, index) => (
                                                 <tr key={item.id} className={item.status === 'Active' ? 'bg-primary' : ''}>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'} style={{ width: "1px" }}>{index + 1 }</td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'} style={{ width: "1px" }}>{index + 1 + (currentpage - 1) * recordsPerPage}</td>
                                                     <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_name}</td>
                                                     <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>
                                                         {item.category_name}
