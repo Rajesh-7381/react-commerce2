@@ -1,4 +1,4 @@
-import { BrowserRouter , Routes, Route } from 'react-router-dom';
+import { BrowserRouter , Routes, Route, useParams } from 'react-router-dom';
 import './App.css';
 import 'react-notifications/lib/notifications.css';
 import Login from './Login';
@@ -16,7 +16,7 @@ import Products from './admin/Products/Products';
 import AddEditProducts from './admin/Products/AddEditProducts';
 import ForgotPassword from './ForgotPassword';
 import NotFound from './NotFound';
-import MUI from './MUI';
+
 
 function App() {
   return (
@@ -39,11 +39,6 @@ function App() {
           <Route path='/cmspageaddedit' element={< CmspageAddEdit/>}></Route>
           <Route path='/products' element={< Products/>}></Route>
           <Route path='/addeditproducts' element={< AddEditProducts/>}></Route>
-
-
-          <Route path='/mui' element={< MUI/>}></Route>
-
-
 
           <Route path='/userdashboard2' element={< Dashboard2/>}></Route>
         </Routes>

@@ -6,8 +6,9 @@ import { Label } from 'reactstrap';
 import Cookies from 'js-cookie';
 
 
+
 const Dashboard1 = () => {
-  
+ 
   const chartref = useRef(null);
   const chartinstance = useRef(null);
   const navigate = useNavigate();
@@ -25,17 +26,20 @@ const Dashboard1 = () => {
   useEffect(() => {
     document.title = 'Dashboard';
       // navigate("/"); 
-      const id=Cookies.get("id");
+      const id=sessionStorage.getItem("id");
+      // console.log(id)
       if(id){
         fetchuserdata(id);
-      }     
+      }else{
+        navigate("/")
+      }   
     
   }, [ navigate]); 
   const fetchuserdata=async(id)=>{
     try {
       const reponse=await axios.get(`http://localhost:8081/singledata/${id}`);
       setUserData(reponse.data.data);
-      console.log(reponse.data.data)
+      // console.log(reponse.data.data)
     } catch (error) {
       
     }
@@ -113,6 +117,11 @@ const Dashboard1 = () => {
     }
   }
   
+  // for logout
+  const handlelogout=()=>{
+    sessionStorage.clear();
+    navigate("/");
+  }
   
   return (
     
@@ -134,7 +143,7 @@ const Dashboard1 = () => {
         <a href="index3.html" className="nav-link">Home</a>
       </li>
       <li className="nav-item d-none d-sm-inline-block">
-        <a href="#" className="nav-link">Contact</a>
+        <button  onClick={handlelogout} className="nav-link">Logout</button>
       </li>
     </ul>
     {/* Right navbar links */}

@@ -47,18 +47,18 @@ const CategoryAddEdit = () => {
             console.log(error);
         }
     };
-
     const renderCategories = (categories, level = 0) => {
         return categories.map(category => {
             const paddingLeft = level * 20; // Adjust the padding based on the level
             return (
                 <option key={category.id} value={category.id} style={{ paddingLeft: `${paddingLeft}px` }}>
-                    {level === 0 ? '' : '->'.repeat(level)} {category.parent_id}
+                    {level === 0 ? '' : '->'.repeat(level)} {category.category_name}
                 </option>
             );
         });
     };
     
+
     const onSubmit = async (formData) => {
         try {
             const form = new FormData();

@@ -5,11 +5,8 @@ const Dashboard2 = () => {
   const navigate=useNavigate();
   useEffect(()=>{
     document.title='Dashboard';
-    const loggedin=sessionStorage.getItem("loggedin");
-    if(!loggedin || loggedin!=="1"){
-      navigate("/");
-    }
-  },[navigate])
+    
+  },[])
   return (
     <div>
     <div>

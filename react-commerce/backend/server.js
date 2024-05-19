@@ -8,7 +8,7 @@ const multer=require("multer");
 // for file date
 const moment=require("moment");
 const path=require("path");
-
+const jsonwebtoken=require("jsonwebtoken");
 const app=express();
 app.use(cors());
 app.use(express.json());
@@ -30,7 +30,7 @@ const storage=multer.diskStorage({
     }else if(file.fieldname === 'category_image'){
       cb(null,"uploads/categories/");
     }else if(file.fieldname === 'product_video'){
-      cb(null,"uploads/products2");
+      cb(null,"uploads/products");
     }
   },
   filename:(req,file,cb)=>{
@@ -63,7 +63,7 @@ app.post("/register",upload.single("image"), async (req, res) => {
 
 // login user data
 app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+  const { email, password ,check} = req.body;
 
   const query = "SELECT * FROM AdminUser WHERE email = ?";
   db.query(query, [email], async (err, data) => {
@@ -74,11 +74,13 @@ app.post("/login", (req, res) => {
       const user = data[0];
       const match = await bcrypt.compare(password, user.password);
       if (match) {
+        const token=jsonwebtoken.sign({email:user.email},'Amirpeet',{expiresIn : check ? '7d' : '1d'});
         res.json({
           status: 1, 
           message: "Login successful",
           role: user.role,
-          id: user.id
+          id: user.id,
+          token
         });
       } else {
         res.json({ status: 0, message: "Invalid email or password" });
@@ -523,24 +525,35 @@ app.get("/parentcategory/:parentId", (req, res) => {
 
 
 // all products data
-app.get("/allproducts",(req,res)=>{
-  const query="select * from products where deleted_at is null";
-  db.query(query,(err,data)=>{
-    if(err){
+app.get("/allproducts", (req, res) => {
+  const query = `
+    SELECT  p.*,  c.category_name AS category_name, pc.category_name AS parent_category_name
+    FROM products p LEFT JOIN  categories c ON p.category_id = c.id LEFT JOIN 
+      categories pc ON c.parent_id = pc.id WHERE p.deleted_at IS NULL `;
+  db.query(query, (err, data) => {
+    if (err) {
       console.error(err);
+      return res.status(500).json({ error: "Internal Server Error" });
     }
-    return res.json(data);
-  })
+    // Map through the data to replace null category_name and parent_category_name with 'No Category' and 'No Parent Category' respectively
+    const products = data.map((product) => ({
+      ...product,
+      category_name: product.category_name || "No Category",
+      parent_category_name: product.parent_category_name || "No Parent Category",
+    }));
+    return res.json(products);
+  });
 });
+
 
 //update products
 app.put("/updateproducts/:id",upload.single("product_video"), (req, res) => {
   const id = req.params.id;
   const product_video=req.file.filename;
-  const {product_name,product_code,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured} = req.body;
-  const query = "UPDATE products SET product_name=?, product_code=?, family_color=?, group_code=?, product_price=?, product_weight=?, product_discount=?, discount_type=?, final_price=?,product_video=?, description=?, washcare=?, keywords=?, fabric=?, pattern=?, sleeve=?, fit=?, meta_keywords=?, meta_description=?, meta_title=?, occassion=?, is_featured=? WHERE id=?";
+  const {category_id,product_name,product_code,product_color,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured} = req.body;
+  const query = "UPDATE products SET category_id=?, product_name=?, product_code=?,product_color=?, family_color=?, group_code=?, product_price=?, product_weight=?, product_discount=?, discount_type=?, final_price=?,product_video=?, description=?, washcare=?, keywords=?, fabric=?, pattern=?, sleeve=?, fit=?, meta_keywords=?, meta_description=?, meta_title=?, occassion=?, is_featured=? WHERE id=?";
   db.query(
-    query,[product_name,product_code,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,product_video,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured,id],(err, result) => {
+    query,[category_id,product_name,product_code,product_color,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,product_video,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured,id],(err, result) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: "Internal Server Error" });
@@ -571,12 +584,13 @@ app.get("/productedit/:id",(req,res)=>{
 // insert products
 app.post("/addproducts", upload.single("product_video"), (req, res) => {
   try {
-    const { product_name, product_code, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured } = req.body;
+    const {category_id, product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured } = req.body;
     const product_video = req.file ? req.file.filename : null;
+    const is_featured_val = is_featured === 'Yes' ? 'Yes' : 'No';
     
-    const query = "INSERT INTO products (product_name, product_code, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const query = "INSERT INTO products (category_id,product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)";
     
-    db.query(query, [product_name, product_code, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured], (err, result) => {
+    db.query(query, [category_id,product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], (err, result) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: "Internal Server Error" });
@@ -615,6 +629,16 @@ app.put("/updatestatus/:id",(req,res)=>{
   })
 });
 
+// productcolor
+app.get("/productcolor",(req,res)=>{
+  const query="select * from colors";
+  db.query(query,(err,data)=>{
+    if(err){
+
+    }
+    res.json(data);
+  })
+})
 
 app.listen(8081,()=>{
     console.log("server listening at port 8081");

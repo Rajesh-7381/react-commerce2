@@ -2,36 +2,89 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { NotificationManager,NotificationContainer } from 'react-notifications';
+import { NotificationManager, NotificationContainer } from 'react-notifications';
 
 const AddEditProducts = () => {
-    const navigate=useNavigate();
-    const location=useLocation();
-    const id=location.state ? location.state.id : null;
-    const {register,handleSubmit,setValue,formState: { errors }}=useForm();
-    const [data,setData]=useState({});
-    
-    useEffect(()=>{
-        document.title="Addeditproduct";
-        if(id){
+    const navigate = useNavigate();
+    const location = useLocation();
+    const id = location.state ? location.state.id : null;
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+    const [data, setData] = useState({});
+    const [categories, setCategories] = useState([]);
+
+    const [productPrice, setProductPrice] = useState(0);
+    const [productDiscount, setProductDiscount] = useState(0);
+    const [finalPrice, setFinalPrice] = useState(0);
+
+    const [isFeatured, setIsFeatured] = useState(false); // New state for checkbox
+    const [colorname,setcolorname]=useState([]);
+    // const [imageSrc, setImageSrc] = useState(null);
+
+    useEffect(() => {
+        // Calculate the final price based on product price and discount
+        const calculatedFinalPrice = productPrice - (productPrice * (productDiscount / 100));
+        setFinalPrice(calculatedFinalPrice.toFixed(2)); // toFixed(2) for two decimal points
+    }, [productPrice, productDiscount]);
+
+    const handlePriceChange = (e) => {
+        setProductPrice(parseFloat(e.target.value) || 0);
+    };
+
+    const handleDiscountChange = (e) => {
+        setProductDiscount(parseFloat(e.target.value) || 0);
+    };
+
+    useEffect(() => {
+        document.title = "Addeditproduct";
+        if (id) {
             handleProductUpdate(id);
         }
-    },[id]);
+    }, [id]);
 
-    const handleProductUpdate=async(id)=>{
+    useEffect(() => {
+        
+                // Fetch categories from the backend when the component mounts
+        fetchCategories();
+        productcolor();
+    }, []);
+
+    const productcolor=async()=>{
+        try {
+            const response= await axios.get("http://localhost:8081/productcolor");
+            setcolorname(response.data);
+            // console.log(response.data);
+        } catch (error) {
+            
+        }
+    }
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8081/categories`);
+            setCategories(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const handleProductUpdate = async (id) => {
         try {
             const response = await axios.get(`http://localhost:8081/productedit/${id}`);
-            const productdata=response.data.data;
+            const productdata = response.data.data;
             setData(productdata);
+            setValue('category_id', productdata.category_id); // Add category_id to FormData
             setValue('product_name', productdata.product_name);
             setValue('product_code', productdata.product_code);
             setValue('family_color', productdata.family_color);
+            setValue('product_color', productdata.product_color);
             setValue('group_code', productdata.group_code);
             setValue('product_price', productdata.product_price);
             setValue('product_weight', productdata.product_weight);
             setValue('product_discount', productdata.product_discount);
             setValue('discount_type', productdata.discount_type);
-            setValue('final_price', productdata.final_price);
+            // Calculate final price based on fetched product data
+             const calculatedFinalPrice = productdata.product_price - (productdata.product_price * (productdata.product_discount / 100));
+            setFinalPrice(calculatedFinalPrice.toFixed(2));
+            setValue('final_price', calculatedFinalPrice.toFixed(2));
             setValue('product_video', productdata.product_video);
             setValue('description', productdata.description);
             setValue('washcare', productdata.washcare);
@@ -44,15 +97,16 @@ const AddEditProducts = () => {
             setValue('meta_description', productdata.meta_description);
             setValue('meta_title', productdata.meta_title);
             setValue('occassion', productdata.occassion);
-            setValue('is_featured', productdata.is_featured);
+            setIsFeatured(productdata.is_featured === 'Yes');
         } catch (error) {
             console.error(error);
         }
     }
 
-    const onSubmit=async(formData)=>{
-      try {
-        const form = new FormData();
+    const onSubmit = async (formData) => {
+        try {
+            const form = new FormData();
+            form.append('category_id', formData.category_id); // Add category_id to FormData
             form.append('product_name', formData.product_name);
             form.append('product_code', formData.product_code);
             form.append('family_color', formData.family_color);
@@ -62,8 +116,8 @@ const AddEditProducts = () => {
             form.append('product_weight', formData.product_weight);
             form.append('product_discount', formData.product_discount);
             form.append('discount_type', formData.discount_type);
-            form.append('final_price', formData.final_price);
-            //form.append('product_video', formData.product_video);
+            form.append('final_price', finalPrice); // Use calculated final price
+            form.append('product_video', formData.product_video[0]);
             form.append('description', formData.description);
             form.append('washcare', formData.washcare);
             form.append('keywords', formData.keywords);
@@ -75,31 +129,59 @@ const AddEditProducts = () => {
             form.append('meta_description', formData.meta_description);
             form.append('meta_title', formData.meta_title);
             form.append('occassion', formData.occassion);
-            form.append('is_featured', formData.is_featured ? 'Yes' : 'No');
-            form.append('product_video', formData.product_video[0]);
-
-        if(id){
-            const response=await axios.put(`http://localhost:8081/updateproducts/${id}`,form,{
-                headers:{
-                    'Content-Type':'multipart/form-data'
-                }
-            });
-
-            NotificationManager.success("product updated successfully!");
-            navigate("/products");
-        }else{
-            const response=await axios.post(`http://localhost:8081/addproducts`,form,{
-                headers:{
-                    'Content-Type':'multipart/form-data'
-                }
-            });
-            NotificationManager.success("product added successfully!");
-            navigate("/products");
-        }
-      } catch (error) {
+            form.append('is_featured', isFeatured ? 'Yes' : 'No');
+    
+            if (id) {
+                await axios.put(`http://localhost:8081/updateproducts/${id}`, form, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+    
+                NotificationManager.success("product updated successfully!");
+                navigate("/products");
+            } else {
+                await axios.post(`http://localhost:8081/addproducts`, form, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                NotificationManager.success("product added successfully!");
+                navigate("/products");
+            }
+        } catch (error) {
             console.error(error)
-      }
+        }
     }
+    
+    // handle checkbox update
+    const handleCheckboxChange = (e) => {
+        setIsFeatured(e.target.checked);
+    }
+
+    const fabricArray=['Cotton','Polyster','Wool'];
+    const sleeveArray=['Fullsleeve','Halfsleeve','Shortsleeve','Sleeveless']
+    const patternArray=['Checked','Plain','Printed','Self','Solid'];
+    const fitArray=['Regular','Slim']
+    const occasionArray=['Casual','Formal']
+
+//     const handleImageChange = (e) => {
+//         // Access the first file selected by the user from the file input element
+//     const file = e.target.files[0];
+//         // Create a new FileReader instance to read the file
+//     const reader = new FileReader();
+//         // Define an event handler to be executed when the file reading operation is complete
+//     reader.onload = () => {
+//         // Update the state with the file's data URL
+//     // This will trigger a re-render and display the image
+//         setImageSrc(reader.result);
+
+//     };
+
+//     // Start reading the file as a data URL
+// // This will result in the file data being converted to a base64-encoded string
+//     reader.readAsDataURL(file);
+// };
 
     return (
         <div>
@@ -128,6 +210,22 @@ const AddEditProducts = () => {
                                         </h3>
                                     </div>
                                     <form onSubmit={handleSubmit(onSubmit)}>
+                                    <div className="row">
+                                            <div className="col-md-12">
+                                                <div className="card-body">
+                                                    <div className="form-group text-start">
+                                                        <label htmlFor="category_id">Select Category</label>
+                                                        <select name="category_id" id="category_id" className="form-control" {...register('category_id', { required: true })} value={data.category_id}>
+                                                            <option value="">Select</option>
+                                                            {categories.map(category => (
+                                                                <option key={category.id} value={category.id} >{category.category_name}</option>
+                                                            ))}
+                                                        </select>
+                                                        {errors.category_id && <span className="text-danger">Category is required</span>}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div className="row">
                                             <div className="col-md-6">
                                                 <div className="card-body">
@@ -153,7 +251,14 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductselectid">product color <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputProductcode" name='product_color' {...register('product_color', { required: true })} defaultValue={data.product_color} />
+                                                        <select name="product_color" id="product_color" className='form-control' {...register('product_color', { required: true })}>
+                                                        <option value="">Select</option>
+                                                        {
+                                                            colorname.map(color=>(
+                                                                <option value={color.colors} key={color} selected={color.colors === data.product_color}>{color.colors}</option>
+                                                            ))
+                                                        }
+                                                        </select>
                                                         {errors.product_color && <span className="text-danger">product color is required </span>}
 
                                                     </div>
@@ -165,7 +270,14 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductColor">Family Color <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputProductColor" name='family_color' {...register('family_color', { required: true })} defaultValue={data.family_color} />
+                                                        <select name="family_color" id="family_color" className='form-control' {...register('family_color', { required: true })}>
+                                                        <option value="">Select</option>
+                                                        {
+                                                            colorname.map(color=>(
+                                                                <option value={color.colors} key={color} selected={color.colors === data.family_color}>{color.colors}</option>
+                                                            ))
+                                                        }
+                                                        </select>
                                                         {errors.family_color && <span className="text-danger">family color is required </span>}
 
                                                     </div>
@@ -187,7 +299,7 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductPrice">Product Price <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputProductPrice" name='product_price' {...register('product_price', { required: true })} defaultValue={data.product_price} />
+                                                        <input type="text" className="form-control" id="exampleInputProductPrice product_price" name='product_price' {...register('product_price', { required: true })} onChange={handlePriceChange} defaultValue={0} />
                                                         {errors.product_price && <span className="text-danger">product price is required </span>}
 
                                                     </div>
@@ -209,7 +321,7 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductDiscount">Product Discount <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputProductDiscount" name='product_discount' {...register('product_discount', { required: true })} defaultValue={data.product_discount} />
+                                                        <input type="text" className="form-control" id="exampleInputProductDiscount product_discount" name='product_discount'  {...register('product_discount', { required: true })} onChange={handleDiscountChange} defaultValue={0}  />
                                                         {errors.product_discount && <span className="text-danger">Product Discount is required </span>}
 
                                                     </div>
@@ -228,16 +340,14 @@ const AddEditProducts = () => {
                                         </div>
                                         <div className="row">
                                             <div className="col-md-6">
-                                                <div className="card-body">
-                                                    <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputProductPrice">Final Price <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputProductPrice" name='final_price' {...register('final_price', { required: true })} defaultValue={data.final_price} />
-                                                        
-
-                                                    </div>
+                                            <div className="card-body">
+                                                <div className="form-group text-start">
+                                                    <label htmlFor="exampleInputProductPrice">Final Price <span className='text-danger'>*</span></label>
+                                                    <input type="text" className="form-control"  id="exampleInputProductPrice final_price" readOnly value={finalPrice} name='final_price' {...register('final_price', { required: true })}   defaultValue={data.final_price}  />
                                                 </div>
                                             </div>
-                                            <div className="col-md-6">
+                                        </div>
+                                        <div className="col-md-6">
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductVideo">Product Video<span className='text-danger'>*</span></label>
@@ -247,7 +357,9 @@ const AddEditProducts = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                    </div>
+                                    
+                                        
                                         <div className="row">
                                             <div className="col-md-6">
                                                 <div className="card-body">
@@ -281,11 +393,17 @@ const AddEditProducts = () => {
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div className="col-md-6">
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductFabric">Fabric<span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputProductFabric" name='fabric' {...register('fabric', { required: true })} defaultValue={data.fabric} />
+                                                        <select name="fabric" id="fabric" className='form-control' {...register('fabric', { required: true })}>
+                                                            <option value="">Select</option>
+                                                            {fabricArray.map(fabricArray=>(
+                                                                <option key={fabricArray} value={fabricArray}>{fabricArray}</option>
+                                                            ))}
+                                                        </select>
                                                         {errors.fabric && <span className="text-danger">fabric is required </span>}
 
                                                     </div>
@@ -297,7 +415,14 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductPattern">Pattern <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputProductPattern" name='pattern' {...register('pattern', { required: true })} defaultValue={data.pattern} />
+                                                        <select name="pattern" id="pattern" {...register('pattern', { required: true })} className='form-control'>
+                                                            <option value="">Select</option>
+                                                            {
+                                                                patternArray.map(patternArray=>(
+                                                                    <option value={patternArray} key={patternArray}>{patternArray}</option>
+                                                                ))
+                                                            }
+                                                        </select>
                                                         {errors.pattern && <span className="text-danger">pattern is required </span>}
 
                                                     </div>
@@ -307,7 +432,12 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductsleeve">Sleeve<span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputProductsleeve" name='sleeve' {...register('sleeve', { required: true })} defaultValue={data.sleeve} />
+                                                        <select name="sleeve" id="sleeve" className='form-control' {...register('sleeve', { required: true })}>
+                                                            <option value="">Select</option>
+                                                            {sleeveArray.map(sleeveArray=>(
+                                                                <option value={sleeveArray} key={sleeveArray}>{sleeveArray}</option>
+                                                            ))}
+                                                        </select>
                                                         {errors.sleeve && <span className="text-danger">sleeve is required </span>}
 
                                                     </div>
@@ -319,7 +449,12 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductfit">Fit <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputProductfit" name='fit' {...register('fit', { required: true })} defaultValue={data.fit} />
+                                                            <select name="fit" id="fit" className='form-control' {...register('fit', { required: true })}>
+                                                                <option value="">Select</option>
+                                                                {fitArray.map(fitArray=>(
+                                                                    <option value={fitArray} key={fitArray}>{fitArray}</option>
+                                                                ))}
+                                                            </select>
                                                         {errors.fit && <span className="text-danger">fit is required </span>}
 
                                                     </div>
@@ -329,7 +464,14 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductoccassion">Occasion<span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputProductoccassion" name='occassion' {...register('occassion', { required: true })} defaultValue={data.occassion} />
+                                                                <select name="occassion" id="occassion" className='form-control' {...register('occassion', { required: true })}>
+                                                                    <option value="">Select</option>
+                                                                    {
+                                                                        occasionArray.map(occasionArray=>(
+                                                                            <option value={occasionArray} key={occasionArray}>{occasionArray}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
                                                         {errors.occassion && <span className="text-danger">occassion is required </span>}
 
                                                     </div>
@@ -371,12 +513,11 @@ const AddEditProducts = () => {
                                             </div>
                                             <div className="col-md-6">
                                                 <div className="card-body">
-                                                    <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputProductis_featured">Is Featured<span className='text-danger'>*</span></label>
-                                                        <input type="checkbox" id="exampleInputProductis_featured" name='is_featured' {...register('is_featured')} checked={data.is_featured === 'Yes'} />                                                    {errors.name && <span className="text-danger">Name is required </span>}
-                                                        {errors.is_featured && <span className="text-danger">Feature is required </span>}
-
-                                                    </div>
+                                                <div className="form-group text-start">
+                                                    <label htmlFor="exampleInputProductis_featured">Is Featured<span className='text-danger'>*</span></label>
+                                                    <input type="checkbox" id="exampleInputProductis_featured" name='is_featured' {...register('is_featured')} checked={isFeatured} onChange={handleCheckboxChange} />
+                                                    {errors.is_featured && <span className="text-danger">Feature is required </span>}
+                                                </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -396,3 +537,5 @@ const AddEditProducts = () => {
 }
 
 export default AddEditProducts;
+
+

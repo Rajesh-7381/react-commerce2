@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import axios from 'axios';
@@ -24,11 +24,17 @@ const Login = () => {
       try {
         const response = await axios.post("http://localhost:8081/login", values);
         const data = response.data;
-        Cookies.set('id', data.id, { expires: 1 / 24 });
+        console.log(data)
+        
+        if(formik.check){
+          document.cookie=`token=${response.data.token}; expires=${new Date(Date.now() + 86400).toUTCString}; path=/`; // after 1day  token will be expired and redirect to login page
+
+        }
         if (data.status === 1) {
+          sessionStorage.setItem('id',data.id);
           if (values.check) {
-            Cookies.set('email', values.email, { expires: 1 / 24 });
-            Cookies.set('password', values.password, { expires: 1 / 24 });
+            sessionStorage.setItem('email', values.email);
+            // sessionStorage.setItem('password', values.password);
           }
           switch (data.role) {
             case 'admin':

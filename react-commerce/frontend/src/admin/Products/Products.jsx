@@ -56,19 +56,23 @@ const Products = () => {
         }
     }
 
-    const toggleclick=async(status,id)=>{
+    const toggleclick = async (status, id) => {
         // alert(status)
-        // alert(id)
-        const newstatus=status === 1 ? 0 : 1;
-        await axios.put(`http://localhost:8081/updatestatus/${id}`,{status:newstatus});
-        const updatedata=productdata.map(item=>{
-            if(item.id === id){
-                return {...item,status:newstatus};
+        const newStatus = status === 'Active' ? 'Inactive' : 'Active';
+        try {
+          await axios.put(`http://localhost:8081/updatestatus/${id}`, { status: newStatus });
+          const updatedData = productdata.map((item) => {
+            if (item.id === id) {
+              return { ...item, status: newStatus };
             }
             return item;
-        })
-        setproductdata(updatedata);
-    }
+          });
+          setproductdata(updatedData);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      
     const [currentpage,setCurrentPage]=useState(1);
     const recordsPerPage=10;
     const lastIndex=currentpage * recordsPerPage;
@@ -154,6 +158,8 @@ const Products = () => {
                                         <tr>
                                             <th className='bg-dark text-light'>SL NO.</th>
                                             <th className='bg-dark text-light'>PRODUCT NAME</th>
+                                            <th className='bg-dark text-light'>CATEGORY</th>
+                                            <th className='bg-dark text-light'>PARENT CATEGORY</th>
                                             <th className='bg-dark text-light'>PRODUCT CODE </th>
                                             <th className='bg-dark text-light'>PRODUCT COLOR</th>
                                             <th className='bg-dark text-light'>FAMILY COLOR </th>
@@ -168,25 +174,31 @@ const Products = () => {
                                     <tbody>
                                         {
                                             productdata.slice((currentpage-1) * recordsPerPage , currentpage * recordsPerPage).map((item, index) => (
-                                                <tr key={item.id} className={item.status === 1 ? 'bg-primary' : ''}>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'} style={{ width: "1px" }}>{index + 1 }</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.product_name}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.product_code}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.product_color}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.family_color}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.group_code}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.product_price}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.product_weight}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.product_discount}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
+                                                <tr key={item.id} className={item.status === 'Active' ? 'bg-primary' : ''}>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'} style={{ width: "1px" }}>{index + 1 }</td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_name}</td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>
+                                                        {item.category_name}
+                                                    </td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>
+                                                        {item.parent_category_name}
+                                                    </td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_code}</td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_color}</td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.family_color}</td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.group_code}</td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_price}</td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_weight}</td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_discount}</td>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}><span className={`badge badge-${item.status === 'Active' ? 'success' : 'danger'}`}>{item.status === 'Active' ? 'Active' : 'Inactive'}</span></td>
                                                     
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>
+                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>
                                                         <NotificationContainer />
                                                         <button className='btn btn-success btn-sm ' onClick={()=>handleedit(item.id)}><i className='fas fa-pencil-alt'></i></button>
                                                         <NotificationContainer />
                                                         <button className='btn btn-danger btn-sm' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
                                                         <NotificationContainer />
-                                                        <button className='btn btn-dark btn-sm' onClick={()=>toggleclick(item.status,item.id)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
+                                                        <button className='btn btn-dark btn-sm' onClick={()=>toggleclick(item.status,item.id)}><i className={item.status === 'Active' ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
                                                     </td>
                                                 </tr>
                                             ))
