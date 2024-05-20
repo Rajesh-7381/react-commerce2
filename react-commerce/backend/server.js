@@ -685,6 +685,19 @@ app.get("/productcolor",(req,res)=>{
   })
 })
 
+app.get("/allproductcount", (req, res) => {
+  const query = "SELECT COUNT(*) AS total FROM products WHERE deleted_at IS NULL";
+
+  db.query(query, (err, data) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      const productcount = data[0].total;
+      res.json({ productcount: productcount });
+    }
+  });
+});
 
 
 app.listen(8081,()=>{

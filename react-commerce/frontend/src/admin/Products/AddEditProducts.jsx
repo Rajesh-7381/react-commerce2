@@ -4,6 +4,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
 import ReactImageMagnify from '@blacklab/react-image-magnify';
+import Header from '../../Component/Header';
+import Footer from '../../Component/Footer';
 
 const AddEditProducts = () => {
     const navigate = useNavigate();
@@ -171,30 +173,43 @@ const AddEditProducts = () => {
 
     const handleImageChange = (e) => {
         // Access the first file selected by the user from the file input element
-    const file = e.target.files[0];
-       
-        // this works when admin choose file but not choosen and they create cancel this time instead of error we shown nothing
-   if(file){
-     // Create a new FileReader instance to read the file
-    const reader=new FileReader();
-    // Define an event handler to be executed when the file reading operation is complete
-
-    reader.onload=()=>{
-        // Update the state with the file's data URL
-        // This will trigger a re-render and display the image
-        setImageSrc(reader.result);
+        const file = e.target.files[0];
+    
+        // Handle the case where no file is selected (e.g., user cancels the file selection)
+        if (!file) {
+            setImageSrc(null);
+            return;
+        }
+    
+        // Define the list of valid file types
+        const validateFiles = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+    
+        // Check if the selected file type is valid
+        if (!validateFiles.includes(file.type)) {
+            alert("Please provide only JPEG, PNG, GIF, or WebP images.");
+            return;
+        }
+    
+        // Create a new FileReader instance to read the file
+        const reader = new FileReader();
+    
+        // Define an event handler to be executed when the file reading operation is complete
+        reader.onload = () => {
+            // Update the state with the file's data URL
+            // This will trigger a re-render and display the image
+            setImageSrc(reader.result);
+        };
+    
+        // Start reading the file as a data URL
+        // This will result in the file data being converted to a base64-encoded string
+        reader.readAsDataURL(file);
     };
-    // Start reading the file as a data URL
-    // This will result in the file data being converted to a base64-encoded string
-    reader.readAsDataURL(file);
-   }else {
-    // Handle the case where no file is selected (e.g., user cancels the file selection)
-    setImageSrc(null);
-  }
-};
+    
 
     return (
         <div>
+        <Header />
+
             <div className="wrapper">
                 <div className="content-wrapper">
                     <section className="content-header">
@@ -361,7 +376,8 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductVideo">Product Video<span className='text-danger'>*</span></label>
-                                                        <input type="file" className="form-control" id="exampleInputProductVideo" name='product_video'   {...register('product_video')} onChange={handleImageChange} />
+                                                        <input type="file" className="form-control" accept="image/jpeg,image/png,image/gif" id="exampleInputProductVideo" name='product_video'   {...register('product_video')} onChange={handleImageChange} />
+                                                        <p>Only accepted jpg,jpeg,webp,png and gif</p>
                                                         {errors.product_video && <span className="text-danger">product video is required </span>}
 
                                                     </div>
@@ -557,10 +573,10 @@ const AddEditProducts = () => {
                     </section>
                 </div>
             </div>
+
+            <Footer />
         </div>
     )
 }
 
 export default AddEditProducts;
-
-

@@ -87,7 +87,7 @@ const SubAdminAddEdit = () => {
                                                 <div className="form-group text-start">
                                                     <label htmlFor="exampleInputMobile"><i className='fas fa-phone'></i> Mobile <span className='text-danger'>*</span></label>
                                                     <input type="text" className="form-control" id="exampleInputMobile" {...register("mobile", { required: true, minLength: 10, maxLength: 10 })} placeholder="Enter mobile number" />
-                                                    {errors.mobile && <span className="text-danger">Mobile number must be 10 digits</span>}
+                                                    {errors.mobile && <span className="text-danger">Mobile number required</span>}
                                                 </div>
                                                 <div className="form-group text-start">
                                                     <label htmlFor="exampleInputEmail1"><i className='fas fa-envelope'></i> Email <span className='text-danger'>*</span></label>
@@ -111,7 +111,7 @@ const SubAdminAddEdit = () => {
                                             </div>
                                             <div className="card-footer text-start">
                                                 <NotificationContainer />
-                                                 <button type="submit" className="btn btn-primary">Submit</button>
+                                                 <button type="submit" className="btn btn-success">Update</button>
                                             </div>
                                         </form>
                                     </div>

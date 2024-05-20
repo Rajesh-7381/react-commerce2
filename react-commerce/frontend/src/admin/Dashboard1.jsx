@@ -16,6 +16,7 @@ const Dashboard1 = () => {
   const [admincount, setAdminCount] = useState(0);
   const [subadmincount, setSubadminCount] = useState(0);
   const [categoriescount, setcategoriesCount] = useState(0);
+  const [allproductcount,setallproductcount]=useState(0);
   const [userData, setUserData] = useState(null);
   const [pdate, setPdate] = useState('');
   const [registeruserdata2, setregisteruserdata] = useState(0);
@@ -52,10 +53,12 @@ const Dashboard1 = () => {
         const adminResponse = await axios.get("http://localhost:8081/countadmin");
         const subadminResponse = await axios.get("http://localhost:8081/countsubadmin");
         const uniquecategoriesResponse =await axios.get("http://localhost:8081/uniquecategories");
+        const productcountResponse=await axios.get("http://localhost:8081/allproductcount");
         setUserCount(userResponse.data.count);
         setAdminCount(adminResponse.data.Admincount);
         setSubadminCount(subadminResponse.data.subaAdmincount);
         setcategoriesCount(uniquecategoriesResponse.data.catcount)
+        setallproductcount(productcountResponse.data.productcount);
         // Cookies.get("id",id);
       } catch (error) {
         console.error("Error fetching count data:", error);
@@ -74,16 +77,17 @@ const Dashboard1 = () => {
     chartinstance.current=new Chart(mychartref,{
       type:"pie",
       data:{
-        labels: ['Admin Registrations', 'SubAdmin Registrations', 'User Registrations','Unique Categories'],
+        labels: ['Admin', 'SubAdmin', 'User','Categories','Products'],
         datasets:[
           {
-            label: 'Registrations',
-            data: [admincount, subadmincount, usercount,categoriescount],
+            label: '',
+            data: [admincount , subadmincount, usercount,categoriescount,allproductcount],
             backgroundColor: [
               'rgb(255, 205, 86)',
               'rgb(0,255,255)',
               'rgb(0,0,255)',
               'rgb(255,0,0)',
+              'rgb(147,112,219)',
               
             ],
             
@@ -439,22 +443,22 @@ const Dashboard1 = () => {
         <div className="row">
           <div className="col-lg-3 col-6">
             {/* small box */}
-            <div className="small-box bg-info">
+            <div className="small-box" style={{backgroundColor:"mediumpurple"}}>
               <div className="inner">
-                <h3>150</h3>
-                <p>New Orders</p>
+                <h3>{allproductcount}</h3>
+                <p>All Products</p>
                  
               </div>
               <div className="icon">
                 <i className="ion ion-bag" />
               </div>
-              <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
+              <a href="#" className="small-box-footer"><span style={{color:"black"}}>More info <i className="fas fa-arrow-circle-right" /></span> </a>
             </div>
           </div>
           {/* ./col */}
           <div className="col-lg-3 col-6">
             {/* small box */}
-            <div className="small-box bg-success">
+            <div className="small-box" style={{backgroundColor:"teal"}}>
               <div className="inner">
                 <h3>53<sup style={{fontSize: 20}}>%</sup></h3>
                 <p>Bounce Rate</p>
@@ -468,7 +472,7 @@ const Dashboard1 = () => {
           {/* ./col */}
           <div className="col-lg-3 col-6">
             {/* small box */}
-            <div className="small-box bg-warning">
+            <div className="small-box bg-success">
               <div className="inner">
                 <h3>45</h3>
                 <p>User Registrations</p>
@@ -482,7 +486,7 @@ const Dashboard1 = () => {
           {/* ./col */}
           <div className="col-lg-3 col-6">
             {/* small box */}
-            <div className="small-box bg-danger">
+            <div className="small-box bg-secondary" >
               <div className="inner">
                 <h3>65</h3>
                 <p>Unique Visitors</p>
@@ -529,6 +533,19 @@ const Dashboard1 = () => {
                       </div>
                       <hr />
                       <hr />
+                      <hr />  
+                      <div className="form-group">
+                        <label htmlFor="fromdate">Search by date range:</label>
+                        <div className="d-flex">
+                          <input type="date" className="form-control mr-2" id="fromdate" value={fromdate} onChange={(e) => setFromDate(e.target.value)} />
+                          <input type="date" className="form-control" id="todate" value={todate} onChange={(e) => setToDate(e.target.value)} />
+                        </div>
+                        <button className="btn btn-primary mt-2" onClick={UserQuery2}>Search</button>
+                        <p><span className="bg-warning">{registeruserdata3}</span> User(s) registered from <span className="bg-warning">{fromdate}</span> to <span className="bg-warning">{todate}</span></p>
+                      </div>
+                      <hr />
+                      <hr />
+                      <hr />
                       <div className="form-group">
                         <label htmlFor="fromdate">Search by date range:</label>
                         <div className="d-flex">
@@ -544,9 +561,95 @@ const Dashboard1 = () => {
               </div>
             </div>
           </section>
-   
+          <section className="learn-bg pt-md-5">
+          
+            <div className="container-fluid">
+              <div className="row pt-md-5">
+                <div className="container text-center mt-5">
+                  <div className="learn-text font-fam-bold">Learn From <span className="teacher">The Best</span></div>
+                  <div className="learn-text-sm font-fam-medium pt-3">Explore the concepts with India’s most experienced
+                    Teachers!</div>
+                </div>
+              </div>
+            </div>
+            <div className="container">
+              <div className="row">
+                <div className="container text-center pt-5">
+                  <h2 className="learn-text font-fam-bold ">Why <span className="why-phy">These Store?</span></h2>
+                  <div className="learn-text-sm font-fam-medium mt-4">Your One Stop Destination For Success</div>
+                </div>
+              </div>
+              <div className="container py-5">
+                <div className="row ">
+                  <div className="col-lg-3 col-sm-12 col-md-3  justify-content-center"><img className="img-fluid" alt="img11" src="https://www.pw.live/version14/assets/img/group-20356.svg" /></div>
+                  <div className="col-lg-9 col-sm-12 col-md-9">
+                    <div className="d-flex flex-column">
+                      <div className="why-inner-head font-fam-bold px-4">Scheduled Lectures</div>
+                      <div className="why-inner-text font-fam-regular px-4">Learning is an important step for achieving dreams in a
+                        student’s journey. We encourage the student to explore the concept in depth
+                        instead
+                        of memorizing. The live lectures help us in learning the needs of the students
+                        and
+                        motivates the students to be creative and be passionate learners.</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-12 col-md-12 text-center">
+                  <div className="col-lg-12 col-sm-12 col-md-12  justify-content-center"><img className="img-fluid" alt="img18" src="https://www.pw.live/version14/assets/img/group-20364.svg" /></div>
+                </div>
+                <div className="row">
+                  <div className="col-12 col-md-12 d-flex justify-content-center d-md-none"><img className="img-fluid" alt="img11" src="https://www.pw.live/version14/assets/img/group-20360.svg" width={220} height={220} /></div>
+                  <div className="col-12 col-md-9">
+                    <div className="d-flex flex-column">
+                      <div className="why-inner-head font-fam-bold px-4"> Doubt Solving Sessions</div>
+                      <div className="why-inner-text font-fam-regular px-4">Our tutorial always encourage students to ask
+                        questions. We have created an atmosphere where students don’t hesitate to ask
+                        their doubts. We firmly believe in More you ask, the more you learn.</div>
+                    </div>
+                  </div>
+                  <div className="col-12 col-md-3 d-flex justify-content-center d-md-block d-none"><img className="img-fluid" alt="img11" src="https://www.pw.live/version14/assets/img/group-20360.svg" width={220} height={220} /></div>
+                </div>
+                <div className="col-12 col-md-12 text-center">
+                  <span className="d-md-block d-none"><img className="img-fluid" alt="img18" src="https://www.pw.live/version14/assets/img/group-20365.svg" /></span>
+                  <span className="d-md-none"><img className="img-fluid" alt="img18" src="https://www.pw.live/version14/assets/img/mgroup20368.svg" /></span>
+                </div>
+                <div className="row">
+                  <div className="col-12 col-md-3 d-flex justify-content-center"><img className="img-fluid" alt="img11" src="https://www.pw.live/version14/assets/img/group-20358.svg" /></div>
+                  <div className="col-12 col-md-9">
+                    <div className="d-flex flex-column">
+                      <div className="why-inner-head font-fam-bold px-4">Structured And Targeted Study Material</div>
+                      <div className="why-inner-text font-fam-regular px-4">Explore the art of concept with our structured material
+                        with intelligent question tackling and problem solving skills.</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-12 col-md-12 text-center">
+                  <span className="d-md-block d-none"><img className="img-fluid" alt="img18" src="https://www.pw.live/version14/assets/img/group-20364.svg" /></span>
+                  <span className="d-md-none"><img className="img-fluid" alt="img18" src="https://www.pw.live/version14/assets/img/mgroup20364.svg" /></span>
+                </div>
+                <div className="row">
+                  <div className="col-12 col-md-3 d-flex justify-content-center d-md-none"><img className="img-fluid" alt="img11" src="https://www.pw.live/version14/assets/img/group-20359.svg" /></div>
+                  <div className="col-12 col-md-9">
+                    <div className="d-flex flex-column">
+                      <div className="why-inner-head font-fam-bold px-4">Tests On Regular Basis For Progress Tracking</div>
+                      <div className="why-inner-text font-fam-regular px-4">It is a set of test papers designed to make the student
+                        comfortable with all possible varieties of questions along with the various ways
+                        in which the same question can be put in order to make the student sweat in the
+                        exam hall.The problems involve multi-dimensional thinking at a time.</div>
+                    </div>
+                  </div>
+                  <div className="col-12 col-md-3 d-flex justify-content-center"><img className="img-fluid d-md-block d-none" alt="img11" src="https://www.pw.live/version14/assets/img/group-20359.svg" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+           
 
   </div>
+  
+
   {/* /.content-wrapper */}
   <footer className="main-footer">
     <strong>Copyright © 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
