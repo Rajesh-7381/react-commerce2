@@ -1,11 +1,11 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
 import ReactImageMagnify from '@blacklab/react-image-magnify';
-import Header from '../../Component/Header';
-import Footer from '../../Component/Footer';
+import Swal from 'sweetalert2';
+
 
 const AddEditProducts = () => {
     const navigate = useNavigate();
@@ -24,6 +24,7 @@ const AddEditProducts = () => {
     const [imageSrc, setImageSrc] = useState(null);
     // this works when admin choose file but not choosen and they create cancel this time instead of error we shown nothing
     // const [fileDataURL, setFileDataURL] = useState(null);
+    const fileinputref=useRef(null); // 
 
 
     useEffect(() => {
@@ -205,10 +206,21 @@ const AddEditProducts = () => {
         reader.readAsDataURL(file);
     };
     
+    // image removing
+    
+    const handleDeleteImage=()=>{
+        setImageSrc(null);
+        if(fileinputref.current){
+            fileinputref.current.value='';
+             // Force reset input value to ensure the same file can be selected again
+            fileinputref.current.type = 'text';
+            fileinputref.current.type = 'file';
+        }
+    }
 
     return (
         <div>
-        <Header />
+        
 
             <div className="wrapper">
                 <div className="content-wrapper">
@@ -376,12 +388,14 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductVideo">Product Video<span className='text-danger'>*</span></label>
-                                                        <input type="file" className="form-control" accept="image/jpeg,image/png,image/gif" id="exampleInputProductVideo" name='product_video'   {...register('product_video')} onChange={handleImageChange} />
+                                                        <input type="file" className="form-control" ref={fileinputref} accept="image/jpeg,image/png,image/gif" id="exampleInputProductVideo" name='product_video'   {...register('product_video')} onChange={handleImageChange} />
+                                                      
                                                         <p>Only accepted jpg,jpeg,webp,png and gif</p>
                                                         {errors.product_video && <span className="text-danger">product video is required </span>}
 
                                                     </div>
-                                                    <div style={{ width: '200px', height: '200px', }}>
+                                                    <div className='d-flex align-items-right' style={{ width: '200px', height: '200px', }}>
+                                                    <div style={{flex:1}}>
                                                     <ReactImageMagnify
 
                                                     imageProps={{
@@ -396,7 +410,9 @@ const AddEditProducts = () => {
                                                     }}
                                                    
                                                     />
-                                                  </div>
+                                                    </div>
+                                                    <button className='btn btn-danger btn-sm' title='Remove Image' onClick={handleDeleteImage} disabled={!imageSrc} ><i className='fas fa-trash'></i></button>
+                                                    </div>
                                                 
                                                 </div>
                                             </div>
@@ -574,7 +590,7 @@ const AddEditProducts = () => {
                 </div>
             </div>
 
-            <Footer />
+            
         </div>
     )
 }
