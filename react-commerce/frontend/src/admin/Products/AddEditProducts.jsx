@@ -25,6 +25,15 @@ const AddEditProducts = () => {
     // this works when admin choose file but not choosen and they create cancel this time instead of error we shown nothing
     // const [fileDataURL, setFileDataURL] = useState(null);
     const fileinputref=useRef(null); // 
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [productImagesPreview, setProductImagesPreview] = useState([]);
+
+
+    const selectFiles = (event) => {
+        setSelectedFiles([...event.target.files]);
+        const previewImages = Array.from(event.target.files).map(file => URL.createObjectURL(file));
+        setProductImagesPreview(previewImages);
+    };
 
 
     useEffect(() => {
@@ -79,6 +88,7 @@ const AddEditProducts = () => {
             setFinalPrice(calculatedFinalPrice.toFixed(2));
             setValue('final_price', calculatedFinalPrice.toFixed(2));
             setValue('product_video', productdata.product_video);
+            setValue('product_image', productdata.product_image);
             setValue('description', productdata.description);
             setValue('washcare', productdata.washcare);
             setValue('keywords', productdata.keywords);
@@ -111,6 +121,7 @@ const AddEditProducts = () => {
             form.append('discount_type', formData.discount_type);
             form.append('final_price', finalPrice); // Use calculated final price
             form.append('product_video', formData.product_video[0]);
+            form.append('product_image', formData.product_image[0]);
             form.append('description', formData.description);
             form.append('washcare', formData.washcare);
             form.append('keywords', formData.keywords);
@@ -123,27 +134,39 @@ const AddEditProducts = () => {
             form.append('meta_title', formData.meta_title);
             form.append('occassion', formData.occassion);
             form.append('is_featured', isFeatured ? 'Yes' : 'No');
+            
+            const url=id ? `http://localhost:8081/updateproducts/${id}` : `http://localhost:8081/addproducts`;
+            const method=id? 'put' : 'post';
+
+            await axios[method](url,form,{
+                headers :{
+                    'Content-Type': 'multipart/form-data'
+                },
+            });
+            NotificationManager.success(id ? "product updated successfully!" : "product added successfully!");
+            navigate("/products");
     
-            if (id) {
-                await axios.put(`http://localhost:8081/updateproducts/${id}`, form, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
+            // if (id) {
+            //     await axios.put(`http://localhost:8081/updateproducts/${id}`, form, {
+            //         headers: {
+            //             'Content-Type': 'multipart/form-data'
+            //         }
+            //     });
     
-                NotificationManager.success("product updated successfully!");
-                navigate("/products");
-            } else {
-                await axios.post(`http://localhost:8081/addproducts`, form, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                NotificationManager.success("product added successfully!");
-                navigate("/products");
-            }
+            //     NotificationManager.success("product updated successfully!");
+            //     navigate("/products");
+            // } else {
+            //     await axios.post(`http://localhost:8081/addproducts`, form, {
+            //         headers: {
+            //             'Content-Type': 'multipart/form-data'
+            //         }
+            //     });
+            //     NotificationManager.success("product added successfully!");
+            //     navigate("/products");
+            // }
         } catch (error) {
-            console.error(error)
+            console.error(error);
+            NotificationManager.error("Error occurred while saving the product.");
         }
     }
     
@@ -205,6 +228,9 @@ const AddEditProducts = () => {
         // This will result in the file data being converted to a base64-encoded string
         reader.readAsDataURL(file);
     };
+    const productimage=(e)=>{
+        const imagefile=e.target.files[0];
+    }
     
     // image removing
     
@@ -389,10 +415,7 @@ const AddEditProducts = () => {
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductVideo">Product Video<span className='text-danger'>*</span></label>
                                                         <input type="file" className="form-control" ref={fileinputref} accept="image/jpeg,image/png,image/gif" id="exampleInputProductVideo" name='product_video'   {...register('product_video')} onChange={handleImageChange} />
-                                                      
-                                                        <p>Only accepted jpg,jpeg,webp,png and gif</p>
-                                                        {errors.product_video && <span className="text-danger">product video is required </span>}
-
+                                                      {errors.product_video && <span className="text-danger">product video is required </span>}
                                                     </div>
                                                     <div className='d-flex align-items-right' style={{ width: '200px', height: '200px', }}>
                                                     <div style={{flex:1}}>
@@ -416,6 +439,18 @@ const AddEditProducts = () => {
                                                 
                                                 </div>
                                             </div>
+                                            <div className="col-md-6">
+                                                <div className="card-body">
+                                                    <div className="form-group text-start">
+                                                        <label htmlFor="exampleInputProductimage">Product image<span className='text-danger'>*</span></label>
+                                                        <input type="file" className="form-control" id="exampleInputProductimage" name='product_image'   {...register('product_image')} onChange={productimage}  />
+                                                        <p>Only accepted jpg,jpeg,webp,png and gif</p>
+                                                        {errors.product_image && <span className="text-danger">product images is required </span>}
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
                                         </div>                                                                         
                                         <div className="row">
                                             <div className="col-md-6">

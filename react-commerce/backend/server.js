@@ -1,28 +1,38 @@
 const express=require("express");
 const cors=require("cors");
 const mysql2=require("mysql2");
+require('dotenv').config();
 // for hashing password
 const bcrypt=require("bcrypt");
 // for file uploading
 const multer=require("multer");
 // for file date
 const moment=require("moment");
+const bodyParser = require('body-parser');
 const path=require("path");
-const jsonwebtoken=require("jsonwebtoken");
+const jwt=require("jsonwebtoken");
 // image process
 const sharp=require("sharp");
+const transpoter=require("./Email/nodemailerConfig");
+// const checkauth=require("./Auth/RouteCheckAuth");
+
+
 // for file sysytem
 const fs=require("fs");
+const checkAuth = require("./Auth/RouteCheckAuth");
 const app=express();
 app.use(cors());
 app.use(express.json());
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const db=mysql2.createPool({
     host:"localhost",
     user:"root",
-    password:"1234",
-    database:"ReactCommerce",
-    port:"3307"
+    password:process.env.password,
+    database:process.env.database,
+    port:process.env.port
 });
 
 // for category image inserting
@@ -34,7 +44,9 @@ const storage=multer.diskStorage({
     }else if(file.fieldname === 'category_image'){
       cb(null,"uploads/categories/");
     }else if(file.fieldname === 'product_video'){
-      cb(null,"uploads/products");
+      cb(null,"uploads/products/");
+    }else if(file.fieldname === 'product_image'){
+      cb(null,"uploads/productImages/")
     }
   },
   filename:(req,file,cb)=>{
@@ -63,40 +75,113 @@ app.post("/register",upload.single("image"), async (req, res) => {
           }
       }
   );
+  const mailOptions={
+    from : process.env.EMAIL, // Your email address
+    to : email, // reciver email
+    subject: 'Welcome to Our Service!',
+    text: `Hello ${name},\n\nThank you for registering at our service! We are excited to have you.\n\nBest regards,\nYour Company`,
+
+  };
+  transpoter.sendMail(mailOptions,(error,info)=>{
+    if (error) {
+      console.error('Error sending email:', error);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+    console.log('Email sent:', info.response);
+    res.status(200).json({ message: 'Registration successful and email sent!' });
+  })
 });
 
-// login user data
-app.post("/login", (req, res) => {
-  const { email, password ,check} = req.body;
+// app.post("/register", upload.single("image"), async (req, res) => {
+//     const { name, mobile, email, password } = req.body;
+//     try {
+//         const salt = await bcrypt.genSalt(10);
+//         const hashedPassword = await bcrypt.hash(password, salt);
+
+//         db.query(
+//             "INSERT INTO AdminUser (name, mobile, email, password, image) VALUES (?, ?, ?, ?, ?)",
+//             [name, mobile, email, hashedPassword, req.file.filename],
+//             (err, data) => {
+//                 if (err) {
+//                     console.error("Error submitting form", err);
+//                     return res.status(500).json({ message: "Internal server error" });
+//                 } else {
+//                     // Send welcome email
+//                     const mailOptions = {
+//                         from: process.env.EMAIL,
+//                         to: email,
+//                         subject: 'Welcome to Our Service!',
+//                         text: `Hello ${name},\n\nThank you for registering at our service! We are excited to have you.\n\nBest regards,\nYour Company`,
+//                     };
+
+//                     transpoter.sendMail(mailOptions, (error, info) => {
+//                         if (error) {
+//                             console.error('Error sending email:', error);
+//                             return res.status(500).json({ message: 'User created but failed to send email' });
+//                         }
+//                         console.log('Email sent:', info.response);
+//                         res.status(200).json({ message: 'Registration successful and email sent!' });
+//                     });
+//                 }
+//             }
+//         );
+//     } catch (error) {
+//         console.error("Error during registration:", error);
+//         res.status(500).json({ message: "Internal server error" });
+//     }
+// });
+
+
+app.post("/login",(req, res,next) => {
+  const { email, password, check } = req.body;
+  console.log(req.body)
+  if (!email || !password) {
+    return res.status(400).json({ status: 0, message: "Email and password are required" });
+  }
 
   const query = "SELECT * FROM AdminUser WHERE email = ?";
   db.query(query, [email], async (err, data) => {
     if (err) {
       console.error("Login unsuccessful:", err);
-      return res.status(500).json({ message: "Internal server error" });
-    } else if (data.length > 0) {
-      const user = data[0];
-      const match = await bcrypt.compare(password, user.password);
-      if (match) {
-        const token=jsonwebtoken.sign({email:user.email},'Amirpeet',{expiresIn : check ? '7d' : '1d'});
-        res.json({
-          status: 1, 
-          message: "Login successful",
-          role: user.role,
-          id: user.id,
-          token
-        });
-      } else {
-        res.json({ status: 0, message: "Invalid email or password" });
-      }
-    } else {
-      res.json({ status: 0, message: "Invalid email or password" });
+      return res.status(500).json({ status: 0, message: "Internal server error" });
     }
+
+    if (data.length === 0) {
+      return res.status(401).json({ status: 0, message: "Invalid email or password" });
+    }
+
+    const user = data[0];
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) {
+      return res.status(401).json({ status: 0, message: "Invalid email or password" });
+    }
+
+    const token = jwt.sign(
+      { email: user.email, role: user.role, id: user.id },
+      // 'dummy text',
+      process.env.JWT_SECRET,
+      // { expiresIn: check ? '7d' : process.env.JWT_EXPIRATION }
+      { expiresIn: "24h" }
+    );
+
+    console.log('Generated Token:', token); // Log the generated token for debugging
+    console.log('Secret Key:', process.env.JWT_SECRET); // Log the JWT secret key for debugging
+
+    res.status(200).json({
+      status: 1,
+      message: "Login successful",
+      email:user.email,
+      role: user.role,
+      id: user.id,
+      token:token
+    });
   });
 });
 
+
 // forgot password before check email already exist in database or not
-app.get("/checkemail/:email", (req, res) => {
+app.get("/checkemail/:email",checkAuth, (req, res) => {
   const email = req.params.email;
   const query = "SELECT * FROM AdminUser WHERE email=?";
   db.query(query, [email], (err, result) => {
@@ -133,7 +218,7 @@ app.post("/passwordforgot/:email", async (req, res) => {
 });
 
 // count user
-app.get('/countuser', (req, res) => {
+app.get('/countuser', checkAuth,(req, res) => {
   const query = "SELECT COUNT(id) AS total FROM AdminUser where role='user'"; // Alias 'count(id)' as 'total'
   db.query(query, (err, data) => {
     if (err) {
@@ -150,7 +235,7 @@ app.get('/countuser', (req, res) => {
   });
 });
 // count admin
-app.get('/countadmin', (req, res) => {
+app.get('/countadmin', checkAuth,(req, res) => {
   const query = "SELECT COUNT(id) AS total FROM AdminUser where role='admin'"; // Alias 'count(id)' as 'total'
   db.query(query, (err, data) => {
     if (err) {
@@ -167,7 +252,7 @@ app.get('/countadmin', (req, res) => {
   });
 });
 // subadmin count
-app.get('/countsubadmin', (req, res) => {
+app.get('/countsubadmin', checkAuth,(req, res) => {
   const query = "SELECT COUNT(id) AS total FROM AdminUser where role='subadmin'"; // Alias 'count(id)' as 'total'
   db.query(query, (err, data) => {
     if (err) {
@@ -186,7 +271,7 @@ app.get('/countsubadmin', (req, res) => {
 
 
 // show all user data
-app.get('/alldata', (req, res) => {
+app.get('/alldata', checkAuth,(req, res) => {
   const sql = "SELECT * FROM AdminUser where deleted_at is null";
   db.query(sql, (err, data) => {
       if (err) {
@@ -199,7 +284,7 @@ app.get('/alldata', (req, res) => {
 
 
 // show single data
-app.get("/singledata/:id",(req,res)=>{
+app.get("/singledata/:id",checkAuth,(req,res)=>{
   const id=req.params.id;
   
   const query="select * from AdminUser where id=?";
@@ -218,7 +303,7 @@ app.get("/singledata/:id",(req,res)=>{
 })
 
 // editdata
-app.get("/editdata/:id", (req, res) => {
+app.get("/editdata/:id", checkAuth,(req, res) => {
   const id = req.params.id;
   // console.log(id);
   const query = "select * from AdminUser where id=?";
@@ -235,7 +320,7 @@ app.get("/editdata/:id", (req, res) => {
 });
 
 // Add update user endpoint
-app.put("/update/:id", (req, res) => {
+app.put("/update/:id", checkAuth,(req, res) => {
   const id = req.params.id;
   // console.log(id)
   const { name, mobile, email, password, role } = req.body;
@@ -251,7 +336,7 @@ app.put("/update/:id", (req, res) => {
 });
 
 // delete functionality
-app.delete("/deletesingledata/:id",(req,res)=>{
+app.delete("/deletesingledata/:id",checkAuth,(req,res)=>{
   const id=req.params.id;
   const query="UPDATE AdminUser SET deleted_at = CURRENT_TIMESTAMP WHERE id=?";
   db.query(query,id,(err,result)=>{
@@ -264,7 +349,7 @@ app.delete("/deletesingledata/:id",(req,res)=>{
 })
 
 // particular date through user data show 
-app.get("/registerUserParticularDate/:date", (req, res) => {
+app.get("/registerUserParticularDate/:date", checkAuth,(req, res) => {
   const date = req.params.date;
   // const formattedDate = date.split('-').reverse().join('-');
   // console.log(formattedDate)
@@ -283,7 +368,7 @@ app.get("/registerUserParticularDate/:date", (req, res) => {
   });
 });
 // from date to to date through user data show 
-app.get("/registerUserfromrDateTotodate/:fromdate/:todate", (req, res) => {
+app.get("/registerUserfromrDateTotodate/:fromdate/:todate", checkAuth,(req, res) => {
   const fromdate = req.params.fromdate;
   const todate = req.params.todate;
 
@@ -300,7 +385,7 @@ app.get("/registerUserfromrDateTotodate/:fromdate/:todate", (req, res) => {
 
 
 // subadmins see all subadmins and user data
-app.get("/subadmindata",(req,res)=>{
+app.get("/subadmindata",checkAuth,(req,res)=>{
   const query ="select * from  AdminUser where role in('subadmin' ,'user')";
   db.query(query,(err,result)=>{
     if(err){
@@ -313,7 +398,7 @@ app.get("/subadmindata",(req,res)=>{
 });
 
 // cms page data
-app.get("/cmspagedata",(req,res)=>{
+app.get("/cmspagedata",checkAuth,(req,res)=>{
   const query="select * from cmspages where deleted_at is null";
   db.query(query,(err,data)=>{
     if(err){
@@ -325,7 +410,7 @@ app.get("/cmspagedata",(req,res)=>{
 });
 
 // cms page staus change
-app.put("/handlecmspagestatus/:id",(req,res)=>{
+app.put("/handlecmspagestatus/:id",checkAuth,(req,res)=>{
   const id=req.params.id;
   const {status}=req.body;
   const query="update cmspages set status=? where id =?";
@@ -340,7 +425,7 @@ app.put("/handlecmspagestatus/:id",(req,res)=>{
 });
 
 // cms page delete data
-app.delete("/cmspagedelete/:id",(req,res)=>{
+app.delete("/cmspagedelete/:id",checkAuth,(req,res)=>{
   const id=req.params.id;
   const query="update cmspages set deleted_at=CURRENT_TIMESTAMP where id=?";
   db.query(query,id,(err,result)=>{
@@ -353,7 +438,7 @@ app.delete("/cmspagedelete/:id",(req,res)=>{
 })
 
 // update cmspage
-app.put("/cmsupdatepage/:id", upload.none(), (req, res) => {
+app.put("/cmsupdatepage/:id", upload.none(), checkAuth,(req, res) => {
   const id = req.params.id;
   const { title, url, description, meta_title, meta_keywords, meta_description } = req.body;
 
@@ -368,7 +453,7 @@ app.put("/cmsupdatepage/:id", upload.none(), (req, res) => {
 })
 
 // add cms pages
-app.post("/cmsaddpage", upload.none(), (req, res) => {
+app.post("/cmsaddpage", upload.none(), checkAuth,(req, res) => {
   const { title, url, description, meta_title, meta_keywords, meta_description } = req.body;
 
   const query = "INSERT INTO cmspages (title, url, description, meta_title, meta_keywords, meta_description) VALUES (?, ?, ?, ?, ?, ?)";
@@ -382,7 +467,7 @@ app.post("/cmsaddpage", upload.none(), (req, res) => {
 })
 
 // cms edit data
-app.get("/cmspageeditdata/:id",(req,res)=>{
+app.get("/cmspageeditdata/:id",checkAuth,(req,res)=>{
   const id=req.params.id;
   const query="SELECT * FROM cmspages WHERE id=?";
   db.query(query,id,(err,result)=>{
@@ -398,7 +483,7 @@ app.get("/cmspageeditdata/:id",(req,res)=>{
 })
 
 // FOR CATEGORIES
-app.get("/categories", (req, res) => {
+app.get("/categories", checkAuth,(req, res) => {
   const query = "SELECT * FROM categories WHERE deleted_at IS NULL";
   db.query(query, (err, data) => {
     if (err) {
@@ -411,7 +496,7 @@ app.get("/categories", (req, res) => {
 
 
 // add category
-app.post("/addcategory",upload.single("category_image"), (req, res) => {
+app.post("/addcategory",upload.single("category_image"), checkAuth,(req, res) => {
   const { category_name,parent_id, category_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
   const category_image=req.file.filename;
   const query = "INSERT INTO categories (category_name,parent_id,category_image, category_discount, description, url, meta_title, meta_description, meta_keyword) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)";
@@ -426,7 +511,7 @@ app.post("/addcategory",upload.single("category_image"), (req, res) => {
 });
 
 // category single data
-app.get("/categoryeditdata/:id",(req,res)=>{
+app.get("/categoryeditdata/:id",checkAuth,(req,res)=>{
   const id=req.params.id;
   const query="select * from categories where id=?";
   db.query(query,id,(err,result)=>{
@@ -445,7 +530,7 @@ app.get("/categoryeditdata/:id",(req,res)=>{
 
 
 // update categories
-app.put("/updatecategory/:id", upload.single("category_image"), (req, res) => {
+app.put("/updatecategory/:id", upload.single("category_image"),checkAuth, (req, res) => {
   const id = req.params.id;
   const category_image = req.file.filename;
   const { category_name, parent_id, category_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
@@ -460,7 +545,7 @@ app.put("/updatecategory/:id", upload.single("category_image"), (req, res) => {
 });
 
 // delete category
-app.delete("/categorydelete/:id", (req, res) => {
+app.delete("/categorydelete/:id", checkAuth,(req, res) => {
   const id = req.params.id;
   const query = "UPDATE categories SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
   db.query(query, id, (err, result) => {
@@ -473,7 +558,7 @@ app.delete("/categorydelete/:id", (req, res) => {
 });
 
 // update category status
-app.put("/updatecategorystatus/:id", (req, res) => {
+app.put("/updatecategorystatus/:id", checkAuth,(req, res) => {
   const id = req.params.id;
   const { status } = req.body;
   const query = "UPDATE categories SET status = ? WHERE id = ?";
@@ -487,7 +572,7 @@ app.put("/updatecategorystatus/:id", (req, res) => {
 });
 
 // count distinct  categories
-app.get("/uniquecategories", (req, res) => {
+app.get("/uniquecategories", checkAuth,(req, res) => {
   const query = "SELECT COUNT(DISTINCT category_name) AS total FROM categories";
   db.query(query, (err, data) => {
     if (err) {
@@ -500,7 +585,7 @@ app.get("/uniquecategories", (req, res) => {
   });
 });
 
-app.get("/categories2", (req, res) => {
+app.get("/categories2", checkAuth,(req, res) => {
   const query = "SELECT id FROM categories WHERE deleted_at IS NULL  ";
   // const query = "SELECT distinct parent_id FROM categories WHERE deleted_at IS NULL  ";
   db.query(query, (err, data) => {
@@ -512,7 +597,7 @@ app.get("/categories2", (req, res) => {
   });
 });
 
-app.get("/parentcategory/:parentId", (req, res) => {
+app.get("/parentcategory/:parentId", checkAuth,(req, res) => {
   const parentId = req.params.parentId;
   const query = "SELECT category_name FROM categories WHERE id = ? AND deleted_at IS NULL";
   db.query(query, parentId, (err, data) => {
@@ -551,7 +636,7 @@ app.get("/allproducts", (req, res) => {
 
 
 //update products
-app.put("/updateproducts/:id",upload.single("product_video"), (req, res) => {
+app.put("/updateproducts/:id",upload.single("product_video"),checkAuth, (req, res) => {
   const id = req.params.id;
   const product_video=req.file.filename;
   const {category_id,product_name,product_code,product_color,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured} = req.body;
@@ -568,7 +653,7 @@ app.put("/updateproducts/:id",upload.single("product_video"), (req, res) => {
 });
 
 // category single data
-app.get("/productedit/:id",(req,res)=>{
+app.get("/productedit/:id",checkAuth,(req,res)=>{
  const id=req.params.id;
   const query="select * from products where id=?";
   db.query(query,id,(err,result)=>{
@@ -585,72 +670,74 @@ app.get("/productedit/:id",(req,res)=>{
   })
 })
 
+// approach-1 for insert only product video
+
 // insert products
-app.post("/addproducts", upload.single("product_video"), async(req, res) => {
-  try {
-    const {category_id, product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured } = req.body;
-    const product_video = req.file ? req.file.filename : null;
-    const is_featured_val = is_featured === 'Yes' ? 'Yes' : 'No';
+// app.post("/addproducts", upload.single("product_video"), async(req, res) => {
+//   try {
+//     const {category_id, product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured } = req.body;
+//     const product_video = req.file ? req.file.filename : null;
+//     const is_featured_val = is_featured === 'Yes' ? 'Yes' : 'c';
 
-    if(product_video){
-      const inputpath=path.join(__dirname,'uploads/products',product_video);
+//     // if(product_video){
+//     //   const inputpath=path.join(__dirname,'uploads/products',product_video);
 
-            // Define the output directories and resolutions
-      const outputdirs={
-        small:'uploads/products/small',
-        medium:'uploads/products/medium',
-        large: 'uploads/products/large'
-      };
+//     //         // Define the output directories and resolutions
+//     //   const outputdirs={
+//     //     small:'uploads/products/small',
+//     //     medium:'uploads/products/medium',
+//     //     large: 'uploads/products/large'
+//     //   };
 
-      const resolutions={
-        small:{width:320,height:480},
-        medium:{width:480,height:800},
-        large:{width:720,height:1280}
-      };
+//     //   const resolutions={
+//     //     small:{width:320,height:480},
+//     //     medium:{width:480,height:800},
+//     //     large:{width:720,height:1280}
+//     //   };
 
-            // Ensure directories exist
-      for(const dir of Object.values(outputdirs)){ //creates an array of the directory paths
-        if(!fs.existsSync(dir)){ // if this directory not present it create recursively
-          fs.mkdirSync(dir,{recursive:true});
-        }
-      }
+//     //         // Ensure directories exist
+//     //   for(const dir of Object.values(outputdirs)){ //creates an array of the directory paths
+//     //     if(!fs.existsSync(dir)){ // if this directory not present it create recursively
+//     //       fs.mkdirSync(dir,{recursive:true});
+//     //     }
+//     //   }
 
-      // Object.entries(resolutions) returns an array of [key, value] pairs from the resolutions object.
-      // .map(async ([key, { width, height }]) => { ... }) iterates over each resolution entry. key is the size label (small, medium, large), and width and height are the respective dimensions.
-      // const outputPath = path.join(__dirname, outputDirs[key], product_video); constructs the output path for the resized video.
-      // await sharp(inputPath).resize(width, height).toFile(outputPath); uses sharp to resize the video and save it to the specified output path.
-      // Promise.all(...) ensures that all resizing operations run in parallel and completes when all promises are resolved.
+//     //   // Object.entries(resolutions) returns an array of [key, value] pairs from the resolutions object.
+//     //   // .map(async ([key, { width, height }]) => { ... }) iterates over each resolution entry. key is the size label (small, medium, large), and width and height are the respective dimensions.
+//     //   // const outputPath = path.join(__dirname, outputDirs[key], product_video); constructs the output path for the resized video.
+//     //   // await sharp(inputPath).resize(width, height).toFile(outputPath); uses sharp to resize the video and save it to the specified output path.
+//     //   // Promise.all(...) ensures that all resizing operations run in parallel and completes when all promises are resolved.
 
-      await Promise.all(
-        Object.entries(resolutions).map(async ([key, { width, height }]) => {
-          const outputPath = path.join(__dirname, outputdirs[key], product_video);
-          await sharp(inputpath)
-            .resize(width, height)
-            .toFile(outputPath);
-        })
-      );
+//     //   await Promise.all(
+//     //     Object.entries(resolutions).map(async ([key, { width, height }]) => {
+//     //       const outputPath = path.join(__dirname, outputdirs[key], product_video);
+//     //       await sharp(inputpath)
+//     //         .resize(width, height)
+//     //         .toFile(outputPath);
+//     //     })
+//     //   );
       
 
-    }
+//     // }
     
-    const query = "INSERT INTO products (category_id,product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)";
+//     const query = "INSERT INTO products (category_id,product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)";
     
-    db.query(query, [category_id,product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Internal Server Error" });
-      }
-      return res.status(200).json({ message: "Product added successfully!" });
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-});
+//     db.query(query, [category_id,product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], (err, result) => {
+//       if (err) {
+//         console.error(err);
+//         return res.status(500).json({ message: "Internal Server Error" });
+//       }
+//       return res.status(200).json({ message: "Product added successfully!" });
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: "Internal Server Error" });
+//   }
+// });
 
 
 // delete products
-app.delete("/productdelete/:id",(req,res)=>{
+app.delete("/productdelete/:id",checkAuth,(req,res)=>{
   const id=req.params.id;
   const query ="update products set deleted_at=current_timestamp where id=?";
   db.query(query,id,(err,result)=>{
@@ -662,7 +749,7 @@ app.delete("/productdelete/:id",(req,res)=>{
 });
 
 // toggle status
-app.put("/updatestatus/:id",(req,res)=>{
+app.put("/updatestatus/:id",checkAuth,(req,res)=>{
   const id=req.params.id;
   const { status } = req.body;
   const query="update products set status=? where id=?";
@@ -675,7 +762,7 @@ app.put("/updatestatus/:id",(req,res)=>{
 });
 
 // productcolor
-app.get("/productcolor",(req,res)=>{
+app.get("/productcolor",checkAuth ,(req,res)=>{
   const query="select * from colors";
   db.query(query,(err,data)=>{
     if(err){
@@ -683,9 +770,9 @@ app.get("/productcolor",(req,res)=>{
     }
     res.json(data);
   })
-})
+});
 
-app.get("/allproductcount", (req, res) => {
+app.get("/allproductcount",(req, res) => {
   const query = "SELECT COUNT(*) AS total FROM products WHERE deleted_at IS NULL";
 
   db.query(query, (err, data) => {
@@ -700,6 +787,123 @@ app.get("/allproductcount", (req, res) => {
 });
 
 
-app.listen(8081,()=>{
-    console.log("server listening at port 8081");
+// approach-2 for product image and video(wrong)
+
+// POST endpoint to handle product creation with video and images
+// app.post("/addproducts", upload.single("product_video"), upload.array("product_images", 10), async (req, res) => {
+//   try {
+//       // Extract product details from the request body
+//       const { category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured } = req.body;
+//       const is_featured_val = is_featured === 'Yes' ? 'Yes' : 'No';
+
+//       // Extract the filename of the uploaded video
+//       const product_video = req.file ? req.file.filename : null;
+
+//       // Prepare the query to insert product details into the products table
+//       const productQuery = "INSERT INTO products (category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      
+//       // Execute the query to insert product details
+//       const productInsertResult = await db.query(productQuery, [category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val]);
+
+//       // Extract the ID of the newly inserted product
+//       const productId = productInsertResult.insertId;
+
+//       // Prepare the query to insert product images into the products_image table
+//       const imagesQuery = "INSERT INTO products_image (product_id, image,image_sort) VALUES (?, ?,?)";
+
+//       // Generate image_sort values
+//       const imageSortValues = Array.from({ length: imageFiles.length }, (_, i) => i + 1);
+
+      
+//       // Extract the filenames of the uploaded images
+//       const imageFiles = req.files.map(file => file.filename);
+
+//       // Execute the query for each uploaded image
+//       await Promise.all(imageFiles.map(async (filename) => {
+//           await db.query(imagesQuery, [productId, filename,imageSortValues[index]]);
+//       }));
+
+//       // Resize and save the uploaded images in different folders (e.g., small, medium, large)
+//       await Promise.all(req.files.map(async (file) => {
+//           const inputPath = path.join(__dirname, 'uploads', 'product_image', file.filename);
+//           const outputDir = path.join(__dirname, 'uploads', 'productImages', 'resized');
+          
+//           // Ensure the output directory exists
+//           if (!fs.existsSync(outputDir)) {
+//               fs.mkdirSync(outputDir, { recursive: true });
+//           }
+
+//           // Define the output paths for resized images
+//           const outputPaths = {
+//               small: path.join(outputDir, 'small', file.filename),
+//               medium: path.join(outputDir, 'medium', file.filename),
+//               large: path.join(outputDir, 'large', file.filename)
+//           };
+
+//           // Define the resolutions for resized images
+//           const resolutions = {
+//               small: { width: 320, height: 240 },
+//               medium: { width: 640, height: 480 },
+//               large: { width: 1024, height: 768 }
+//           };
+
+//           // Resize and save images in different resolutions
+//           await Promise.all(Object.entries(resolutions).map(async ([size, dimensions]) => {
+//               await sharp(inputPath)
+//                   .resize(dimensions.width, dimensions.height)
+//                   .toFile(outputPaths[size]);
+//           }));
+//       }));
+
+//       // Respond with success message
+//       return res.status(200).json({ message: "Product added successfully!" });
+//   } catch (error) {
+//       console.error(error);
+//       return res.status(500).json({ message: "Internal Server Error" });
+//   }
+// });
+
+
+
+// approach-3 for inserting 
+// Route for adding products
+app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 },{ name: 'product_image', maxCount: 1 }]), checkAuth,(req, res) => {
+  try {
+    // console.log(req.files);
+    const {
+      category_id, product_name, product_code, product_color, family_color,group_code, product_price, product_weight, product_discount, discount_type,final_price, description, washcare, keywords, fabric, pattern, sleeve, fit,meta_keywords, meta_description, meta_title, occassion, is_feature} = req.body;
+
+    const product_video = req.files['product_video'] ? req.files['product_video'][0].filename : null;
+    const product_image = req.files['product_image'] ? req.files['product_image'][0].filename : null;
+    const is_featured_val = is_feature === 'Yes' ? 'Yes' : 'No';
+
+    // Insert product data into the database
+    const query = "INSERT INTO products (category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    db.query(query, [category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+      // using contexxt it will capture recent
+      const productId = result.insertId;
+
+      // Insert product image into the database
+      const imagesQuery = "INSERT INTO products_image (product_id, image, image_sort) VALUES (?, ?, ?)";
+      db.query(imagesQuery, [productId, product_image, 1], (err, data) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Internal Server Error" });
+        }
+        return res.status(200).json({ message: "Product added successfully!" });
+      });
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+app.listen(process.env.serverport,()=>{
+    console.log(`server listening at port ${process.env.serverport}`);
 })

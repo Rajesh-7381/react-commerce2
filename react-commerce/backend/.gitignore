@@ -1,0 +1,13 @@
+uploads
+.env
+Reactcommerce.sql
+
+# FAQ:: when we try to write .env file why we write process.env
+    Ans::   process.env: An object that contains the user environment. When Node.js runs, it provides this object to access all the environment variables available to the process.
+         -  Configuration Management,security,flexible at the point of view we use process.env 
+         -  This practice makes your application more secure, flexible, and easier to maintain.
+
+
+# protected route
+login.jsx ->we set jwt in localstorage if we set session when browser refreshing session will be destroyed thats why we use localstorage
+backend to see login api 

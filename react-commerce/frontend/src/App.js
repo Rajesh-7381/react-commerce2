@@ -14,6 +14,7 @@ import Cmspages from './admin/CmsPages/Cmspages';
 import CmspageAddEdit from './admin/CmsPages/CmspageAddEdit';
 import Products from './admin/Products/Products';
 import AddEditProducts from './admin/Products/AddEditProducts';
+
 import ForgotPassword from './ForgotPassword';
 import NotFound from './NotFound';
 
@@ -41,6 +42,7 @@ function App() {
           <Route path='/addeditproducts' element={< AddEditProducts/>}></Route>
 
           <Route path='/userdashboard2' element={< Dashboard2/>}></Route>
+          
         </Routes>
       </BrowserRouter>
      

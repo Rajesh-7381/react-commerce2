@@ -10,6 +10,10 @@ const Login = () => {
   const navigate = useNavigate();
   const [pass, setPass] = useState(false);
 
+  useEffect(()=>{
+    document.title="Login";
+  })
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -26,12 +30,14 @@ const Login = () => {
         const data = response.data;
         console.log(data)
         
-        if(formik.check){
-          document.cookie=`token=${response.data.token}; expires=${new Date(Date.now() + 86400).toUTCString}; path=/`; // after 1day  token will be expired and redirect to login page
-
-        }
+        // if(formik.check){
+          // localStorage.setItem('token',response.data.token); // after 1day  token will be expired and redirect to login page
+          // localStorage.setItem=`token=${response.data.token}; expires=${new Date(Date.now() + 86400).toUTCString}; path=/`; // after 1day  token will be expired and redirect to login page
+          // console.log(response.data.token)
+        // }
         if (data.status === 1) {
           sessionStorage.setItem('id',data.id);
+          localStorage.setItem('token',response.data.token);
           if (values.check) {
             sessionStorage.setItem('email', values.email);
             // sessionStorage.setItem('password', values.password);
