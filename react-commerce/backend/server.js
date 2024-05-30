@@ -904,6 +904,6 @@ app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 },{
   }
 });
 
-app.listen(process.env.serverport,()=>{
-    console.log(`server listening at port ${process.env.serverport}`);
+app.listen(process.env.SERVERPORT,()=>{
+    console.log(`server listening at port ${process.env.SERVERPORT}`);
 })
