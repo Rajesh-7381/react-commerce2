@@ -18,6 +18,7 @@ const Dashboard1 = () => {
   const [categoriescount, setcategoriesCount] = useState(0);
   const [allproductcount,setallproductcount]=useState(0);
   const [userData, setUserData] = useState(null);
+  // console.log(userData)
   const [pdate, setPdate] = useState('');
   const [registeruserdata2, setregisteruserdata] = useState(0);
   const [registeruserdata3, setregisteruserdata3] = useState(0);
@@ -40,7 +41,7 @@ const Dashboard1 = () => {
     try {
       const reponse=await axios.get(`http://localhost:8081/singledata/${id}`);
       setUserData(reponse.data.data);
-      // console.log(reponse.data.data)
+      console.log(reponse.data.data)
     } catch (error) {
       
     }
@@ -284,7 +285,7 @@ const Dashboard1 = () => {
       {/* Sidebar user panel (optional) */}
       <div className="user-panel mt-3 pb-3 mb-3 d-flex">
         <div className="image">
-        <img src={userData && userData.image} className="img-circle elevation-2" alt={userData && userData.name} />
+        <img src={`http://localhost:8081/profile/${userData && userData.image}`} className="img-circle elevation-2" alt={userData && userData.name} />
         </div>
         <div className='text-light '>{userData && userData.name}</div>
         <div className="info">
@@ -345,6 +346,12 @@ const Dashboard1 = () => {
                 <Link to={"/products"} className="nav-link">
                   <i className="far fa-circle nav-icon" />
                   <p>Products</p>
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to={"/productsimage"} className="nav-link">
+                  <i className="far fa-circle nav-icon" />
+                  <p>ProductsImage</p>
                 </Link>
               </li>
               

@@ -23,6 +23,18 @@ const checkAuth = require("./Auth/RouteCheckAuth");
 const app=express();
 app.use(cors());
 app.use(express.json());
+
+// Serve static files for profile images
+app.use('/profile', express.static(path.join(__dirname, 'uploads/profile')));
+
+// Serve static files for product video
+app.use('/products',express.static(path.join(__dirname,'uploads/products')));
+
+// Serve static files for category images
+app.use('/categories',express.static(path.join(__dirname,'uploads/categories')));
+// Serve static files for product images
+// for image showing in frontend
+app.use('/productsimage', express.static(path.join(__dirname, 'uploads/productImages')));
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -36,11 +48,11 @@ const db=mysql2.createPool({
 });
 
 // for category image inserting
-// Multer configuration for file upload
-const storage=multer.diskStorage({
-  destination:(req,file,cb)=>{
+// Multer is a middleware for handling multipart/form-data, which is primarily used for uploading files in Node.js applications
+const storage=multer.diskStorage({ //this specifies how  files should be stored on disk
+  destination:(req,file,cb)=>{ //destination function within diskStorage determines the directory where the uploaded files will be stored based on the fieldname of the file
     if(file.fieldname==='image'){
-    cb(null,"uploads/profile/");
+      cb(null,"uploads/profile/");
     }else if(file.fieldname === 'category_image'){
       cb(null,"uploads/categories/");
     }else if(file.fieldname === 'product_video'){
@@ -49,12 +61,12 @@ const storage=multer.diskStorage({
       cb(null,"uploads/productImages/")
     }
   },
-  filename:(req,file,cb)=>{
-    const ext=path.extname(file.originalname);
-    cb(null,Date.now()+ext);
+  filename:(req,file,cb)=>{ //filename function determines the name of the file to be saved
+    const ext=path.extname(file.originalname);//extracts orignal file extension
+    cb(null,Date.now()+ext); //constructs the new filename by appending the current timestamp to the file extension, ensuring a unique filename
   },
 })
-const upload=multer({storage:storage});
+const upload=multer({storage:storage}); //The upload constant is created using multer({storage: storage}), which initializes Multer with the defined storage configuration.
 
 // register user data
 app.post("/register",upload.single("image"), async (req, res) => {
@@ -181,7 +193,7 @@ app.post("/login",(req, res,next) => {
 
 
 // forgot password before check email already exist in database or not
-app.get("/checkemail/:email",checkAuth, (req, res) => {
+app.get("/checkemail/:email", (req, res) => {
   const email = req.params.email;
   const query = "SELECT * FROM AdminUser WHERE email=?";
   db.query(query, [email], (err, result) => {
@@ -218,7 +230,7 @@ app.post("/passwordforgot/:email", async (req, res) => {
 });
 
 // count user
-app.get('/countuser', checkAuth,(req, res) => {
+app.get('/countuser', (req, res) => {
   const query = "SELECT COUNT(id) AS total FROM AdminUser where role='user'"; // Alias 'count(id)' as 'total'
   db.query(query, (err, data) => {
     if (err) {
@@ -235,7 +247,7 @@ app.get('/countuser', checkAuth,(req, res) => {
   });
 });
 // count admin
-app.get('/countadmin', checkAuth,(req, res) => {
+app.get('/countadmin', (req, res) => {
   const query = "SELECT COUNT(id) AS total FROM AdminUser where role='admin'"; // Alias 'count(id)' as 'total'
   db.query(query, (err, data) => {
     if (err) {
@@ -252,7 +264,7 @@ app.get('/countadmin', checkAuth,(req, res) => {
   });
 });
 // subadmin count
-app.get('/countsubadmin', checkAuth,(req, res) => {
+app.get('/countsubadmin', (req, res) => {
   const query = "SELECT COUNT(id) AS total FROM AdminUser where role='subadmin'"; // Alias 'count(id)' as 'total'
   db.query(query, (err, data) => {
     if (err) {
@@ -271,7 +283,7 @@ app.get('/countsubadmin', checkAuth,(req, res) => {
 
 
 // show all user data
-app.get('/alldata', checkAuth,(req, res) => {
+app.get('/alldata', (req, res) => {
   const sql = "SELECT * FROM AdminUser where deleted_at is null";
   db.query(sql, (err, data) => {
       if (err) {
@@ -284,7 +296,7 @@ app.get('/alldata', checkAuth,(req, res) => {
 
 
 // show single data
-app.get("/singledata/:id",checkAuth,(req,res)=>{
+app.get("/singledata/:id",(req,res)=>{
   const id=req.params.id;
   
   const query="select * from AdminUser where id=?";
@@ -303,7 +315,7 @@ app.get("/singledata/:id",checkAuth,(req,res)=>{
 })
 
 // editdata
-app.get("/editdata/:id", checkAuth,(req, res) => {
+app.get("/editdata/:id", (req, res) => {
   const id = req.params.id;
   // console.log(id);
   const query = "select * from AdminUser where id=?";
@@ -320,7 +332,7 @@ app.get("/editdata/:id", checkAuth,(req, res) => {
 });
 
 // Add update user endpoint
-app.put("/update/:id", checkAuth,(req, res) => {
+app.put("/update/:id", (req, res) => {
   const id = req.params.id;
   // console.log(id)
   const { name, mobile, email, password, role } = req.body;
@@ -336,7 +348,7 @@ app.put("/update/:id", checkAuth,(req, res) => {
 });
 
 // delete functionality
-app.delete("/deletesingledata/:id",checkAuth,(req,res)=>{
+app.delete("/deletesingledata/:id",(req,res)=>{
   const id=req.params.id;
   const query="UPDATE AdminUser SET deleted_at = CURRENT_TIMESTAMP WHERE id=?";
   db.query(query,id,(err,result)=>{
@@ -349,7 +361,7 @@ app.delete("/deletesingledata/:id",checkAuth,(req,res)=>{
 })
 
 // particular date through user data show 
-app.get("/registerUserParticularDate/:date", checkAuth,(req, res) => {
+app.get("/registerUserParticularDate/:date", (req, res) => {
   const date = req.params.date;
   // const formattedDate = date.split('-').reverse().join('-');
   // console.log(formattedDate)
@@ -368,7 +380,7 @@ app.get("/registerUserParticularDate/:date", checkAuth,(req, res) => {
   });
 });
 // from date to to date through user data show 
-app.get("/registerUserfromrDateTotodate/:fromdate/:todate", checkAuth,(req, res) => {
+app.get("/registerUserfromrDateTotodate/:fromdate/:todate", (req, res) => {
   const fromdate = req.params.fromdate;
   const todate = req.params.todate;
 
@@ -385,7 +397,7 @@ app.get("/registerUserfromrDateTotodate/:fromdate/:todate", checkAuth,(req, res)
 
 
 // subadmins see all subadmins and user data
-app.get("/subadmindata",checkAuth,(req,res)=>{
+app.get("/subadmindata",(req,res)=>{
   const query ="select * from  AdminUser where role in('subadmin' ,'user')";
   db.query(query,(err,result)=>{
     if(err){
@@ -398,7 +410,7 @@ app.get("/subadmindata",checkAuth,(req,res)=>{
 });
 
 // cms page data
-app.get("/cmspagedata",checkAuth,(req,res)=>{
+app.get("/cmspagedata",(req,res)=>{
   const query="select * from cmspages where deleted_at is null";
   db.query(query,(err,data)=>{
     if(err){
@@ -410,7 +422,7 @@ app.get("/cmspagedata",checkAuth,(req,res)=>{
 });
 
 // cms page staus change
-app.put("/handlecmspagestatus/:id",checkAuth,(req,res)=>{
+app.put("/handlecmspagestatus/:id",(req,res)=>{
   const id=req.params.id;
   const {status}=req.body;
   const query="update cmspages set status=? where id =?";
@@ -425,7 +437,7 @@ app.put("/handlecmspagestatus/:id",checkAuth,(req,res)=>{
 });
 
 // cms page delete data
-app.delete("/cmspagedelete/:id",checkAuth,(req,res)=>{
+app.delete("/cmspagedelete/:id",(req,res)=>{
   const id=req.params.id;
   const query="update cmspages set deleted_at=CURRENT_TIMESTAMP where id=?";
   db.query(query,id,(err,result)=>{
@@ -438,7 +450,7 @@ app.delete("/cmspagedelete/:id",checkAuth,(req,res)=>{
 })
 
 // update cmspage
-app.put("/cmsupdatepage/:id", upload.none(), checkAuth,(req, res) => {
+app.put("/cmsupdatepage/:id", upload.none(), (req, res) => {
   const id = req.params.id;
   const { title, url, description, meta_title, meta_keywords, meta_description } = req.body;
 
@@ -453,7 +465,7 @@ app.put("/cmsupdatepage/:id", upload.none(), checkAuth,(req, res) => {
 })
 
 // add cms pages
-app.post("/cmsaddpage", upload.none(), checkAuth,(req, res) => {
+app.post("/cmsaddpage", upload.none(), (req, res) => {
   const { title, url, description, meta_title, meta_keywords, meta_description } = req.body;
 
   const query = "INSERT INTO cmspages (title, url, description, meta_title, meta_keywords, meta_description) VALUES (?, ?, ?, ?, ?, ?)";
@@ -467,7 +479,7 @@ app.post("/cmsaddpage", upload.none(), checkAuth,(req, res) => {
 })
 
 // cms edit data
-app.get("/cmspageeditdata/:id",checkAuth,(req,res)=>{
+app.get("/cmspageeditdata/:id",(req,res)=>{
   const id=req.params.id;
   const query="SELECT * FROM cmspages WHERE id=?";
   db.query(query,id,(err,result)=>{
@@ -483,7 +495,7 @@ app.get("/cmspageeditdata/:id",checkAuth,(req,res)=>{
 })
 
 // FOR CATEGORIES
-app.get("/categories", checkAuth,(req, res) => {
+app.get("/categories", (req, res) => {
   const query = "SELECT * FROM categories WHERE deleted_at IS NULL";
   db.query(query, (err, data) => {
     if (err) {
@@ -496,7 +508,7 @@ app.get("/categories", checkAuth,(req, res) => {
 
 
 // add category
-app.post("/addcategory",upload.single("category_image"), checkAuth,(req, res) => {
+app.post("/addcategory",upload.single("category_image"), (req, res) => {
   const { category_name,parent_id, category_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
   const category_image=req.file.filename;
   const query = "INSERT INTO categories (category_name,parent_id,category_image, category_discount, description, url, meta_title, meta_description, meta_keyword) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)";
@@ -511,7 +523,7 @@ app.post("/addcategory",upload.single("category_image"), checkAuth,(req, res) =>
 });
 
 // category single data
-app.get("/categoryeditdata/:id",checkAuth,(req,res)=>{
+app.get("/categoryeditdata/:id",(req,res)=>{
   const id=req.params.id;
   const query="select * from categories where id=?";
   db.query(query,id,(err,result)=>{
@@ -530,7 +542,7 @@ app.get("/categoryeditdata/:id",checkAuth,(req,res)=>{
 
 
 // update categories
-app.put("/updatecategory/:id", upload.single("category_image"),checkAuth, (req, res) => {
+app.put("/updatecategory/:id", upload.single("category_image"), (req, res) => {
   const id = req.params.id;
   const category_image = req.file.filename;
   const { category_name, parent_id, category_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
@@ -545,7 +557,7 @@ app.put("/updatecategory/:id", upload.single("category_image"),checkAuth, (req, 
 });
 
 // delete category
-app.delete("/categorydelete/:id", checkAuth,(req, res) => {
+app.delete("/categorydelete/:id", (req, res) => {
   const id = req.params.id;
   const query = "UPDATE categories SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
   db.query(query, id, (err, result) => {
@@ -558,7 +570,7 @@ app.delete("/categorydelete/:id", checkAuth,(req, res) => {
 });
 
 // update category status
-app.put("/updatecategorystatus/:id", checkAuth,(req, res) => {
+app.put("/updatecategorystatus/:id", (req, res) => {
   const id = req.params.id;
   const { status } = req.body;
   const query = "UPDATE categories SET status = ? WHERE id = ?";
@@ -572,7 +584,7 @@ app.put("/updatecategorystatus/:id", checkAuth,(req, res) => {
 });
 
 // count distinct  categories
-app.get("/uniquecategories", checkAuth,(req, res) => {
+app.get("/uniquecategories", (req, res) => {
   const query = "SELECT COUNT(DISTINCT category_name) AS total FROM categories";
   db.query(query, (err, data) => {
     if (err) {
@@ -585,7 +597,7 @@ app.get("/uniquecategories", checkAuth,(req, res) => {
   });
 });
 
-app.get("/categories2", checkAuth,(req, res) => {
+app.get("/categories2", (req, res) => {
   const query = "SELECT id FROM categories WHERE deleted_at IS NULL  ";
   // const query = "SELECT distinct parent_id FROM categories WHERE deleted_at IS NULL  ";
   db.query(query, (err, data) => {
@@ -597,7 +609,7 @@ app.get("/categories2", checkAuth,(req, res) => {
   });
 });
 
-app.get("/parentcategory/:parentId", checkAuth,(req, res) => {
+app.get("/parentcategory/:parentId", (req, res) => {
   const parentId = req.params.parentId;
   const query = "SELECT category_name FROM categories WHERE id = ? AND deleted_at IS NULL";
   db.query(query, parentId, (err, data) => {
@@ -636,7 +648,7 @@ app.get("/allproducts", (req, res) => {
 
 
 //update products
-app.put("/updateproducts/:id",upload.single("product_video"),checkAuth, (req, res) => {
+app.put("/updateproducts/:id",upload.single("product_video"), (req, res) => {
   const id = req.params.id;
   const product_video=req.file.filename;
   const {category_id,product_name,product_code,product_color,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured} = req.body;
@@ -653,7 +665,7 @@ app.put("/updateproducts/:id",upload.single("product_video"),checkAuth, (req, re
 });
 
 // category single data
-app.get("/productedit/:id",checkAuth,(req,res)=>{
+app.get("/productedit/:id",(req,res)=>{
  const id=req.params.id;
   const query="select * from products where id=?";
   db.query(query,id,(err,result)=>{
@@ -737,7 +749,7 @@ app.get("/productedit/:id",checkAuth,(req,res)=>{
 
 
 // delete products
-app.delete("/productdelete/:id",checkAuth,(req,res)=>{
+app.delete("/productdelete/:id",(req,res)=>{
   const id=req.params.id;
   const query ="update products set deleted_at=current_timestamp where id=?";
   db.query(query,id,(err,result)=>{
@@ -749,7 +761,7 @@ app.delete("/productdelete/:id",checkAuth,(req,res)=>{
 });
 
 // toggle status
-app.put("/updatestatus/:id",checkAuth,(req,res)=>{
+app.put("/updatestatus/:id",(req,res)=>{
   const id=req.params.id;
   const { status } = req.body;
   const query="update products set status=? where id=?";
@@ -762,7 +774,7 @@ app.put("/updatestatus/:id",checkAuth,(req,res)=>{
 });
 
 // productcolor
-app.get("/productcolor",checkAuth ,(req,res)=>{
+app.get("/productcolor" ,(req,res)=>{
   const query="select * from colors";
   db.query(query,(err,data)=>{
     if(err){
@@ -867,9 +879,9 @@ app.get("/allproductcount",(req, res) => {
 
 // approach-3 for inserting 
 // Route for adding products
-app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 },{ name: 'product_image', maxCount: 1 }]), checkAuth,(req, res) => {
+app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 },{ name: 'product_image', maxCount: 1 }]),(req, res) => {
   try {
-    // console.log(req.files);
+    console.log(req.files);
     const {
       category_id, product_name, product_code, product_color, family_color,group_code, product_price, product_weight, product_discount, discount_type,final_price, description, washcare, keywords, fabric, pattern, sleeve, fit,meta_keywords, meta_description, meta_title, occassion, is_feature} = req.body;
 
@@ -904,6 +916,41 @@ app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 },{
   }
 });
 
+
+// for products image
+app.get("/productsimage",(req,res)=>{
+  const query="select * from products_image where deleted_at is null";
+  db.query(query,(err,data)=>{
+    if(err){
+      console.log(err);
+    }
+    return res.json(data);
+  })
+});
+
+// handle productsimage status
+app.put("/handleproductsstatus/:id",(req,res)=>{
+  // console.log(req.body)
+  const id=req.params.id;
+  const {status}=req.body;
+  const query="update products_image set status=? where id=?";
+  db.query(query,[status,id],(err,data)=>{
+    if(err){
+      console.log(err);
+    }
+    return res.status(200).json({message:"status updated successfully!"});
+  })
+});
+
+// delete products image
+app.delete("/productsimagedelete/:id",(req,res)=>{
+  const id=req.params.id;
+  const query="update products_image set deleted_at=current_timestamp where id=?";
+  db.query(query,id,(err,data)=>{
+    // console.log(err);
+  });
+  return res.status(200).json({ message: "Data deleted successfully!" });
+})
 app.listen(process.env.SERVERPORT,()=>{
     console.log(`server listening at port ${process.env.SERVERPORT}`);
 })

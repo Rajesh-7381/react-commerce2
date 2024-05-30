@@ -17,7 +17,7 @@ import AddEditProducts from './admin/Products/AddEditProducts';
 
 import ForgotPassword from './ForgotPassword';
 import NotFound from './NotFound';
-
+import ProductImages from './admin/ProductImages/ProductImages';
 
 function App() {
   return (
@@ -40,6 +40,8 @@ function App() {
           <Route path='/cmspageaddedit' element={< CmspageAddEdit/>}></Route>
           <Route path='/products' element={< Products/>}></Route>
           <Route path='/addeditproducts' element={< AddEditProducts/>}></Route>
+          <Route path='/productsimage' element={< ProductImages/>}></Route>
+                  
 
           <Route path='/userdashboard2' element={< Dashboard2/>}></Route>
           
