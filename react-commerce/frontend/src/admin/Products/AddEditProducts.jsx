@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
 import ReactImageMagnify from '@blacklab/react-image-magnify';
 import Swal from 'sweetalert2';
-
+import $ from 'jquery';
 
 const AddEditProducts = () => {
     const navigate = useNavigate();
@@ -28,6 +28,63 @@ const AddEditProducts = () => {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [productImagesPreview, setProductImagesPreview] = useState([]);
 
+    useEffect(() => {
+        let maxField = 10; // Input fields increment limitation
+        let x = 1; // Initial field counter is 1
+    
+        const fieldHTML = `
+        <div className="col-md-12">
+            <div className="card-body">
+                <div className="field_wrapper">
+                    <div>
+                        <input type="text" name="size[]" id='size' placeholder='Size' style={{width:"120px"}} value="" />
+                        <input type="text" name="sku[]" id='sku' placeholder='Sku' style={{width:"120px"}} value="" />
+                        <input type="text" name="price[]" id='price' placeholder='Price' style={{width:"120px"}} value="" />
+                        <input type="text" name="stock[]" id='stock' placeholder='Stock' style={{width:"120px"}} value="" />
+                        <a href="javascript:void(0);" class="remove_button" style="color:red;text-decoration: none;">Remove</a>
+                    </div>
+                 </div>
+            </div>
+          </div>
+          <br>
+        `;
+    
+        // Ensure the click event is only attached once
+        $('.add_button').off('click').on('click', function () {
+          if (x < maxField) {
+            x++; // Increase field counter
+            $('.field_wrapper').append(fieldHTML); // Add field html
+          } else {
+            // alert('A maximum of ' + maxField + ' fields are allowed to be added.');
+
+            try {
+                const confirmed =  Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This action cannot be undone.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: `A maximum of  ${ maxField }  fields are allowed to be added.`,
+                });
+    
+                if (confirmed.isConfirmed) {
+                    
+                } 
+            } catch (error) {
+                console.error(error);
+            }
+          }
+        });
+    
+        // Once remove button is clicked
+        $('.field_wrapper').off('click', '.remove_button').on('click', '.remove_button', function (e) {
+          e.preventDefault();
+          $(this).parent('div').remove(); // Remove field html
+          x--; // Decrease field counter
+        });
+      }, []); // Empty dependency array ensures this runs only once after the initial render
+    
 
     const selectFiles = (event) => {
         setSelectedFiles([...event.target.files]);
@@ -67,11 +124,16 @@ const AddEditProducts = () => {
             console.error(error);
         }
     }
-
+    const [PImages,setPImages]=useState([]);
+    const productimage=(e)=>{
+        const imagefile=e.target.files;
+        setPImages(imagefile);
+    }
     const handleProductUpdate = async (id) => {
         try {
             const response = await axios.get(`http://localhost:8081/productedit/${id}`);
             const productdata = response.data.data;
+            console.log(productdata)
             setData(productdata);
             setValue('category_id', productdata.category_id); // Add category_id to FormData
             setValue('product_name', productdata.product_name);
@@ -121,7 +183,10 @@ const AddEditProducts = () => {
             form.append('discount_type', formData.discount_type);
             form.append('final_price', finalPrice); // Use calculated final price
             form.append('product_video', formData.product_video[0]);
-            form.append('product_image', formData.product_image[0]);
+            // form.append('product_image', formData.product_image[0]);
+            for(let i=0;i<PImages.length;i++){
+                form.append('product_image',PImages[i]);
+            }
             form.append('description', formData.description);
             form.append('washcare', formData.washcare);
             form.append('keywords', formData.keywords);
@@ -228,9 +293,7 @@ const AddEditProducts = () => {
         // This will result in the file data being converted to a base64-encoded string
         reader.readAsDataURL(file);
     };
-    const productimage=(e)=>{
-        const imagefile=e.target.files[0];
-    }
+   
     
     // image removing
     
@@ -443,8 +506,9 @@ const AddEditProducts = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputProductimage">Product image<span className='text-danger'>*</span></label>
-                                                        <input type="file" className="form-control" id="exampleInputProductimage" name='product_image'   {...register('product_image')} onChange={productimage}  />
+                                                        <input type="file" className="form-control" id="exampleInputProductimage" name='product_image' multiple   {...register('product_image')} onChange={productimage}  />
                                                         <p>Only accepted jpg,jpeg,webp,png and gif</p>
+                                                        <img src={`http://localhost:8081/productsimage/`+data.image} alt="" />
                                                         {errors.product_image && <span className="text-danger">product images is required </span>}
 
                                                     </div>
@@ -452,6 +516,23 @@ const AddEditProducts = () => {
                                             </div>
                                             
                                         </div>                                                                         
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <div className="card-body">
+                                                    <div className="field_wrapper">
+                                                        <div className="form-group text-start">
+                                                            <label htmlFor="">Product Attribute</label>
+                                                            <input type="text" name="size[]" id='size' placeholder='Size' style={{width:"120px"}} value="" />
+                                                            <input type="text" name="sku[]" id='sku' placeholder='Sku' style={{width:"120px"}} value="" />
+                                                            <input type="text" name="price[]" id='price' placeholder='Price' style={{width:"120px"}} value="" />
+                                                            <input type="text" name="stock[]" id='stock' placeholder='Stock' style={{width:"120px"}} value="" />
+                                                            <a href="javascript:void(0);" className="add_button" title="Add field">Add</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
                                         <div className="row">
                                             <div className="col-md-6">
                                                 <div className="card-body">
@@ -624,6 +705,7 @@ const AddEditProducts = () => {
                     </section>
                 </div>
             </div>
+            
 
             
         </div>
