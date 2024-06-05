@@ -1,13 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { NotificationManager, NotificationContainer } from 'react-notifications';
 import Swal from 'sweetalert2';
 
 
 const ProductImages = () => {
-    const navigate=useNavigate();
-    const [cmspagedata,setcmspagedata]=useState([]);
+    // const navigate=useNavigate();
+    const [productsimage,setproductsimage]=useState([]);
     const [filterdata,setfilterdata]=useState([]);
     useEffect(()=>{
         document.title='ProductImages';
@@ -16,8 +16,8 @@ const ProductImages = () => {
 
     const productsimagetabledata=async()=>{
         const response=await axios.get("http://localhost:8081/productsimage");
-        console.log(response.data)
-        setcmspagedata(response.data);
+        // console.log(response.data)
+        setproductsimage(response.data);
         setfilterdata(response.data);
     }
     
@@ -40,10 +40,13 @@ const ProductImages = () => {
                 await axios.delete(`http://localhost:8081/productsimagedelete/${id}`);
                 NotificationManager.success("successfully!  deleted data");
                 // Fetch the updated data from the server and update the local state
-                const response = await axios.get("http://localhost:8081/productsimage");
+                // const response = await axios.get("http://localhost:8081/productsimage");
 
-                setcmspagedata(response.data);
-                setfilterdata(response.data);
+                // Update the state immediately
+                // after successfully deleting the item from the server, we immediately update the state using setfilterdata and setproductsimage to filter out the deleted item.
+                //  This ensures that the UI reflects the deletion instantly without needing to refresh the page.
+                setfilterdata(filterdata.filter(item => item.id !== id));
+                setproductsimage(productsimage.filter(item => item.id !== id));
             } else {
                 // Do nothing
                 NotificationManager.error("Data not deletd  successfully!");
@@ -135,6 +138,7 @@ const ProductImages = () => {
                                                     
                                                     <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.status}</td>
                                                     <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}>
+                                                    <NotificationContainer />
                                                         <button className='btn btn-sm btn-danger mr-1' title='delete' onClick={()=>handlecmspagedelete(item.id)}><i className='fas fa-trash'></i></button>
                                                         <button className='btn btn-sm btn-dark' title='toggle off/on' onClick={()=>handlecmspagetoggle(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
                                                     </td>

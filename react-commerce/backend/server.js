@@ -25,7 +25,7 @@ const app=express(); //create express.js(framework) instance
 app.use(cors()); //enables Cross-Origin Resource Sharing (CORS) to allow requests from different origins.
 app.use(express.json()); // parses incoming requests with JSON payloads.
 // Use Morgan middleware for logging HTTP requests
-app.use(morgan('tiny')); //logs HTTP requests in a concise format.
+app.use(morgan('combined')); //logs HTTP requests in a concise format.
 
 // bodyParser.json() and bodyParser.urlencoded({ extended: true }): parse incoming request bodies in JSON and URL-encoded formats, respectively. 
 app.use(bodyParser.json());
@@ -41,7 +41,7 @@ app.use('/products',express.static(path.join(__dirname,'uploads/products')));
 app.use('/categories',express.static(path.join(__dirname,'uploads/categories')));
 // Serve static files for product images
 // for image showing in frontend
-app.use('/productsimage', express.static(path.join(__dirname, 'uploads/productImages')));
+app.use('/productsimage', express.static(path.join(__dirname, 'uploads/productImages/medium')));
 // Middleware
 
 //createPool is used to create a connection pool, which is a group of connections that are managed by the mysql2 library. createConnection is used to create a single connection to the database.
@@ -655,6 +655,98 @@ app.get("/allproducts", (req, res) => {
   });
 });
 
+app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, { name: 'product_image', maxCount: 20 }]), async (req, res) => {
+  try {
+      const {
+          category_id, product_name, product_code, product_color, family_color, group_code,
+          product_price, product_weight, product_discount, discount_type, final_price, description,
+          washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description,
+          meta_title, occassion, is_featured
+      } = req.body;
+
+      const product_video = req.files['product_video'] ? req.files['product_video'][0].filename : null;
+      const product_images = req.files['product_image'] ? req.files['product_image'] : [];
+      const is_featured_val = is_featured === 'Yes' ? 'Yes' : 'No';
+
+      // Insert product data into the database
+      const query = "INSERT INTO products (category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      db.query(query, [category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], async (err, result) => {
+          if (err) {
+              console.error(err);
+              return res.status(500).json({ message: "Internal Server Error" });
+          }
+
+          const productId = result.insertId;
+
+          if (product_images.length > 0) {
+              const outputDirs = {
+                  large: 'uploads/productImages/large',
+                  medium: 'uploads/productImages/medium',
+                  small: 'uploads/productImages/small',
+              };
+
+              const resolutions = {
+                  large: { width: 1280, height: 760 },
+                  medium: { width: 760, height: 480 },
+                  small: { width: 480, height: 320 }
+              };
+
+              // Ensure directories exist
+              for (const dir of Object.values(outputDirs)) {
+                  if (!fs.existsSync(dir)) {
+                      fs.mkdirSync(dir, { recursive: true });
+                  }
+              }
+
+              // Process and save the images in different resolutions
+              await Promise.all(product_images.map(async (file) => {
+                  await Promise.all(Object.entries(resolutions).map(async ([key, { width, height }]) => {
+                      const outputPath = path.join(__dirname, outputDirs[key], file.filename);
+                      await sharp(file.path)
+                          .resize(width, height)
+                          .toFile(outputPath);
+                  }));
+              }));
+
+              // Insert each product image into the database
+              const imagesQuery = "INSERT INTO products_image (product_id, image, image_sort) VALUES ?";
+              const imageValues = product_images.map((file, index) => [productId, file.filename, index + 1]);
+
+              db.query(imagesQuery, [imageValues], (err, data) => {
+                  if (err) {
+                      console.error(err);
+                      return res.status(500).json({ message: "Internal Server Error" });
+                  }
+              });
+          }
+
+          // for product attributes
+          let attributes = req.body.attributes;
+          if (typeof attributes === 'string') {
+              attributes = JSON.parse(attributes);
+          }
+
+          if (Array.isArray(attributes) && attributes.length > 0) {
+              const attributesQuery = "INSERT INTO product_attributes (product_id, size, sku, price, stock) VALUES ?";
+              const attributeValues = attributes.map((attribute) => [productId, attribute.size, attribute.sku, attribute.price, attribute.stock]);
+
+              db.query(attributesQuery, [attributeValues], (err, data) => {
+                  if (err) {
+                      console.error(err);
+                      return res.status(500).json({ message: "Internal Server Error" });
+                  }
+              });
+          }
+
+          return res.status(200).json({ message: "Product added successfully!" });
+      });
+
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 
 //update products
 app.put("/updateproducts/:id",upload.single("product_video"), (req, res) => {
@@ -690,71 +782,6 @@ app.get("/productedit/:id",(req,res)=>{
     return res.status(200).json({message:"data fetched!",data});
   })
 });
-
-// approach-1 for insert only product video
-
-// insert products
-// app.post("/addproducts", upload.single("product_video"), async(req, res) => {
-//   try {
-//     const {category_id, product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured } = req.body;
-//     const product_video = req.file ? req.file.filename : null;
-//     const is_featured_val = is_featured === 'Yes' ? 'Yes' : 'c';
-
-//     // if(product_video){
-//     //   const inputpath=path.join(__dirname,'uploads/products',product_video);
-
-//     //         // Define the output directories and resolutions
-//     //   const outputdirs={
-//     //     small:'uploads/products/small',
-//     //     medium:'uploads/products/medium',
-//     //     large: 'uploads/products/large'
-//     //   };
-
-//     //   const resolutions={
-//     //     small:{width:320,height:480},
-//     //     medium:{width:480,height:800},
-//     //     large:{width:720,height:1280}
-//     //   };
-
-//     //         // Ensure directories exist
-//     //   for(const dir of Object.values(outputdirs)){ //creates an array of the directory paths
-//     //     if(!fs.existsSync(dir)){ // if this directory not present it create recursively
-//     //       fs.mkdirSync(dir,{recursive:true});
-//     //     }
-//     //   }
-
-//     //   // Object.entries(resolutions) returns an array of [key, value] pairs from the resolutions object.
-//     //   // .map(async ([key, { width, height }]) => { ... }) iterates over each resolution entry. key is the size label (small, medium, large), and width and height are the respective dimensions.
-//     //   // const outputPath = path.join(__dirname, outputDirs[key], product_video); constructs the output path for the resized video.
-//     //   // await sharp(inputPath).resize(width, height).toFile(outputPath); uses sharp to resize the video and save it to the specified output path.
-//     //   // Promise.all(...) ensures that all resizing operations run in parallel and completes when all promises are resolved.
-
-//     //   await Promise.all(
-//     //     Object.entries(resolutions).map(async ([key, { width, height }]) => {
-//     //       const outputPath = path.join(__dirname, outputdirs[key], product_video);
-//     //       await sharp(inputpath)
-//     //         .resize(width, height)
-//     //         .toFile(outputPath);
-//     //     })
-//     //   );
-      
-
-//     // }
-    
-//     const query = "INSERT INTO products (category_id,product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)";
-    
-//     db.query(query, [category_id,product_name, product_code,product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], (err, result) => {
-//       if (err) {
-//         console.error(err);
-//         return res.status(500).json({ message: "Internal Server Error" });
-//       }
-//       return res.status(200).json({ message: "Product added successfully!" });
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
 
 
 // delete products
@@ -808,196 +835,6 @@ app.get("/allproductcount",(req, res) => {
 });
 
 
-// approach-2 for product image and video(wrong)
-
-// POST endpoint to handle product creation with video and images
-// app.post("/addproducts", upload.single("product_video"), upload.array("product_images", 10), async (req, res) => {
-//   try {
-//       // Extract product details from the request body
-//       const { category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured } = req.body;
-//       const is_featured_val = is_featured === 'Yes' ? 'Yes' : 'No';
-
-//       // Extract the filename of the uploaded video
-//       const product_video = req.file ? req.file.filename : null;
-
-//       // Prepare the query to insert product details into the products table
-//       const productQuery = "INSERT INTO products (category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-      
-//       // Execute the query to insert product details
-//       const productInsertResult = await db.query(productQuery, [category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val]);
-
-//       // Extract the ID of the newly inserted product
-//       const productId = productInsertResult.insertId;
-
-//       // Prepare the query to insert product images into the products_image table
-//       const imagesQuery = "INSERT INTO products_image (product_id, image,image_sort) VALUES (?, ?,?)";
-
-//       // Generate image_sort values
-//       const imageSortValues = Array.from({ length: imageFiles.length }, (_, i) => i + 1);
-
-      
-//       // Extract the filenames of the uploaded images
-//       const imageFiles = req.files.map(file => file.filename);
-
-//       // Execute the query for each uploaded image
-//       await Promise.all(imageFiles.map(async (filename) => {
-//           await db.query(imagesQuery, [productId, filename,imageSortValues[index]]);
-//       }));
-
-//       // Resize and save the uploaded images in different folders (e.g., small, medium, large)
-//       await Promise.all(req.files.map(async (file) => {
-//           const inputPath = path.join(__dirname, 'uploads', 'product_image', file.filename);
-//           const outputDir = path.join(__dirname, 'uploads', 'productImages', 'resized');
-          
-//           // Ensure the output directory exists
-//           if (!fs.existsSync(outputDir)) {
-//               fs.mkdirSync(outputDir, { recursive: true });
-//           }
-
-//           // Define the output paths for resized images
-//           const outputPaths = {
-//               small: path.join(outputDir, 'small', file.filename),
-//               medium: path.join(outputDir, 'medium', file.filename),
-//               large: path.join(outputDir, 'large', file.filename)
-//           };
-
-//           // Define the resolutions for resized images
-//           const resolutions = {
-//               small: { width: 320, height: 240 },
-//               medium: { width: 640, height: 480 },
-//               large: { width: 1024, height: 768 }
-//           };
-
-//           // Resize and save images in different resolutions
-//           await Promise.all(Object.entries(resolutions).map(async ([size, dimensions]) => {
-//               await sharp(inputPath)
-//                   .resize(dimensions.width, dimensions.height)
-//                   .toFile(outputPaths[size]);
-//           }));
-//       }));
-
-//       // Respond with success message
-//       return res.status(200).json({ message: "Product added successfully!" });
-//   } catch (error) {
-//       console.error(error);
-//       return res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
-
-
-
-// approach-3 for inserting 
-// Route for adding products
-// app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 },{ name: 'product_image', maxCount: 10 }]),(req, res) => {
-//   try {
-//     console.log(req.files);
-//     const {
-//       category_id, product_name, product_code, product_color, family_color,group_code, product_price, product_weight, product_discount, discount_type,final_price, description, washcare, keywords, fabric, pattern, sleeve, fit,meta_keywords, meta_description, meta_title, occassion, is_feature} = req.body;
-
-//     const product_video = req.files['product_video'] ? req.files['product_video'][0].filename : null;
-//     const product_image = req.files['product_image'] ? req.files['product_image'][0].filename : null;
-//     const is_featured_val = is_feature === 'Yes' ? 'Yes' : 'No';
-
-//     // Insert product data into the database
-//     const query = "INSERT INTO products (category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-//     db.query(query, [category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], (err, result) => {
-//       if (err) {
-//         console.error(err);
-//         return res.status(500).json({ message: "Internal Server Error" });
-//       }
-//       // using contexxt it will capture recent
-//       const productId = result.insertId;
-
-//       // Insert product image into the database
-//       const imagesQuery = "INSERT INTO products_image (product_id, image, image_sort) VALUES (?, ?, ?)";
-//       db.query(imagesQuery, [productId, product_image, 1], (err, data) => {
-//         if (err) {
-//           console.error(err);
-//           return res.status(500).json({ message: "Internal Server Error" });
-//         }
-//         return res.status(200).json({ message: "Product added successfully!" });
-//       });
-//     });
-
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
-
-// approach-4 for inserting multiple image
-app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, { name: 'product_image', maxCount: 20 }]), async (req, res) => {
-  try {
-    console.log(req.files);
-    const {
-            category_id, product_name, product_code, product_color, family_color,group_code, product_price, product_weight, product_discount, discount_type,final_price, description, washcare, keywords, fabric, pattern, sleeve, fit,meta_keywords, meta_description, meta_title, occassion, is_feature} = req.body;
-
-    const product_video = req.files['product_video'] ? req.files['product_video'][0].filename : null;
-    const product_images = req.files['product_image'] ? req.files['product_image'] : [];
-    const is_featured_val = is_feature === 'Yes' ? 'Yes' : 'No';
-
-    // Insert product data into the database
-    const query = "INSERT INTO products (category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    db.query(query, [category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], async(err, result) => {    if (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Internal Server Error" });
-      }
-
-      const productId = result.insertId;
-
-      if (product_images.length > 0) {
-        const outputDirs = {
-          large: 'uploads/productImages/large',
-          medium: 'uploads/productImages/medium',
-          small: 'uploads/productImages/small',
-        };
-
-        const resolutions = {
-          large: { width: 1280, height: 760 },
-          medium: { width: 760, height: 480 },
-          small: { width: 480, height: 320 }
-        };
-
-        // Ensure directories exist
-        for (const dir of Object.values(outputDirs)) {
-          if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-          }
-        }
-
-        // Process and save the images in different resolutions
-        await Promise.all(product_images.map(async (file) => {
-          await Promise.all(Object.entries(resolutions).map(async ([key, { width, height }]) => {
-            const outputPath = path.join(__dirname, outputDirs[key], file.filename);
-            await sharp(file.path)
-              .resize(width, height)
-              .toFile(outputPath);
-          }));
-        }));
-
-        // Insert each product image into the database
-        const imagesQuery = "INSERT INTO products_image (product_id, image, image_sort) VALUES ?";
-        const imageValues = product_images.map((file, index) => [productId, file.filename, index + 1]);
-
-        db.query(imagesQuery, [imageValues], (err, data) => {
-          if (err) {
-            console.error(err);
-            return res.status(500).json({ message: "Internal Server Error" });
-          }
-          return res.status(200).json({ message: "Product added successfully!" });
-        });
-      } else {
-        return res.status(200).json({ message: "Product added successfully without images!" });
-      }
-    });
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-
 // for products image
 app.get("/productsimage",(req,res)=>{
   const query="select * from products_image where deleted_at is null";
@@ -1032,6 +869,7 @@ app.delete("/productsimagedelete/:id",(req,res)=>{
   });
   return res.status(200).json({ message: "Data deleted successfully!" });
 });
+
 
 app.listen(process.env.SERVERPORT,()=>{
     console.log(`server listening at port ${process.env.SERVERPORT}`);
