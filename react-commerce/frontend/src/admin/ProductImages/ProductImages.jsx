@@ -136,7 +136,7 @@ const ProductImages = () => {
                                                     <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.product_id}</td>
                                                     <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.image_sort}</td>
                                                     
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.status}</td>
+                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> <span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
                                                     <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}>
                                                     <NotificationContainer />
                                                         <button className='btn btn-sm btn-danger mr-1' title='delete' onClick={()=>handlecmspagedelete(item.id)}><i className='fas fa-trash'></i></button>

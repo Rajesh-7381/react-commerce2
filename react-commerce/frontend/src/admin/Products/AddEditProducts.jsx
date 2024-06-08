@@ -20,6 +20,7 @@ const AddEditProducts = () => {
 
 
   const [data, setData] = useState({});
+  const [productattributedata, setproductattributedata] = useState([]);
   const [categories, setCategories] = useState([]);
 
   const [productPrice, setProductPrice] = useState(0);
@@ -34,9 +35,8 @@ const AddEditProducts = () => {
   const fileinputref = useRef(null); //
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [productImagesPreview, setProductImagesPreview] = useState([]);
-  const [dynamicfields, setDynamicFields] = useState([
-    { size: "", sku: "", price: "", stock: "" },
-  ]);
+  const [allproductsAttributes,setallproductsAttributes]=useState([]);
+  const [dynamicfields, setDynamicFields] = useState([{ size: "", sku: "", price: "", stock: "" },]);
 
   // useEffect(() => {
   //     let maxField = 10; // Input fields increment limitation
@@ -142,8 +142,13 @@ const AddEditProducts = () => {
         `http://localhost:8081/productedit/${id}`
       );
       const productdata = response.data.data;
-      console.log(productdata);
+
+      const response2=await axios.get(`http://localhost:8081/editproductattributes/${id}`);
+      const productattributes=response2.data.data
+      // console.log(productattributes)
+      // console.log(productdata);
       setData(productdata);
+      setproductattributedata(productattributes)
       setValue("category_id", productdata.category_id); // Add category_id to FormData
       setValue("product_name", productdata.product_name);
       setValue("product_code", productdata.product_code);
@@ -174,6 +179,8 @@ const AddEditProducts = () => {
       setValue("meta_title", productdata.meta_title);
       setValue("occassion", productdata.occassion);
       setIsFeatured(productdata.is_featured === "Yes");
+
+      
     } catch (error) {
       console.error(error);
     }
@@ -363,6 +370,61 @@ const AddEditProducts = () => {
     values.splice(index, 1);
     setDynamicFields(values);
   };
+
+  const handleChange2=(index,e)=>{
+    const newSize = e.target.value;
+    console.log(newSize);
+    
+  }
+
+  // productattribute status change
+//   const ProductAttributeStatus = async (status, productID) => {
+//     const newStatus = status === 'Active' ? 'Inactive' : 'Active';
+//     try {
+//         await axios.put(`http://localhost:8081/ProductAttributesStatusChange/${productID}`, { status: newStatus });
+//         const changeStatus = productattributedata.map((item) => {
+//             if (item.product_id === productID) {
+//                 return { ...item, status: newStatus };
+//             }
+//             return item;
+//         });
+//         setproductattributedata(changeStatus);
+//     } catch (error) {
+//         console.error(error);
+//     }
+// };
+
+
+// delete product attribute
+// const productattributedelete = async (id) => {
+//   // alert(id)
+//   try {
+//       const confirmed = await Swal.fire({
+//           title: 'Are you sure?',
+//           text: 'This action cannot be undone.',
+//           icon: 'warning',
+//           showCancelButton: true,
+//           confirmButtonColor: '#3085d6',
+//           cancelButtonColor: '#d33',
+//           confirmButtonText: 'Yes, delete it!',
+//       });
+
+//       if (confirmed.isConfirmed) {
+//           // Delete the item
+//           await axios.delete(`http://localhost:8081/deleteattribute/${id}}`);
+//           NotificationManager.success("Successfully deleted data!");
+
+//           // Fetch the updated data from the server and update the local state
+//           const response = await axios.get("http://localhost:8081/allproductsAttributes");
+//           setproductattributedata(response.data);
+//       } else {
+//           NotificationManager.error("Data not deleted successfully!");
+//       }
+//   } catch (error) {
+//       console.error(error);
+//       NotificationManager.error("An error occurred while deleting data!");
+//   }
+// };
 
   return (
     <div>
@@ -771,18 +833,54 @@ const AddEditProducts = () => {
                       </div>
                     </div>
                     <div className="row">
-                      <div className="col-md-12">
+                      <div className="col-md-12" >
                         <div className="card-body">
                           <div className="field_wrapper">
+                            {
+                              id ? (
+                                <div className="table-responsive">
+                                  <table className="table table-bordered table-striped">
+                                    <thead >
+                                      <tr>
+                                         
+                                        <th className='bg-dark text-light'>Size</th>
+                                        <th className='bg-dark text-light'>SKU</th>
+                                        <th className='bg-dark text-light'>Price</th>
+                                        <th className='bg-dark text-light'>Stock</th>
+                                        <th className='bg-dark text-light'>Action</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {productattributedata.map((item, index) => (
+                                        <tr key={index}>
+                                          <td><input type="text" className="form-control bg-dark" name="size" value={item.size} onChange={(e) => handleChange2(index, e)} /></td>
+                                          <td><input type="text" className="form-control bg-dark" value={item.sku} /></td>
+                                          <td><input type="number" className="form-control bg-dark" value={item.price} /></td>
+                                          <td><input type="number" className="form-control bg-dark" value={item.stock} /></td>
+                                          <td>
+                                          <NotificationContainer />
+                                          <button className='btn btn-dark btn-sm  mr-1' ><i className='fas  fa-toggle-on'></i></button>
+                                          <button className='btn btn-danger btn-sm ' ><i className='fas fa-trash'></i></button>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>  
+
+
+                              ) : ''
+                            }
                             <Link
                               href="javascript:void(0);"
                               className="add_button"
+                              
                               title="Add field"
                               onClick={handleAddField}
                             >
-                              Add
+                              {id ? '' : 'Add'}
                             </Link>
-                            {dynamicfields.map((field, index) => (
+                            { dynamicfields.map((field, index) => (
                               <div
                                 key={index}
                                 className="form-group text-start"
@@ -805,7 +903,7 @@ const AddEditProducts = () => {
                                   onChange={(e) => handleChange(index, e)}
                                 />
                                 <input
-                                  type="text"
+                                  type="number"
                                   name="price"
                                   placeholder="Price"
                                   style={{ width: "120px" }}
@@ -813,7 +911,7 @@ const AddEditProducts = () => {
                                   onChange={(e) => handleChange(index, e)}
                                 />
                                 <input
-                                  type="text"
+                                  type="number"
                                   name="stock"
                                   placeholder="Stock"
                                   style={{ width: "120px" }}

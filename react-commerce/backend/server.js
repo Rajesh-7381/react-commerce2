@@ -25,7 +25,7 @@ const app=express(); //create express.js(framework) instance
 app.use(cors()); //enables Cross-Origin Resource Sharing (CORS) to allow requests from different origins.
 app.use(express.json()); // parses incoming requests with JSON payloads.
 // Use Morgan middleware for logging HTTP requests
-app.use(morgan('combined')); //logs HTTP requests in a concise format.
+// app.use(morgan('combined')); //logs HTTP requests in a concise format.
 
 // bodyParser.json() and bodyParser.urlencoded({ extended: true }): parse incoming request bodies in JSON and URL-encoded formats, respectively. 
 app.use(bodyParser.json());
@@ -68,6 +68,10 @@ const storage=multer.diskStorage({ //this specifies how  files should be stored 
       cb(null,"uploads/products/");
     }else if(file.fieldname === 'product_image'){
       cb(null,"uploads/productImages/")
+    }else if(file.fieldname ==='brand_image'){
+      cb(null,"uploads/Brands/BrandImage/")
+    }else if(file.fieldname ==='brand_logo'){
+      cb(null,'uploads/Brands/BrandLogo/');
     }
   },
   filename:(req,file,cb)=>{ //filename function determines the name of the file to be saved
@@ -870,6 +874,123 @@ app.delete("/productsimagedelete/:id",(req,res)=>{
   return res.status(200).json({ message: "Data deleted successfully!" });
 });
 
+
+app.get("/editproductattributes/:id",(req,res)=>{
+  const id=req.params.id;
+  // console.log("idddddddddddddddddd",id)
+  const query="select * from product_attributes where product_id=?";
+  db.query(query,id,(err,data)=>{
+    if(err){
+      console.log(err)
+    }
+    return res.status(200).json({message:"data fetched!",data});
+  });
+});
+
+app.put("/ProductAttributesStatusChange/:id", (req, res) => {
+  const productID = req.params.id;
+  const { status } = req.body; // Extract status from the request body
+  const newStatus = status === 'Active' ? 1 : 0; // Convert status to integer
+
+  // console.log(productID, newStatus);
+  const query = "UPDATE product_attributes SET status = ? WHERE product_id = ?";
+
+  db.query(query, [newStatus, productID], (err, data) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Internal Server Error" });
+      }
+      return res.status(200).json({ message: "Status Updated Successfully" });
+  });
+});
+
+// DELETE Endpoint
+app.delete("/deleteattribute/:id", (req, res) => {
+  const id = req.params.id;
+  const query = "UPDATE product_attributes SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
+  db.query(query, [id], (err, data) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Internal Server Error" });
+      }
+      return res.status(200).json({ message: "Data deleted successfully!" });
+  });
+});
+
+
+// GET Endpoint
+app.get("/allproductsAttributes", (req, res) => {
+  const query = "SELECT * FROM product_attributes WHERE deleted_at IS NULL";
+  db.query(query, (err, data) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Internal Server Error" });
+      }
+      return res.json(data);
+  });
+});
+
+// getting brands table data
+app.get("/getAllBrands",(req,res)=>{
+  const query="select * from brands where deleted_at is null";
+  db.query(query,(err,data)=>{
+    if(err){
+      console.log(err)
+    }
+    res.json(data);
+  })
+});
+
+// get single brand details
+app.get("/GetSingleBrandDetals/:id",(req,res)=>{
+  const id=req.params.id;
+  const query="select * from brands where id=?";
+  db.query(query,id,(err,data)=>{
+    if(err){
+      console.log(err);
+    }
+    return res.status(200).json({message:"data fetched!",data});
+  })
+});
+
+app.put("/UpdateBrand/:id",(req,res)=>{
+  const id=req.params.id;
+  const query="update brands set "
+});
+
+app.post("/AddBrand", upload.fields([{ name: 'brand_image', maxCount: 1 }, { name: 'brand_logo', maxCount: 1 }]), (req, res) => {
+  const { brand_name, brand_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
+  const brand_image = req.files['brand_image'] ? req.files['brand_image'][0].filename : null;
+  const brand_logo = req.files['brand_logo'] ? req.files['brand_logo'][0].filename : null;
+
+  const query = "INSERT INTO brands (brand_name, brand_image, brand_logo, brand_discount, description, url, meta_title, meta_descriptions, meta_keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  
+  db.query(query, [brand_name, brand_image, brand_logo, brand_discount, description, url, meta_title, meta_description, meta_keyword], (err, data) => {
+      if (err) {
+          console.log(err);
+          return res.status(500).json({ message: "Database error" });
+      }
+      return res.status(200).json({ message: "Inserted successfully!" });
+  });
+});
+
+app.get("/AllBrandCount",(req,res)=>{
+  const query="select  count(distinct brand_name) as total  from brands";
+  // const query="select  count(*) as total  from brands";
+  db.query(query,(err,data)=>{
+    if (err) {
+      return res.status(500).json({message: "Internal server error"});
+    } else {
+      const Brandcount = data[0].total; // Access using the alias 'total'
+      // const count2 = data[0].email; // Access using the alias 'total'
+      // console.log("Total Users:", count);
+      res.json({
+        Brandcount: Brandcount
+        
+      });
+    }
+  })
+})
 
 app.listen(process.env.SERVERPORT,()=>{
     console.log(`server listening at port ${process.env.SERVERPORT}`);

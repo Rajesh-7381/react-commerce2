@@ -4,7 +4,8 @@ import { Link, useHistory, useNavigate } from 'react-router-dom';
 import Chart from 'chart.js/auto';
 import { Label } from 'reactstrap';
 import Cookies from 'js-cookie';
-
+import BarChart  from 'react-apexcharts';
+import DountChart  from 'react-apexcharts';
 
 
 const Dashboard1 = () => {
@@ -17,6 +18,7 @@ const Dashboard1 = () => {
   const [subadmincount, setSubadminCount] = useState(0);
   const [categoriescount, setcategoriesCount] = useState(0);
   const [allproductcount,setallproductcount]=useState(0);
+  const [allbrandcount,setallbrandcount]=useState(0);
   const [userData, setUserData] = useState(null);
   // console.log(userData)
   const [pdate, setPdate] = useState('');
@@ -55,11 +57,13 @@ const Dashboard1 = () => {
         const subadminResponse = await axios.get("http://localhost:8081/countsubadmin");
         const uniquecategoriesResponse =await axios.get("http://localhost:8081/uniquecategories");
         const productcountResponse=await axios.get("http://localhost:8081/allproductcount");
+        const BrandcountResponse=await axios.get("http://localhost:8081/AllBrandCount");
         setUserCount(userResponse.data.count);
         setAdminCount(adminResponse.data.Admincount);
         setSubadminCount(subadminResponse.data.subaAdmincount);
         setcategoriesCount(uniquecategoriesResponse.data.catcount)
         setallproductcount(productcountResponse.data.productcount);
+        setallbrandcount(BrandcountResponse.data.Brandcount);
         // Cookies.get("id",id);
       } catch (error) {
         console.error("Error fetching count data:", error);
@@ -78,17 +82,18 @@ const Dashboard1 = () => {
     chartinstance.current=new Chart(mychartref,{
       type:"pie",
       data:{
-        labels: ['Admin', 'SubAdmin', 'User','Categories','Products'],
+        labels: ['Admin', 'SubAdmin', 'User','Categories','Products','Brands'],
         datasets:[
           {
             label: '',
-            data: [admincount , subadmincount, usercount,categoriescount,allproductcount],
+            data: [admincount , subadmincount, usercount,categoriescount,allproductcount,allbrandcount],
             backgroundColor: [
               'rgb(255, 205, 86)',
               'rgb(0,255,255)',
               'rgb(0,0,255)',
               'rgb(255,0,0)',
               'rgb(147,112,219)',
+              'rgb(0,128,128)',
               
             ],
             
@@ -354,6 +359,12 @@ const Dashboard1 = () => {
                   <p>ProductsImage</p>
                 </Link>
               </li>
+              <li className="nav-item">
+                <Link to={"/brands"} className="nav-link">
+                  <i className="far fa-circle nav-icon" />
+                  <p>Brands</p>
+                </Link>
+              </li>
               
             </ul>
           </li>
@@ -467,13 +478,13 @@ const Dashboard1 = () => {
             {/* small box */}
             <div className="small-box" style={{backgroundColor:"teal"}}>
               <div className="inner">
-                <h3>53<sup style={{fontSize: 20}}>%</sup></h3>
-                <p>Bounce Rate</p>
+                <h3>{allbrandcount}</h3>
+                <p>Unique Brands</p>
               </div>
               <div className="icon">
                 <i className="ion ion-stats-bars" />
               </div>
-              <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
+              <Link to={"/brands"} className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
             </div>
           </div>
           {/* ./col */}
@@ -563,6 +574,73 @@ const Dashboard1 = () => {
                         <p><span className="bg-warning">{registeruserdata3}</span> User(s) registered from <span className="bg-warning">{fromdate}</span> to <span className="bg-warning">{todate}</span></p>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="container-fluid">
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="card">
+                    <div className="card-header">
+                      <h3 className="card-title">Bar Chart</h3>
+                    </div>
+                       <div className='card-body'>
+                       {/* bar */}
+                  {/* <BarChart type='bar' width={575} height={700}
+                        series={[
+                          {
+                            name:"",
+                            data:[admincount , subadmincount, usercount,categoriescount,allproductcount,allbrandcount]
+                          }
+                        ]}
+
+                        options={{
+                          title:{text :'developed by me',style:{fontSize:30}},
+                          colors:['#ff0000'],
+                          theme:{mode:'dark'},
+                          xaxis:{
+                            tickPlacement:"on",
+                            categories:['Admin', 'SubAdmin', 'User','Categories','Products','Brands'],
+                            title:{text:'e-Commerce',style:{color:'#FFFF00',fontSize:30}}
+                          }
+                        }}
+                      >
+                      
+                        </BarChart>
+
+                  */}
+                  <DountChart
+    type='dount'
+    width={550}
+    height={700}
+    series={[34, 5, 445, 55]}
+    options={{ labels: ['a', 'b', 'c', 'd'] }}
+/>
+
+
+                  
+                       </div>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="card">
+                    <div className="card-header">
+                      <h3 className="card-title">All Chart</h3>
+                      <div>
+                      <label htmlFor="">Choose One</label>
+                        <select name="" id="" className='form-control'>
+                          <option value="pie">PIE CHART</option>
+                          <option value="bar">BAR CHART</option>
+                          <option value="area">AREA CHART</option>
+                          <option value="reactline">REACT LINE CHART</option>
+                          <option value="dount">DOUNT CHART</option>
+                          <option value="stacked">STACKED CHART</option>
+                          
+                        </select>
+                      </div>
+                    </div>
+                    
                   </div>
                 </div>
               </div>
