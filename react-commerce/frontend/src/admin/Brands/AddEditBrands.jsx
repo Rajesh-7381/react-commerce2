@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 
 const AddEditBrands = () => {
@@ -70,7 +71,9 @@ const AddEditBrands = () => {
                     }
                 });
                 setTimeout(() => {
+                    NotificationManager.success("Created successfully!");
                     navigate("/brands");
+
                 }, 2000);
             }
         } catch (error) {
@@ -120,6 +123,7 @@ const AddEditBrands = () => {
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputBrandfile">Brand Image<span className='text-danger'>*</span></label>
                                                         <input type="file" className="form-control" id="exampleInputBrandfile" name='brand_image' {...register('brand_image', { required: id ? false : true })} />
+                                                        {brandData && brandData.brand_image && <img src={`http://localhost:8081/brandimage/` + brandData.brand_image} width={50} height={50} alt="" />}
                                                         {errors.brand_image && <span className="text-danger">This field is required</span>}
                                                     </div>
                                                 </div>
@@ -192,6 +196,7 @@ const AddEditBrands = () => {
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputBrandLogo">Brand Logo <span className='text-danger'>*</span></label>
                                                         <input type="file" className="form-control" id="exampleInputBrandLogo" name='brand_logo' {...register('brand_logo', { required: id ? false : true })} />
+                                                        {brandData && brandData.brand_logo && <img src={`http://localhost:8081/brandlogo/` + brandData.brand_logo} width={50} height={50} alt="" />}
                                                         {errors.brand_logo && <span className="text-danger">This field is required</span>}
                                                     </div>
                                                 </div>

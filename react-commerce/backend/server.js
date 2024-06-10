@@ -1,6 +1,13 @@
 const express=require("express");
 const cors=require("cors");
-const mysql2=require("mysql2");
+// const mysql2=require("mysql2");
+
+// db
+const db=require("./config/dbconfig");
+
+// for multiple database
+// const {db,db2}=require("./config/dbconfig");
+
 require('dotenv').config(); //note.txt
 // for hashing password
 const bcrypt=require("bcrypt");
@@ -15,10 +22,14 @@ const jwt=require("jsonwebtoken");//note.txt
 const sharp=require("sharp"); //The sharp library is a popular JavaScript library for image processing in Node.js. It provides a simple and efficient API for resizing, cropping, and transforming images in a variety of formats, including JPEG, PNG, WebP, and TIFF.
 const morgan=require("morgan");//note.txt
 const transpoter=require("./Email/nodemailerConfig");
+
 // const checkauth=require("./Auth/RouteCheckAuth");
 // for file sysytem
 const fs=require("fs");
 const checkAuth = require("./Auth/RouteCheckAuth");
+
+// here multerConfig is roled to define file path also image where stored
+const upload=require("./utils/multerConfig");
 const app=express(); //create express.js(framework) instance
 
 // middleware
@@ -42,44 +53,12 @@ app.use('/categories',express.static(path.join(__dirname,'uploads/categories')))
 // Serve static files for product images
 // for image showing in frontend
 app.use('/productsimage', express.static(path.join(__dirname, 'uploads/productImages/medium')));
-// Middleware
 
-//createPool is used to create a connection pool, which is a group of connections that are managed by the mysql2 library. createConnection is used to create a single connection to the database.
-// createConnection is used to create a single connection to the database.
-//The choice between createPool and createConnection depends on the specific needs of your application. 
-// If you need to execute a large number of queries or need to improve the performance of your application, you should use createPool. If you only need to execute a few queries or need to perform a one-time operation, you can use createConnection.
-const db=mysql2.createPool({
-    host:process.env.LOCALHOST,
-    user:process.env.USER,
-    password:process.env.PASSWORD,
-    database:process.env.DATABASE,
-    port:process.env.PORT
-});
+// for brand image
+app.use('/brandimage', express.static(path.join(__dirname, 'uploads/Brands/BrandImage')));
+// for brand logo
+app.use('/brandlogo', express.static(path.join(__dirname, 'uploads/Brands/BrandLogo')));
 
-// for category image inserting
-// Multer is a middleware for handling multipart/form-data, which is primarily used for uploading files in Node.js applications
-const storage=multer.diskStorage({ //this specifies how  files should be stored on disk
-  destination:(req,file,cb)=>{ //destination function within diskStorage determines the directory where the uploaded files will be stored based on the fieldname of the file
-    if(file.fieldname==='image'){
-      cb(null,"uploads/profile/");
-    }else if(file.fieldname === 'category_image'){
-      cb(null,"uploads/categories/");
-    }else if(file.fieldname === 'product_video'){
-      cb(null,"uploads/products/");
-    }else if(file.fieldname === 'product_image'){
-      cb(null,"uploads/productImages/")
-    }else if(file.fieldname ==='brand_image'){
-      cb(null,"uploads/Brands/BrandImage/")
-    }else if(file.fieldname ==='brand_logo'){
-      cb(null,'uploads/Brands/BrandLogo/');
-    }
-  },
-  filename:(req,file,cb)=>{ //filename function determines the name of the file to be saved
-    const ext=path.extname(file.originalname);//extracts orignal file extension
-    cb(null,Date.now()+ext); //constructs the new filename by appending the current timestamp to the file extension, ensuring a unique filename
-  },
-});
-const upload=multer({storage:storage}); //The upload constant is created using multer({storage: storage}), which initializes Multer with the defined storage configuration.
 
 // register user data
 app.post("/register",upload.single("image"), async (req, res) => {
@@ -953,11 +932,8 @@ app.get("/GetSingleBrandDetals/:id",(req,res)=>{
   })
 });
 
-app.put("/UpdateBrand/:id",(req,res)=>{
-  const id=req.params.id;
-  const query="update brands set "
-});
 
+// add all brands
 app.post("/AddBrand", upload.fields([{ name: 'brand_image', maxCount: 1 }, { name: 'brand_logo', maxCount: 1 }]), (req, res) => {
   const { brand_name, brand_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
   const brand_image = req.files['brand_image'] ? req.files['brand_image'][0].filename : null;
@@ -974,6 +950,7 @@ app.post("/AddBrand", upload.fields([{ name: 'brand_image', maxCount: 1 }, { nam
   });
 });
 
+// fetch all brands
 app.get("/AllBrandCount",(req,res)=>{
   const query="select  count(distinct brand_name) as total  from brands";
   // const query="select  count(*) as total  from brands";
@@ -990,7 +967,68 @@ app.get("/AllBrandCount",(req,res)=>{
       });
     }
   })
-})
+});
+
+// delete brand 
+app.delete("/branddelete/:id", (req, res) => {
+  const id = req.params.id;
+
+  const query = "SELECT brand_image, brand_logo FROM brands WHERE id = ?";
+  db.query(query, [id], (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Error retrieving brand data" });
+    }
+
+    if (data.length === 0) {
+      return res.status(404).json({ message: "Brand not found" });
+    }
+
+    const brandData = data[0];
+    const brandImage = brandData.brand_image;
+    const brandLogo = brandData.brand_logo;
+
+    const deleteFile = (filePath) => {
+      if (fs.existsSync(filePath)) {
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            // console.log(`File deleted: ${filePath}`);
+          }
+        });
+      } else {
+        // console.log(`File does not exist: ${filePath}`);
+      }
+    };
+
+    // Define the paths to the image and logo
+    const brandImagePath = path.join(__dirname, `./uploads/Brands/BrandImage/${brandImage}`);
+    const brandLogoPath = path.join(__dirname, `./uploads/Brands/BrandLogo/${brandLogo}`);
+  
+
+    // Delete image and logo files
+    if (brandImage) {
+      deleteFile(brandImagePath);
+    }
+
+    if (brandLogo) {
+      deleteFile(brandLogoPath);
+    }
+
+    // Delete the brand from the database
+    const deleteQuery = "DELETE FROM brands WHERE id = ?";
+    db.query(deleteQuery, [id], (err) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Error deleting brand" });
+      }
+
+      res.status(200).json({ message: "Brand deleted successfully!" });
+    });
+  });
+});
+
 
 app.listen(process.env.SERVERPORT,()=>{
     console.log(`server listening at port ${process.env.SERVERPORT}`);

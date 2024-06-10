@@ -1,7 +1,9 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { NotificationContainer, NotificationManager } from "react-notifications";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 const Brands = () => {
     const navigate=useNavigate();
     const [brandData,setbrandData]=useState([]);
@@ -24,6 +26,38 @@ const Brands = () => {
         // alert(id)
         navigate("/addeditbrands",{state :{id:id}});
 
+    }
+
+    const DeleteBrand=async(id)=>{
+      // alert(id)
+      try {
+        const confirmed = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'This action cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        });
+
+        if (confirmed.isConfirmed) {
+            // Delete the item
+            await axios.delete(`http://localhost:8081/branddelete/${id}`);
+            // alert("de")
+            NotificationManager.success("successfully!  deleted data");
+            // Fetch the updated data from the server and update the local state
+            const response = await axios.get("http://localhost:8081/getAllBrands");
+
+            setbrandData(response.data);
+            // setFilterData(response.data);
+        } else {
+            // Do nothing
+            NotificationManager.error("Data not deletd  successfully!");
+        }
+    } catch (error) {
+        console.error(error);
+    }
     }
   return (
     <div>
@@ -370,7 +404,7 @@ const Brands = () => {
                     <div className="input-group">
                       <input className="form-control mr-2" type="search" placeholder="Search using name, url, title etc..." aria-label="Search"   />
                       <div className="input-group-append">
-                          
+                          <NotificationContainer />
                           <button className='btn btn-primary ' onClick={()=>BrandsAddEdit()}>Add</button>
                           
                       </div>
@@ -424,16 +458,24 @@ const Brands = () => {
                             <tr key={index}>
                               <td>{index+1}</td>
                               <td>{item.brand_name}  </td>
-                              <td>{item.brand_image} </td>
-                              <td>{item.brand_logo} </td>
+                              <td>
+                                    <Link to={`http://localhost:8081/brandimage/`+  item.brand_image} target="_blank" id='image-constrained'>
+                                        <img src={`http://localhost:8081/brandimage/` + item.brand_image} width={50} height={50} alt="" />
+                                    </Link>
+                              </td>
+                              <td>
+                                  <Link to={`http://localhost:8081/brandlogo/`+  item.brand_logo} target="_blank" id='image-constrained'>
+                                      <img src={`http://localhost:8081/brandlogo/` + item.brand_logo} width={50} height={50} alt="" />
+                                  </Link>
+                              </td>
                               <td>{item.brand_discount} </td>
                               <td><Link to={item.url}>{item.url} </Link></td>
                               <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 'Active' ? 'Active' : 'Inactive'}</span> </td>
                               <td>
-                              
+                              <NotificationContainer />
                               <button className='btn btn-success btn-sm  mr-1' onClick={()=>BrandsAddEdit(item.id)}><i className='fas  fa-pencil-alt'></i></button>
                               <button className='btn btn-dark btn-sm  mr-1' ><i className='fas  fa-toggle-on'></i></button>
-                              <button className='btn btn-danger btn-sm ' ><i className='fas fa-trash'></i></button>
+                              <button className='btn btn-danger btn-sm ' onClick={()=>DeleteBrand(item.id)}><i className='fas fa-trash'></i></button>
                               </td>
                             </tr>
                           ))}

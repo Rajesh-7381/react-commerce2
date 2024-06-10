@@ -1,11 +1,14 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react'
-import { Link, useHistory, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Chart from 'chart.js/auto';
-import { Label } from 'reactstrap';
-import Cookies from 'js-cookie';
-import BarChart  from 'react-apexcharts';
-import DountChart  from 'react-apexcharts';
+
+import AreaChart from './Chart/AreaChart';
+import BARChart from './Chart/BARChart';
+import DOUNGHTChart from './Chart/DOUNGHTChart';
+import LINEChart from './Chart/LINEChart';
+import STACKEDChart from './Chart/STACKEDChart';
+import PIEChart from './Chart/PIEChart';
 
 
 const Dashboard1 = () => {
@@ -26,6 +29,9 @@ const Dashboard1 = () => {
   const [registeruserdata3, setregisteruserdata3] = useState(0);
   const [fromdate, setFromDate] = useState('');
   const [todate, setToDate] = useState('');
+  const [selectedChart, setSelectedChart] = useState('pie');
+
+  
 
   useEffect(() => {
     document.title = 'Dashboard';
@@ -132,6 +138,11 @@ const Dashboard1 = () => {
     sessionStorage.clear();
     navigate("/");
   }
+
+  // for chart
+  const handleChartChange = (e) => {
+    setSelectedChart(e.target.value);
+  };
   
   return (
     
@@ -586,40 +597,7 @@ const Dashboard1 = () => {
                       <h3 className="card-title">Bar Chart</h3>
                     </div>
                        <div className='card-body'>
-                       {/* bar */}
-                  {/* <BarChart type='bar' width={575} height={700}
-                        series={[
-                          {
-                            name:"",
-                            data:[admincount , subadmincount, usercount,categoriescount,allproductcount,allbrandcount]
-                          }
-                        ]}
-
-                        options={{
-                          title:{text :'developed by me',style:{fontSize:30}},
-                          colors:['#ff0000'],
-                          theme:{mode:'dark'},
-                          xaxis:{
-                            tickPlacement:"on",
-                            categories:['Admin', 'SubAdmin', 'User','Categories','Products','Brands'],
-                            title:{text:'e-Commerce',style:{color:'#FFFF00',fontSize:30}}
-                          }
-                        }}
-                      >
-                      
-                        </BarChart>
-
-                  */}
-                  <DountChart
-    type='dount'
-    width={550}
-    height={700}
-    series={[34, 5, 445, 55]}
-    options={{ labels: ['a', 'b', 'c', 'd'] }}
-/>
-
-
-                  
+                                         
                        </div>
                   </div>
                 </div>
@@ -629,15 +607,26 @@ const Dashboard1 = () => {
                       <h3 className="card-title">All Chart</h3>
                       <div>
                       <label htmlFor="">Choose One</label>
-                        <select name="" id="" className='form-control'>
-                          <option value="pie">PIE CHART</option>
+                        <select name="" id="" className='form-control' onChange={handleChartChange}>
+                          <option value="pie" selected>PIE CHART</option>
                           <option value="bar">BAR CHART</option>
                           <option value="area">AREA CHART</option>
-                          <option value="reactline">REACT LINE CHART</option>
-                          <option value="dount">DOUNT CHART</option>
-                          <option value="stacked">STACKED CHART</option>
+                          <option value="line">REACT LINE CHART</option>
+                          <option value="donut">DOUNT CHART</option>
+                          <option value="stack">STACKED CHART</option>
                           
                         </select>
+                        {/* 
+                          
+                        <canvas ref={dountchartref}></canvas>
+
+                        */}
+                        {selectedChart === 'pie' && <PIEChart />}
+                        {selectedChart === 'area' && <AreaChart />}
+                        {selectedChart === 'bar' && <BARChart />}
+                        {selectedChart === 'donut' && <DOUNGHTChart />}
+                        {selectedChart === 'line' && <LINEChart />}
+                        {selectedChart === 'stack' && <STACKEDChart />}
                       </div>
                     </div>
                     
