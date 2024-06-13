@@ -62,8 +62,10 @@ const Brands = () => {
     // for status change
     const StatusChange = async (id, status) => {
       try {
+        // alert(id + ""+status)
           // console.log(`Initial status: ${status}`);
           const newStatus = status === 1 ? 0 : 1; // Toggle status
+          // alert(newStatus)
           // console.log(`New status: ${newStatus}`);
   
           const response = await axios.put(`http://localhost:8081/BrandStatusChange/${id}`, { status: newStatus });

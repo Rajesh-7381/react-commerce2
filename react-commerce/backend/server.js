@@ -883,6 +883,7 @@ app.put("/ProductAttributesStatusChange/:id", (req, res) => {
   });
 });
 
+
 // DELETE Endpoint
 app.delete("/deleteattribute/:id", (req, res) => {
   const id = req.params.id;
@@ -1029,6 +1030,20 @@ app.delete("/branddelete/:id", (req, res) => {
   });
 });
 
+// brand status change
+app.put("/BrandStatusChange/:id",(req,res)=>{
+  const id=req.params.id;
+  const {status}=req.body;
+  const newStatus=status==='Active'? 1 : 0;
+  const query="update brands set status=? where id=?";
+  db.query(query,[id,newStatus],(err,data)=>{
+    if(err){
+          console.error(err);
+          return res.status(500).json({ message: "Internal Server Error" });
+    }
+    return res.status(200).json({ message: "Status Updated Successfully" });
+  })
+})
 
 app.listen(process.env.SERVERPORT,()=>{
     console.log(`server listening at port ${process.env.SERVERPORT}`);
