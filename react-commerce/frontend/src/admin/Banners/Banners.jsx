@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { NotificationContainer,NotificationManager } from 'react-notifications'
 import { Link } from 'react-router-dom'
@@ -11,7 +12,7 @@ const Banners = () => {
 
     const BannerData=async()=>{
         try {
-            const response="http://localhost:8081/AllBannerData";
+            const response=await axios.get("http://localhost:8081/AllBannerData");
             setbannerData(response.data);
             console.log(bannerData)
             
@@ -424,14 +425,14 @@ const Banners = () => {
                         <tr key={index}>
                           <td>{index+1}</td>
                           <td>{item.type}</td>
-                          <td>{item.image}  </td>
+                          
                           <td>
                                 <Link to={`http://localhost:8081/bannerimage/`+  item.image} target="_blank" id='image-constrained'>
                                     <img src={`http://localhost:8081/bannerimage/` + item.image} width={50} height={50} alt="" />
                                 </Link>
                           </td>
                           
-                          <td>{item.link} </td>
+                          <td><Link to={item.link}>{item.link}</Link> </td>
                           <td>{item.alt} </td>
                           <td>{item.sort} </td>
                           <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 'Active' ? 'Active' : 'Inactive'}</span> </td>
