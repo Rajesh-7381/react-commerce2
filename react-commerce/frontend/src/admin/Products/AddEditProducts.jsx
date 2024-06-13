@@ -7,6 +7,7 @@ import ReactImageMagnify from "@blacklab/react-image-magnify";
 import Swal from "sweetalert2";
 import $ from "jquery";
 
+
 const AddEditProducts = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,6 +23,7 @@ const AddEditProducts = () => {
   const [data, setData] = useState({});
   const [productattributedata, setproductattributedata] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [brands, setbrands] = useState([]);
 
   const [productPrice, setProductPrice] = useState(0);
   const [productDiscount, setProductDiscount] = useState(0);
@@ -126,7 +128,9 @@ const AddEditProducts = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(`http://localhost:8081/categories`);
+      const response2 = await axios.get(`http://localhost:8081/productBrands`);
       setCategories(response.data);
+      setbrands(response2.data);
     } catch (error) {
       console.error(error);
     }
@@ -150,6 +154,7 @@ const AddEditProducts = () => {
       setData(productdata);
       setproductattributedata(productattributes)
       setValue("category_id", productdata.category_id); // Add category_id to FormData
+      setValue("brand_id", productdata.brand_id);
       setValue("product_name", productdata.product_name);
       setValue("product_code", productdata.product_code);
       setValue("family_color", productdata.family_color);
@@ -190,6 +195,7 @@ const AddEditProducts = () => {
     try {
       const form = new FormData();
       form.append("category_id", formData.category_id); // Add category_id to FormData
+      form.append("brand_id", formData.brand_id);
       form.append("product_name", formData.product_name);
       form.append("product_code", formData.product_code);
       form.append("family_color", formData.family_color);
@@ -482,6 +488,34 @@ const AddEditProducts = () => {
                             {errors.category_id && (
                               <span className="text-danger">
                                 Category is required
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-md-12">
+                        <div className="card-body">
+                          <div className="form-group text-start">
+                            <label htmlFor="category_id">Select Brand</label>
+                            <select
+                              name="brand_id"
+                              id="brand_id"
+                              className="form-control"
+                              {...register("brand_id", { required: true })}
+                              value={data.brand_id}
+                            >
+                              <option value="">Select</option>
+                              {brands.map((brand) => (
+                                <option key={brand.id} value={brand.id}>
+                                  {brand.brand_name}
+                                </option>
+                              ))}
+                            </select>
+                            {errors.brand_id && (
+                              <span className="text-danger">
+                                Brand is required
                               </span>
                             )}
                           </div>

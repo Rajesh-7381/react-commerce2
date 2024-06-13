@@ -10,8 +10,14 @@ const AddEditBrands = () => {
     const { register, handleSubmit, setValue, formState: { errors } } = useForm();
     const [brandData, setBrandData] = useState(null);
     const navigate = useNavigate();
+    const [previewImage, setPreviewImage] = useState(null);
+    const [previewImage2, setPreviewImage2] = useState(null);
+    const [brandImageName, setBrandImageName] = useState('');
+    const [brandLogoName, setBrandLogoName] = useState('');
+
 
     useEffect(() => {
+        document.title = "AddEditBrands";
         if (id) {
             GetSingleBrands(id);
         }
@@ -49,10 +55,10 @@ const AddEditBrands = () => {
             form.append('meta_keyword', formData.meta_keyword);
             
             // Append image files
-            if (formData.brand_image[0]) {
+            if (formData.brand_image && formData.brand_image[0]) {
                 form.append('brand_image', formData.brand_image[0]);
             }
-            if (formData.brand_logo[0]) {
+            if (formData.brand_logo && formData.brand_logo[0]) {
                 form.append('brand_logo', formData.brand_logo[0]);
             }
 
@@ -63,6 +69,10 @@ const AddEditBrands = () => {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
+                NotificationManager.success("Updated successfully!");
+                setTimeout(() => {
+                    navigate("/brands");
+                }, 2000);
             } else {
                 // Add new brand
                 await axios.post('http://localhost:8081/AddBrand', form, {
@@ -70,16 +80,93 @@ const AddEditBrands = () => {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
+                NotificationManager.success("Created successfully!");
                 setTimeout(() => {
-                    NotificationManager.success("Created successfully!");
                     navigate("/brands");
-
                 }, 2000);
             }
         } catch (error) {
             console.log(error);
         }
     };
+
+    // image handling for brand image
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+    
+        // Check if the file exists and reset input and state if invalid file or no file selected
+        if (!file) {
+            setBrandImageName(null); //  it means when i click on cancel button any error not shown
+            setPreviewImage(null);
+            return;
+        }
+    
+        const validateFiles = [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
+        ];
+    
+        // Validate the file type
+        if (!validateFiles.includes(file.type)) {
+            alert("Please provide only JPEG, PNG, GIF, or WebP images.");
+            // Reset the file input and state if the file is invalid
+            event.target.value = null;
+            setBrandImageName(null);
+            setPreviewImage(null);
+            return;
+        }
+    
+        // Set the brand image name
+        setBrandImageName(file.name);
+    
+        // Create a FileReader to read the file
+        const reader = new FileReader();
+    
+        // Event handler for when the file is successfully read
+        reader.onload = () => {
+            setPreviewImage(reader.result);
+        };
+    
+        // Read the file as a data URL
+        reader.readAsDataURL(file);
+    };
+    
+    // image handling for brand logo
+    const handleImageChange2 = (event) => {
+        const file = event.target.files[0]; //in most of cases we use single image so we put [0]
+        if (!file) {
+            setBrandLogoName(null); //  it means when i click on cancel button any error not shown
+            setPreviewImage2(null);
+            return;
+        }
+        // Define the list of valid file types
+        const validateFiles = [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
+        ];   
+        if(!validateFiles.includes(file.type)){
+            alert("Please provide only JPEG, PNG, GIF, or WebP images.");
+            event.target.value = null;
+            setBrandLogoName(null); //  it means when i click on cancel button any error not shown
+            setPreviewImage2(null);
+            return;
+        }else{
+            setBrandLogoName(file.name);
+        // console.log(file)
+        if (file) { //if not exist shown 'undefined
+            const reader = new FileReader(); //it works asynchroneously.bulit in js function it reads content of the file and storedin users computer
+            reader.onload = () => { //This is an event handler that gets called when the file has been read successfully.
+                setPreviewImage2(reader.result); //This contains the data URL of the file once it has been read. This URL can be used as the src attribute for an image element to display the preview of the image.
+            };
+            reader.readAsDataURL(file);
+        }
+        }
+        
+     };
 
     return (
         <div>
@@ -122,8 +209,15 @@ const AddEditBrands = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputBrandfile">Brand Image<span className='text-danger'>*</span></label>
-                                                        <input type="file" className="form-control" id="exampleInputBrandfile" name='brand_image' {...register('brand_image', { required: id ? false : true })} />
-                                                        {brandData && brandData.brand_image && <img src={`http://localhost:8081/brandimage/` + brandData.brand_image} width={50} height={50} alt="" />}
+                                                        <input type="file" className="form-control" id="exampleInputBrandfile"   name='brand_image' {...register('brand_image', { required: id ? false : true })} onChange={handleImageChange}/>
+                                                        
+                                                        {previewImage ? (
+                                                            <img src={previewImage} alt="Brand Preview" style={{ marginTop: '10px', width: '100px', height: '100px' }} />
+                                                        ) : (
+                                                            brandData && brandData.brand_image && (
+                                                                <img src={`http://localhost:8081/brandimage/${brandData.brand_image}`} style={{ marginTop: '10px', width: '100px', height: '100px' }} alt="" />
+                                                            )
+                                                        )}
                                                         {errors.brand_image && <span className="text-danger">This field is required</span>}
                                                     </div>
                                                 </div>
@@ -195,8 +289,14 @@ const AddEditBrands = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputBrandLogo">Brand Logo <span className='text-danger'>*</span></label>
-                                                        <input type="file" className="form-control" id="exampleInputBrandLogo" name='brand_logo' {...register('brand_logo', { required: id ? false : true })} />
-                                                        {brandData && brandData.brand_logo && <img src={`http://localhost:8081/brandlogo/` + brandData.brand_logo} width={50} height={50} alt="" />}
+                                                        <input type="file" className="form-control" id="exampleInputBrandLogo" name='brand_logo' {...register('brand_logo', { required: id ? false : true })} onChange={handleImageChange2}/>
+                                                        {previewImage2 ? (
+                                                            <img src={previewImage2} alt="Logo Preview" style={{ marginTop: '10px', width: '100px', height: '100px' }} />
+                                                        ) : (
+                                                            brandData && brandData.brand_logo && (
+                                                                <img src={`http://localhost:8081/brandlogo/${brandData.brand_logo}`} style={{ marginTop: '10px', width: '100px', height: '100px' }} alt="" />
+                                                            )
+                                                        )}
                                                         {errors.brand_logo && <span className="text-danger">This field is required</span>}
                                                     </div>
                                                 </div>

@@ -98,7 +98,7 @@ const Products = () => {
     // searching functionality
     const searchfunction=(event)=>{
         const searchdata=event.target.value.toLowerCase().trim();
-        console.log(searchdata)
+        // console.log(searchdata)
         if(searchdata === ""){
             setproductdata(productdata)
         }else{

@@ -23,6 +23,7 @@
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
     "oors": "^3.3.0",
+    "sequelize": "^6.37.3",
     "sharp": "^0.32.0"
   }
 }

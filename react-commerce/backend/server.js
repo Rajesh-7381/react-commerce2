@@ -617,6 +617,17 @@ app.get("/parentcategory/:parentId", (req, res) => {
 });
 
 
+// product brand shown in product form
+app.get("/productBrands",(req,res)=>{
+  const query="select b.id as brand_id, b.brand_name as brand_name from products as p left join brands as b on b.id=p.id";
+  db.query(query,(err,data)=>{
+    if(err){
+      console.log(err)
+    }
+    res.json(data)
+  })
+})
+
 // all products data
 app.get("/allproducts", (req, res) => {
   const query = `
@@ -641,7 +652,7 @@ app.get("/allproducts", (req, res) => {
 app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, { name: 'product_image', maxCount: 20 }]), async (req, res) => {
   try {
       const {
-          category_id, product_name, product_code, product_color, family_color, group_code,
+          category_id,brand_id, product_name, product_code, product_color, family_color, group_code,
           product_price, product_weight, product_discount, discount_type, final_price, description,
           washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description,
           meta_title, occassion, is_featured
@@ -652,8 +663,8 @@ app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, 
       const is_featured_val = is_featured === 'Yes' ? 'Yes' : 'No';
 
       // Insert product data into the database
-      const query = "INSERT INTO products (category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-      db.query(query, [category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], async (err, result) => {
+      const query = "INSERT INTO products (category_id,brand_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      db.query(query, [category_id,brand_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], async (err, result) => {
           if (err) {
               console.error(err);
               return res.status(500).json({ message: "Internal Server Error" });
@@ -735,10 +746,10 @@ app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, 
 app.put("/updateproducts/:id",upload.single("product_video"), (req, res) => {
   const id = req.params.id;
   const product_video=req.file.filename;
-  const {category_id,product_name,product_code,product_color,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured} = req.body;
-  const query = "UPDATE products SET category_id=?, product_name=?, product_code=?,product_color=?, family_color=?, group_code=?, product_price=?, product_weight=?, product_discount=?, discount_type=?, final_price=?,product_video=?, description=?, washcare=?, keywords=?, fabric=?, pattern=?, sleeve=?, fit=?, meta_keywords=?, meta_description=?, meta_title=?, occassion=?, is_featured=? WHERE id=?";
+  const {category_id,brand_id,product_name,product_code,product_color,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured} = req.body;
+  const query = "UPDATE products SET category_id=?,brand_id=?, product_name=?, product_code=?,product_color=?, family_color=?, group_code=?, product_price=?, product_weight=?, product_discount=?, discount_type=?, final_price=?,product_video=?, description=?, washcare=?, keywords=?, fabric=?, pattern=?, sleeve=?, fit=?, meta_keywords=?, meta_description=?, meta_title=?, occassion=?, is_featured=? WHERE id=?";
   db.query(
-    query,[category_id,product_name,product_code,product_color,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,product_video,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured,id],(err, result) => {
+    query,[category_id,brand_id,product_name,product_code,product_color,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,product_video,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured,id],(err, result) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: "Internal Server Error" });
@@ -1027,6 +1038,58 @@ app.delete("/branddelete/:id", (req, res) => {
       res.status(200).json({ message: "Brand deleted successfully!" });
     });
   });
+});
+
+// const Brand=require("./Routes/brandRoute");
+// app.use('/',Brand);
+
+
+app.put('/UpdateBrand/:id', upload.fields([{ name: 'brand_image', maxCount: 1 }, { name: 'brand_logo', maxCount: 1 }]), (req, res) => {
+  const id = req.params.id;
+  const { brand_name, brand_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
+  const brand_image = req.files && req.files['brand_image'] ? req.files['brand_image'][0].filename : null;
+const brand_logo = req.files && req.files['brand_logo'] ? req.files['brand_logo'][0].filename : null;
+
+
+  // Construct the SQL query with parameterized inputs
+  let query = `UPDATE brands SET brand_name = ?, brand_discount = ?, description = ?, url = ?, meta_title = ?, meta_descriptions = ?, meta_keywords = ?`;
+  const values = [brand_name, brand_discount, description, url, meta_title, meta_description, meta_keyword];
+
+  // Append brand_image and brand_logo 
+  if (brand_image) {
+      query += `, brand_image = ?`;
+      values.push(brand_image);
+  }
+
+  if (brand_logo) {
+      query += `, brand_logo = ?`;
+      values.push(brand_logo);
+  }
+
+  query += ` WHERE id = ?`;
+  values.push(id);
+
+  db.query(query, values, (err, data) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Internal Server Error" });
+      }
+      return res.status(200).json({ message: "Updated successfully" });
+  });
+});
+
+app.put("/BrandStatusChange/:id",(req,res)=>{
+  const id=req.params.id;
+  const { status } = req.body; // Extract status from the request body
+  const newStatus = status === 'Active' ? 1 : 0; // Convert status to integer
+  const query ="UPDATE brands SET status = ? WHERE id = ?";
+  db.query(query,[newStatus, id],(err,data)=>{
+      if(err){
+          console.log(err);
+          return res.status(500).json({ message: "Internal Server Error" });
+      }
+      return res.status(200).json({message:"status changed successfully!"});
+  })
 });
 
 
