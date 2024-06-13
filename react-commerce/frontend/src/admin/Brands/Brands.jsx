@@ -59,6 +59,46 @@ const Brands = () => {
         console.error(error);
     }
     }
+    // for status change
+    const StatusChange = async (id, status) => {
+      try {
+          // console.log(`Initial status: ${status}`);
+          const newStatus = status === 1 ? 0 : 1; // Toggle status
+          // console.log(`New status: ${newStatus}`);
+  
+          const response = await axios.put(`http://localhost:8081/BrandStatusChange/${id}`, { status: newStatus });
+          // console.log('Response from backend:', response.data);
+  
+          // Update local state with the new status
+          const updatedStatus = brandData.map(item => {
+              if (item.id === id) {
+                  // console.log(`Updating item with id: ${id}`);
+                  return { ...item, status: newStatus }; // Create a new object with the updated status
+              }
+              return item; // Return the original item if the id does not match
+          });
+  
+          // console.log('Updated brandData:', updatedStatus);
+          NotificationManager.success("Status Update successfully!"); // Show success notification
+          setbrandData(updatedStatus); // Update the state with the new array
+      } catch (error) {
+          console.error('Error updating status:', error); // Log any errors
+      }
+  }
+  
+  const searchfunction = (event) => {
+    alert("1")
+    const searchdata = event.target.value.toLowerCase().trim();
+    if (searchdata === "") {
+      setbrandData(brandData);
+    } else {
+      const filteredData = brandData.filter(item =>
+        item && item.brand_name && item.brand_name.toLowerCase().includes(searchdata)
+      );
+      setbrandData(filteredData);
+    }
+  }
+  
   return (
     <div>
       <div>
@@ -402,7 +442,7 @@ const Brands = () => {
                   </div>
                   <form className='d-flex align-items-center justify-content-end'>
                     <div className="input-group">
-                      <input className="form-control mr-2" type="search" placeholder="Search using name, url, title etc..." aria-label="Search"   />
+                      <input className="form-control mr-2" type="search" placeholder="Search using Brand Name" aria-label="Search" onClick={searchfunction}  />
                       <div className="input-group-append">
                           <NotificationContainer />
                           <button className='btn btn-primary ' onClick={()=>BrandsAddEdit()}>Add</button>
@@ -474,7 +514,7 @@ const Brands = () => {
                               <td>
                               <NotificationContainer />
                               <button className='btn btn-success btn-sm  mr-1' onClick={()=>BrandsAddEdit(item.id)}><i className='fas  fa-pencil-alt'></i></button>
-                              <button className='btn btn-dark btn-sm  mr-1' ><i className='fas  fa-toggle-on'></i></button>
+                              <button className='btn btn-dark btn-sm  mr-1' onClick={()=>StatusChange(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
                               <button className='btn btn-danger btn-sm ' onClick={()=>DeleteBrand(item.id)}><i className='fas fa-trash'></i></button>
                               </td>
                             </tr>
