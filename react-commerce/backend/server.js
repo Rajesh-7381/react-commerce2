@@ -1045,6 +1045,17 @@ app.put("/BrandStatusChange/:id",(req,res)=>{
   })
 })
 
+// for banners table
+app.get("/AllBannerData",(req,res)=>{
+  const query="select * from banners where deleted_at is null";
+  db.query(query,(err,data)=>{
+    if(err) {
+      console.log(err);
+    }
+    res.json(data);
+  });
+});
+
 app.listen(process.env.SERVERPORT,()=>{
     console.log(`server listening at port ${process.env.SERVERPORT}`);
 });
