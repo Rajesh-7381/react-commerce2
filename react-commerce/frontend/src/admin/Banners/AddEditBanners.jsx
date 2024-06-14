@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { NotificationManager } from 'react-notifications';
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -7,11 +7,31 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 const AddEditBanners = () => {
     const location = useLocation();
     const id = location.state ? location.state.id : null;
+    
     const { register, handleSubmit, setValue, formState: { errors } } = useForm();
     const [bannerData,setbannerData]=useState([]);
     const navigate=useNavigate();
 
+    useEffect(()=>{
+        if(id){
+            // alert(id)
+            GetBannerDetails();
+        }
+    },[]);
+
+    const GetBannerDetails = async (id) => {
+        try {
+            alert(id)
+          const response = await axios.get(`http://localhost:8081/EditBannerDetails/${id}`);
+          console.log(response.data.data[0]);
+        } catch (error) {
+          console.error("Error fetching banner details:", error);
+        }
+      };
+      
+
     const onSubmit=async(formData)=>{
+        
         try {
             const form=new  FormData();
             form.append('type',formData.type);

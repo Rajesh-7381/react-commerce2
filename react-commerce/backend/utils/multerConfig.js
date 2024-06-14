@@ -19,8 +19,8 @@ const storage=multer.diskStorage({ //this specifies how  files should be stored 
       cb(null,"uploads/Brands/BrandImage/")
     }else if(file.fieldname ==='brand_logo'){
       cb(null,'uploads/Brands/BrandLogo/');
-    }else if(file.filename === 'banner_image'){
-      cb(null,"uploads/banners");
+    }else if(file.filename === 'image'){
+      cb(null,"uploads/banners/");
     }
   },
   filename:(req,file,cb)=>{ //filename function determines the name of the file to be saved

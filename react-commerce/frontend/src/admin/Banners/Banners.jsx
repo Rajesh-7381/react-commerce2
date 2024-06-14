@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { NotificationContainer,NotificationManager } from 'react-notifications'
 import { Link, useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2';
 
 const Banners = () => {
     const [bannerData,setbannerData]=useState([]);
@@ -15,7 +16,7 @@ const Banners = () => {
         try {
             const response=await axios.get("http://localhost:8081/AllBannerData");
             setbannerData(response.data);
-            console.log(bannerData)
+            // console.log(bannerData)
             
         } catch (error) {
             console.log(error)
@@ -23,7 +24,57 @@ const Banners = () => {
     }
 
     const BannersAddEdit=(id)=>{
-      navigate('/addeditbanners',{state:{id:id}});
+      // alert(id)
+      if(id){
+        alert(id)
+        navigate('/addeditbanners',{state :{id:id}});
+      }else{
+        navigate('/addeditbanners');
+      }
+    }
+
+    // banner delete
+    const BannerDelete=async(id)=>{
+      try {
+        // alert(id)
+        const confirmed = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'This action cannot be undone.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!',
+      });
+      if(confirmed.isConfirmed){
+        await axios.delete(`http://localhost:8081/DeleteBanners/${id}`);
+        NotificationManager.success("Banner deleted successfully!");
+
+        const response=await axios.get("http://localhost:8081/AllBannerData");
+            setbannerData(response.data);
+      }
+
+      } catch (error) {
+        
+      }
+    }
+
+    const BannerStatusChange=async(id,status)=>{
+        try {
+          const newStatus=status === 1 ? 0 : 1;
+          const response=await axios.put(`http://localhost:8081/BannersStatusChange/${id}`,{status:newStatus});
+
+          const updatedData=bannerData.map(item=>{
+            if(item.id === id){
+              return {...item ,status:newStatus};
+            }
+            return item;
+            
+          });
+          setbannerData(updatedData)
+        } catch (error) {
+            console.log(error)
+        }      
     }
   return (
     <div>
@@ -432,8 +483,8 @@ const Banners = () => {
                           <td>{item.type}</td>
                           
                           <td>
-                                <Link to={`http://localhost:8081/bannerimage/`+  item.image} target="_blank" id='image-constrained'>
-                                    <img src={`http://localhost:8081/bannerimage/` + item.image} width={50} height={50} alt="" />
+                                <Link to={`http://localhost:8081/bannerImage/`+  item.image} target="_blank" id='image-constrained'>
+                                    <img src={`http://localhost:8081/bannerImage/` + item.image} width={50} height={50} alt="" />
                                 </Link>
                           </td>
                           
@@ -443,9 +494,9 @@ const Banners = () => {
                           <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 'Active' ? 'Active' : 'Inactive'}</span> </td>
                           <td>
                           <NotificationContainer />
-                          <button className='btn btn-success btn-sm  mr-1' ><i className='fas  fa-pencil-alt'></i></button>
-                          <button className='btn btn-dark btn-sm  mr-1' ><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
-                          <button className='btn btn-danger btn-sm ' ><i className='fas fa-trash'></i></button>
+                          <button className='btn btn-success btn-sm  mr-1'onClick={()=>BannersAddEdit(item.id)} ><i className='fas  fa-pencil-alt'></i></button>
+                          <button className='btn btn-dark btn-sm  mr-1' onClick={()=>BannerStatusChange(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
+                          <button className='btn btn-danger btn-sm ' onClick={()=>BannerDelete(item.id)}><i className='fas fa-trash'></i></button>
                           </td>
                         </tr>
                       ))}
