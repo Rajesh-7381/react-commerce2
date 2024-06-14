@@ -1,0 +1,141 @@
+import axios from 'axios';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form';
+import { NotificationManager } from 'react-notifications';
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+
+const AddEditBanners = () => {
+    const location = useLocation();
+    const id = location.state ? location.state.id : null;
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+    const [bannerData,setbannerData]=useState([]);
+    const navigate=useNavigate();
+
+    const onSubmit=async(formData)=>{
+        try {
+            const form=new  FormData();
+            form.append('type',formData.type);
+            form.append('link',formData.link);
+            form.append('alt',formData.alt);
+
+            if (formData.image && formData.image[0]) {
+                form.append('image', formData.image[0]);
+              }
+
+            if(id){
+                await axios.put(`http://localhost:8081/UpdateBanners/${id}`,form,{
+                    headers:{
+                        'Content-Type':'multipart/form-data'
+                    }
+                });
+            }else{
+                await axios.post("http://localhost:8081/AddBanners",form,{
+                    headers:{
+                        'Content-Type':'multipart/form-data'
+                    }
+                });
+                setTimeout(()=>{
+                    NotificationManager.success("Form submited successfully!");
+                    navigate("/banners");
+                },2000)
+            }
+        } catch (error) {
+            
+        }
+    }
+  return (
+    <div>
+        <div className="wrapper">
+        <div className="content-wrapper">
+            <section className="content-header">
+                <div className="container-fluid">
+                    <div className="row mb-2">
+                        <div className="col-sm-6"></div>
+                        <div className="col-sm-6">
+                            <ol className="breadcrumb float-sm-right">
+                                <li className="breadcrumb-item"><Link to={"/admindashboard1"}>Home</Link></li>
+                                <li className="breadcrumb-item"><Link to={"/Banners"}>Back</Link></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section className="content">
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="card card-primary">
+                            <div className="card-header">
+                                <h3 className="card-title" style={{ width: "100%", fontWeight: "bold" }}>
+                                    {id ? "Update Banner Form" : "Add Banner Form"}
+                                </h3>
+                            </div>
+                            <form onSubmit={handleSubmit(onSubmit)}>
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <div className="card-body">
+                                            <div className="form-group text-start">
+                                                <label htmlFor="exampleInputBannerName">Type <span className='text-danger'>*</span></label>
+                                                <input type="text" className="form-control" id="exampleInputBannerName" name='type' {...register('type', { required: true })} defaultValue={bannerData ? bannerData.type : ""} />
+                                                {errors.type && <span className="text-danger">This field is required</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="card-body">
+                                            <div className="form-group text-start">
+                                                <label htmlFor="exampleInputBannerfile">Banner Image<span className='text-danger'>*</span></label>
+                                                <input type="file" className="form-control" id="exampleInputBannerfile" name='image' {...register('image', { required: id ? false : true })} />
+                                                {errors.image && <span className="text-danger">This field is required</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <div className="card-body">
+                                            <div className="form-group text-start">
+                                                <label htmlFor="exampleInputBannerDiscount">Link <span className='text-danger'>*</span></label>
+                                                <input type="text" className="form-control" id="exampleInputBannerDiscount" name='link' {...register('link', { required: true })} defaultValue={bannerData ? bannerData.link : ''} />
+                                                {errors.link && <span className="text-danger">This field is required</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="card-body">
+                                            <div className="form-group text-start">
+                                                <label htmlFor="exampleInputBannerDescription">Alt <span className='text-danger'>*</span></label>
+                                                <input type="text" className="form-control" id="exampleInputBannerDescription" name='alt' {...register('alt', { required: true })} defaultValue={bannerData ? bannerData.alt : ''} />
+                                                {errors.alt && <span className="text-danger">This field is required</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div className="row">
+                                    
+                                    <div className="col-md-6">
+                                        <div className="card-body">
+                                            <div className="form-group text-start">
+                                                <label htmlFor="exampleInputBannercheckbox">Status <span className='text-danger'>*</span></label>
+                                                <input type="checkbox" id="exampleInputBannercheckbox" name='status' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='text-start'>
+                                    <button type="submit" className='btn btn-outline-primary'>{id ? "Update" : "Submit"}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+    </div>
+  )
+}
+
+export default AddEditBanners

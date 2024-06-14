@@ -89,7 +89,7 @@ const Brands = () => {
   }
   
   const searchfunction = (event) => {
-    alert("1")
+    // alert("1")
     const searchdata = event.target.value.toLowerCase().trim();
     if (searchdata === "") {
       setbrandData(brandData);

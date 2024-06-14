@@ -376,6 +376,12 @@ const Dashboard1 = () => {
                   <p>Brands</p>
                 </Link>
               </li>
+              <li className="nav-item">
+                <Link to={"/banners"} className="nav-link">
+                  <i className="far fa-circle nav-icon" />
+                  <p>Banners</p>
+                </Link>
+              </li>
               
             </ul>
           </li>

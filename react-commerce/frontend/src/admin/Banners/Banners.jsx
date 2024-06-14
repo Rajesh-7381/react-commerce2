@@ -1,10 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { NotificationContainer,NotificationManager } from 'react-notifications'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Banners = () => {
     const [bannerData,setbannerData]=useState([]);
+    const navigate=useNavigate();
 
     useEffect(()=>{
         BannerData();
@@ -19,6 +20,10 @@ const Banners = () => {
         } catch (error) {
             console.log(error)
         }
+    }
+
+    const BannersAddEdit=(id)=>{
+      navigate('/addeditbanners',{state:{id:id}});
     }
   return (
     <div>
@@ -372,7 +377,7 @@ const Banners = () => {
                   <input className="form-control mr-2" type="search" placeholder="Search using banner Name" aria-label="Search"   />
                   <div className="input-group-append">
                       <NotificationContainer />
-                      <button className='btn btn-primary ' >Add</button>
+                      <button className='btn btn-primary ' onClick={()=>BannersAddEdit()}>Add</button>
                       
                   </div>
                  </div>

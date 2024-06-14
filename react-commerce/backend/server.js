@@ -1056,6 +1056,23 @@ app.get("/AllBannerData",(req,res)=>{
   });
 });
 
+// banner inserting
+app.post("/AddBanners",upload.single("image"),(req,res)=>{
+  const image = req.file ? req.file.filename : null;
+    // console.log(image);
+  const {type,link,alt}=req.body;
+  // console.log(req.body)
+  const query="insert into banners (type,image,link,alt) values(?,?,?,?)";
+
+  db.query(query,[type,image,link,alt],(err,data)=>{
+    if(err){
+      console.log(err);
+      return res.status(500).json({ message: "Database error" });
+    }
+    return res.status(200).json({ message: "Inserted successfully!" });
+  })
+})
+
 app.listen(process.env.SERVERPORT,()=>{
     console.log(`server listening at port ${process.env.SERVERPORT}`);
 });

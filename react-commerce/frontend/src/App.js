@@ -21,6 +21,7 @@ import ProductImages from './admin/ProductImages/ProductImages';
 import Brands from './admin/Brands/Brands';
 import AddEditBrands from './admin/Brands/AddEditBrands';
 import Banners from './admin/Banners/Banners';
+import AddEditBanners from './admin/Banners/AddEditBanners';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
           <Route path='/brands' element={< Brands/>}></Route>
           <Route path='/addeditbrands' element={< AddEditBrands/>}></Route>
           <Route path='/banners' element={< Banners/>}></Route>
+          <Route path='/addeditbanners' element={< AddEditBanners/>}></Route>
                   
 
           <Route path='/userdashboard2' element={< Dashboard2/>}></Route>
