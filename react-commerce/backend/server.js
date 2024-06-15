@@ -1060,20 +1060,20 @@ app.get("/AllBannerData",(req,res)=>{
 });
 
 // banner inserting
-app.post("/AddBanners",upload.fields("image"),(req,res)=>{
-  const image = req.file ? req.file.filename : null;
-    // console.log(image);
-  const {type,link,alt}=req.body;
-  // console.log(req.body)
-  const query="insert into banners (type,image,link,alt) values(?,?,?,?)";
+app.post("/AddBanners", upload.single("BannerImage"), (req, res) => {
+  const BannerImage = req.file ? req.file.filename : null;
+  console.log(BannerImage);
+  const { type, link, alt } = req.body;
+  console.log(req.body);
+  const query = "insert into banners (type, image, link, alt) values(?,?,?,?)";
 
-  db.query(query,[type,image,link,alt],(err,data)=>{
-    if(err){
+  db.query(query, [type, BannerImage, link, alt], (err, data) => {
+    if (err) {
       console.log(err);
       return res.status(500).json({ message: "Database error" });
     }
     return res.status(200).json({ message: "Inserted successfully!" });
-  })
+  });
 });
 
 // single bannerdata retrival
@@ -1082,7 +1082,7 @@ app.get("/EditBannerDetails/:id", (req, res) => {
   const query = "SELECT * FROM banners WHERE id = ?";
   db.query(query, [id], (err, data) => {
     if (err) {
-      console.log("Database query error:", err);
+      // console.log("Database query error:", err);
       res.status(500).json({ message: "Internal server error" });
       return;
     }
@@ -1090,60 +1090,77 @@ app.get("/EditBannerDetails/:id", (req, res) => {
       res.status(404).json({ message: "No data found for the given ID" });
       return;
     }
-    console.log("Data fetched from DB:", data); 
+    // console.log("Data fetched from DB:", data); 
     res.status(200).json({ message: "Data fetched successfully!", data });
   });
 });
 
-
-// delete banners
-app.delete("/DeleteBanners/:id",(req,res)=>{
+// update banner details
+app.put("/UpdateBanners/:id",upload.single("BannerImage"),(req,res)=>{
   const id=req.params.id;
-  const query="select image from banners where id=?";
-  db.query(query,[id],(err,data)=>{
+  const BannerImage = req.file ? req.file.filename : null;
+  const { type, link, alt } = req.body;
+  const query="update banners set type=?,image=?,link=?,alt=?";
+  db.query(query,[id,type,BannerImage,link,alt],(err,data)=>{
     if(err){
       console.log(err);
+
     }
+    return res.status(200).json({message:"Banner updated successfully!"});
 
-    if(data.length==0){
-      console.log("Banner image not found!");
-    }
-
-    const BannerData=data[0];
-    const image=BannerData.image;
-
-    const DeleteBanner=(imagepath)=>{
-      if(fs.existsSync(imagepath)){
-        fs.unlink(image,(err)=>{
-          if(err){
-            console.log(err);
-          }else{
-            console.log("file deleted")
-          }
-        })
-      }else{
-        console.log("file not deleted")
-      }
-    }
-
-    const imagepath=path.join(__dirname,`./uploads/banners/${banners}`);
-
-    if(image){
-      DeleteBanner(imagepath)
-    }
-
-    const deletequery="delete * from banners where id=?"; 
-    db.query(deletequery,[id],(err,data)=>{
-      if(err){
-        console.log(err);
-        return res.status(500).json({ message: "Error deleting Banner" });
-
-      }
-      res.status(200).json({ message: "Banner deleted successfully!" });
-
-
-    })
   })
+})
+
+
+// delete banners
+app.delete("/DeleteBanners/:id", (req, res) => {
+  const id = req.params.id;
+  const query = "SELECT image FROM banners WHERE id=?";
+  
+  db.query(query, [id], (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Database error" });
+    }
+
+    if (data.length == 0) {
+      console.log("Banner image not found!");
+      return res.status(404).json({ message: "Banner not found!" });
+    }
+
+    const BannerData = data[0];
+    const image = BannerData.image;
+
+    const deleteBannerImage = (imagePath) => {
+      if (fs.existsSync(imagePath)) {
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            // console.log(`File deleted: ${imagePath}`);
+          }
+        });
+      } else {
+        // console.log(`File does not exist: ${imagePath}`);
+      }
+    };
+
+    const imagePath = path.join(__dirname, `./uploads/banners/${image}`);
+    // console.log(imagePath);
+
+    if (image) {
+      deleteBannerImage(imagePath);
+    }
+
+    const deleteQuery = "DELETE FROM banners WHERE id=?";
+    db.query(deleteQuery, [id], (err, data) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Error deleting banner" });
+      }
+      return res.status(200).json({ message: "Banner deleted successfully!" });
+    });
+  });
 });
 
 // banners status change
@@ -1151,7 +1168,7 @@ app.put("/BannersStatusChange/:id",(req,res)=>{
   const id=req.params.id;
   const {status}=req.body;
   const newStatus=status === 'Active' ? 1 : 0;
-  console.log(newStatus)
+  // console.log(newStatus)
 
   const query="update banners set status=? where id=?";
   db.query(query,[id,newStatus],(err,data)=>{

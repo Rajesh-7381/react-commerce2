@@ -4,6 +4,7 @@ uploads
 backup.txt
 Reactcommerce.sql
 server2.js
+multerConfig2.js
 
 # FAQ:: when we try to write .env file why we write process.env
     Ans::   process.env: An object that contains the user environment. When Node.js runs, it provides this object to access all the environment variables available to the process.
