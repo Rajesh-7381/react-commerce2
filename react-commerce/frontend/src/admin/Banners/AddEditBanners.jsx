@@ -1,68 +1,67 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { NotificationManager } from 'react-notifications';
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const AddEditBanners = () => {
-    const location = useLocation();
-    const id = location.state ? location.state.id : null;
-    
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm();
-    const [bannerData,setbannerData]=useState([]);
-    const navigate=useNavigate();
+  const location = useLocation(); 
+  const id = location.state ? location.state.id : null;
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+  const [bannerData, setBannerData] = useState({});
+  const navigate = useNavigate();
 
-    useEffect(()=>{
-        if(id){
-            // alert(id)
-            GetBannerDetails();
-        }
-    },[]);
-
-    const GetBannerDetails = async (id) => {
-        try {
-            alert(id)
-          const response = await axios.get(`http://localhost:8081/EditBannerDetails/${id}`);
-          console.log(response.data.data[0]);
-        } catch (error) {
-          console.error("Error fetching banner details:", error);
-        }
-      };
-      
-
-    const onSubmit=async(formData)=>{
-        
-        try {
-            const form=new  FormData();
-            form.append('type',formData.type);
-            form.append('link',formData.link);
-            form.append('alt',formData.alt);
-
-            if (formData.image && formData.image[0]) {
-                form.append('image', formData.image[0]);
-              }
-
-            if(id){
-                await axios.put(`http://localhost:8081/UpdateBanners/${id}`,form,{
-                    headers:{
-                        'Content-Type':'multipart/form-data'
-                    }
-                });
-            }else{
-                await axios.post("http://localhost:8081/AddBanners",form,{
-                    headers:{
-                        'Content-Type':'multipart/form-data'
-                    }
-                });
-                setTimeout(()=>{
-                    NotificationManager.success("Form submited successfully!");
-                    navigate("/banners");
-                },2000)
-            }
-        } catch (error) {
-            
-        }
+  useEffect(() => {
+    if (id) {
+      GetBannerDetails(id);
     }
+  }, [id]);
+
+  const GetBannerDetails = async (id) => {
+    try {
+      const response = await axios.get(`http://localhost:8081/EditBannerDetails/${id}`);
+      const data = response.data.data[0];
+      setBannerData(data);
+      setValue("type", data.type);
+      setValue("link", data.link);
+      setValue("alt", data.alt);
+    } catch (error) {
+      console.error("Error fetching banner details:", error);
+    }
+  };
+
+  const onSubmit = async (formData) => {
+    try {
+      const form = new FormData();
+      form.append('type', formData.type);
+      form.append('link', formData.link);
+      form.append('alt', formData.alt);
+
+      if (formData.BannerImage && formData.BannerImage[0]) {
+        form.append('BannerImage', formData.BannerImage[0]);
+      }
+
+      if (id) {
+        await axios.put(`http://localhost:8081/UpdateBanners/${id}`, form, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        NotificationManager.success("Banner updated successfully!");
+      } else {
+        await axios.post("http://localhost:8081/AddBanners", form, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        NotificationManager.success("Banner added successfully!");
+      }
+      navigate("/banners");
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      NotificationManager.error("Form submission failed!");
+    }
+  };
   return (
     <div>
         <div className="wrapper">
@@ -103,9 +102,9 @@ const AddEditBanners = () => {
                                     <div className="col-md-6">
                                         <div className="card-body">
                                             <div className="form-group text-start">
-                                                <label htmlFor="exampleInputBannerfile">Banner Image<span className='text-danger'>*</span></label>
-                                                <input type="file" className="form-control" id="exampleInputBannerfile" name='image' {...register('image', { required: id ? false : true })} />
-                                                {errors.image && <span className="text-danger">This field is required</span>}
+                                                <label htmlFor="exampleInputBannerfile">Banner BannerImage<span className='text-danger'>*</span></label>
+                                                <input type="file" className="form-control" id="exampleInputBannerfile" name='BannerImage' {...register('BannerImage', { required: id ? false : true })} />
+                                                {errors.BannerImage && <span className="text-danger">This field is required</span>}
                                             </div>
                                         </div>
                                     </div>

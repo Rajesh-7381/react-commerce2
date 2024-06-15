@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
@@ -10,6 +10,9 @@ const AddEditBrands = () => {
     const { register, handleSubmit, setValue, formState: { errors } } = useForm();
     const [brandData, setBrandData] = useState(null);
     const navigate = useNavigate();
+    const imageRef=useRef(null);
+    const imageRef2=useRef(null);
+   
 
     useEffect(() => {
         if (id) {
@@ -81,6 +84,42 @@ const AddEditBrands = () => {
         }
     };
 
+    // zoom effect 
+    const zoomIn = () => {
+        if (imageRef.current) {
+            const currentWidth = imageRef.current.clientWidth;
+            imageRef.current.style.width = `${currentWidth + 50}px`;
+            imageRef.current.style.height = `${currentWidth + 50}px`;
+        }
+    };
+    
+    const zoomOut = () => {
+        if (imageRef.current) {
+            const currentWidth = imageRef.current.clientWidth;
+            if (currentWidth > 50) {
+                imageRef.current.style.width = `${currentWidth - 50}px`;  
+                imageRef.current.style.height = `${currentWidth - 50}px`; 
+            }
+        }
+    };
+    const zoomIn2 = () => {
+        if (imageRef2.current) {
+            const currentWidth = imageRef2.current.clientWidth;
+            imageRef2.current.style.width = `${currentWidth + 50}px`;
+            imageRef2.current.style.height = `${currentWidth + 50}px`;
+        }
+    };
+    
+    const zoomOut2 = () => {
+        if (imageRef2.current) {
+            const currentWidth = imageRef2.current.clientWidth;
+            if (currentWidth > 50) {
+                imageRef2.current.style.width = `${currentWidth - 50}px`;  
+                imageRef2.current.style.height = `${currentWidth - 50}px`; 
+            }
+        }
+    };
+
     return (
         <div>
             <div className="wrapper">
@@ -120,12 +159,31 @@ const AddEditBrands = () => {
                                             </div>
                                             <div className="col-md-6">
                                                 <div className="card-body">
-                                                    <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputBrandfile">Brand Image<span className='text-danger'>*</span></label>
-                                                        <input type="file" className="form-control" id="exampleInputBrandfile" name='brand_image' {...register('brand_image', { required: id ? false : true })} />
-                                                        {brandData && brandData.brand_image && <img src={`http://localhost:8081/brandimage/` + brandData.brand_image} width={50} height={50} alt="" />}
-                                                        {errors.brand_image && <span className="text-danger">This field is required</span>}
-                                                    </div>
+                                                <div className="form-group text-start">
+                                                <label htmlFor="exampleInputBrandfile">Brand Image<span className='text-danger'>*</span></label>
+                                                <input 
+                                                  type="file" 
+                                                  className="form-control" 
+                                                  id="exampleInputBrandfile" 
+                                                  name='brand_image' 
+                                                  {...register('brand_image', { required: id ? false : true })} 
+                                                />
+                                                {brandData && brandData.brand_image && (
+                                                  <div>
+                                                    <img 
+                                                      ref={imageRef} 
+                                                      src={`http://localhost:8081/brandimage/${brandData.brand_image}`} 
+                                                      width={50} 
+                                                      height={50} 
+                                                      alt="" 
+                                                      style={{ transition: 'width 0.5s, height 0.5s' }} 
+                                                    />
+                                                    <button className='btn btn-success mr-1' onClick={zoomIn}>+</button>
+                                                    <button className='btn btn-danger' onClick={zoomOut}>-</button>
+                                                  </div>
+                                                )}
+                                                {errors.brand_image && <span className="text-danger">This field is required</span>}
+                                              </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -196,7 +254,20 @@ const AddEditBrands = () => {
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputBrandLogo">Brand Logo <span className='text-danger'>*</span></label>
                                                         <input type="file" className="form-control" id="exampleInputBrandLogo" name='brand_logo' {...register('brand_logo', { required: id ? false : true })} />
-                                                        {brandData && brandData.brand_logo && <img src={`http://localhost:8081/brandlogo/` + brandData.brand_logo} width={50} height={50} alt="" />}
+                                                        {brandData && brandData.brand_logo && (
+                                                            <div>
+                                                              <img 
+                                                                ref={imageRef2} 
+                                                                src={`http://localhost:8081/brandlogo/${brandData.brand_logo}`} 
+                                                                width={50} 
+                                                                height={50} 
+                                                                alt="" 
+                                                                style={{ transition: 'width 0.5s, height 0.5s' }} 
+                                                              />
+                                                              <button className='btn btn-success mr-1' onClick={zoomIn2}>+</button>
+                                                              <button className='btn btn-danger' onClick={zoomOut2}>-</button>
+                                                            </div>
+                                                          )}
                                                         {errors.brand_logo && <span className="text-danger">This field is required</span>}
                                                     </div>
                                                 </div>

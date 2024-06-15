@@ -26,8 +26,8 @@ const Banners = () => {
     const BannersAddEdit=(id)=>{
       // alert(id)
       if(id){
-        alert(id)
-        navigate('/addeditbanners',{state :{id:id}});
+        // alert(id)
+        navigate('/addeditbanners',{state :{id:id}}); //pass an object with single object property id 
       }else{
         navigate('/addeditbanners');
       }
@@ -469,7 +469,7 @@ const Banners = () => {
                           <th className="bg-dark text-light">Sl No.</th>
                           <th className="bg-dark text-light"> TYPE</th>
                           <th className="bg-dark text-light">IMAGE</th>
-                          <th className="bg-dark text-light">LINK</th>
+                          <th className="bg-dark text-light" style={{height:'20px' ,width:"20px"}}>LINK</th>
                           <th className="bg-dark text-light">ALT</th>
                           <th className="bg-dark text-light">SORT</th>
                           <th className="bg-dark text-light">STATUS</th>
