@@ -38,6 +38,7 @@ const Dashboard1 = () => {
       // navigate("/"); 
       const id=sessionStorage.getItem("id");
       // console.log(id)
+      // alert(id)
       if(id){
         fetchuserdata(id);
       }else{
@@ -49,7 +50,8 @@ const Dashboard1 = () => {
     try {
       const reponse=await axios.get(`http://localhost:8081/singledata/${id}`);
       setUserData(reponse.data.data);
-      console.log(reponse.data.data)
+      // console.log(reponse.data.data)
+      // alert(JSON.stringify(userData))
     } catch (error) {
       
     }
@@ -143,6 +145,8 @@ const Dashboard1 = () => {
   const handleChartChange = (e) => {
     setSelectedChart(e.target.value);
   };
+
+ 
   
   return (
     
@@ -301,7 +305,7 @@ const Dashboard1 = () => {
       {/* Sidebar user panel (optional) */}
       <div className="user-panel mt-3 pb-3 mb-3 d-flex">
         <div className="image">
-        <img src={`http://localhost:8081/profile/${userData && userData.image}`} className="img-circle elevation-2" alt={userData && userData.name} />
+        <img src={`http://localhost:8081/profile/${userData && userData.image}`} style={{width:'50%'}} className="img-circle elevation-2" alt={userData && userData.name} />
         </div>
         <div className='text-light '>{userData && userData.name}</div>
         <div className="info">
@@ -312,7 +316,7 @@ const Dashboard1 = () => {
       {/* SidebarSearch Form */}
       <div className="form-inline">
         <div className="input-group" data-widget="sidebar-search">
-          <input className="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" />
+          <input className="form-control form-control-sidebar" type="search"  placeholder="Search" aria-label="Search" />
           <div className="input-group-append">
             <button className="btn btn-sidebar">
               <i className="fas fa-search fa-fw" />

@@ -79,21 +79,21 @@ app.post("/register",upload.single("image"), async (req, res) => {
           }
       }
   );
-  const mailOptions={
-    from : process.env.EMAIL, // Your email address
-    to : email, // reciver email
-    subject: 'Welcome to Our Service!',
-    text: `Hello ${name},\n\nThank you for registering at our service! We are excited to have you.\n\nBest regards,\nYour Company`,
+  // const mailOptions={
+  //   from : process.env.EMAIL, // Your email address
+  //   to : email, // reciver email
+  //   subject: 'Welcome to Our Service!',
+  //   text: `Hello ${name},\n\nThank you for registering at our service! We are excited to have you.\n\nBest regards,\nYour Company`,
 
-  };
-  transpoter.sendMail(mailOptions,(error,info)=>{
-    if (error) {
-      console.error('Error sending email:', error);
-      return res.status(500).json({ message: 'Internal Server Error' });
-    }
-    console.log('Email sent:', info.response);
-    res.status(200).json({ message: 'Registration successful and email sent!' });
-  })
+  // };
+  // transpoter.sendMail(mailOptions,(error,info)=>{
+  //   if (error) {
+  //     console.error('Error sending email:', error);
+  //     return res.status(500).json({ message: 'Internal Server Error' });
+  //   }
+  //   console.log('Email sent:', info.response);
+  //   res.status(200).json({ message: 'Registration successful and email sent!' });
+  // })
 });
 
 // app.post("/register", upload.single("image"), async (req, res) => {
@@ -138,7 +138,7 @@ app.post("/register",upload.single("image"), async (req, res) => {
 
 app.post("/login",(req, res,next) => {
   const { email, password, check } = req.body;
-  console.log(req.body)
+  // console.log(req.body)
   if (!email || !password) {
     return res.status(400).json({ status: 0, message: "Email and password are required" });
   }
@@ -169,8 +169,8 @@ app.post("/login",(req, res,next) => {
       { expiresIn: "24h" }
     );
 
-    console.log('Generated Token:', token); // Log the generated token for debugging
-    console.log('Secret Key:', process.env.JWT_SECRET); // Log the JWT secret key for debugging
+    // console.log('Generated Token:', token); // Log the generated token for debugging
+    // console.log('Secret Key:', process.env.JWT_SECRET); // Log the JWT secret key for debugging
 
     res.status(200).json({
       status: 1,
