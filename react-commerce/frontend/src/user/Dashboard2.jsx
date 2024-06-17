@@ -1021,9 +1021,10 @@ const Dashboard2 = () => {
     </header>
     {/*====== End - Main Header ======*/}
     {/*====== App Content ======*/}
+    <br />
     <div className="app-content">
       {/*====== Primary Slider ======*/}
-      {/*<div className="s-skeleton s-skeleton--h-600 s-skeleton--bg-grey">
+       {/*<div className="s-skeleton s-skeleton--h-600 s-skeleton--bg-grey">
         <div className="owl-carousel primary-style-1" id="sitemakers-slider">
         <div className="sitemakers-slide sitemakers-slide--1" style={{backgroundImage: `url("./frontend/images/banners/sitemaker-slider-banner-1.png")`}}>
         <div className="container">
