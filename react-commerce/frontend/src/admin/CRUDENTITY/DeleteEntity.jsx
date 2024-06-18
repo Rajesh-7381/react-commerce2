@@ -16,18 +16,38 @@ export const DeleteEntity = async (entity, id) => {
   
       if (confirmed.isConfirmed) {
         switch (entity) {
-          case 'category':
+          case 'Category':
             await axios.delete(`http://localhost:8081/categorydelete/${id}`);
             break;
-          case 'brand':
+
+          case 'Brand':
             await axios.delete(`http://localhost:8081/branddelete/${id}`);
             break;
-          case 'product':
+
+          case 'Product':
             await axios.delete(`http://localhost:8081/productdelete/${id}`);
             break;
+
           case 'Banner':
             await axios.delete(`http://localhost:8081/DeleteBanners/${id}`);
             break;
+
+          case 'Cms':
+            await axios.delete(`http://localhost:8081/cmsdelete/${id}`);
+            break;
+
+          case 'ProductsImage':
+            await axios.delete(`http://localhost:8081/ProductsImageDelete/${id}`);
+            break;
+
+          case 'SubAdmin':
+            await axios.delete(`http://localhost:8081/deleteAdminSubAdminUser/${id}`);
+            break;  
+
+          case 'Admin':
+            await axios.delete(`http://localhost:8081/deleteAdminSubAdminUser/${id}`);
+            break;  
+
           default:
             throw new Error(`Unknown entity: ${entity}`);
         }

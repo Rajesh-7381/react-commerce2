@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Swal from 'sweetalert2';
+import { DeleteEntity} from '../CRUDENTITY/DeleteEntity';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 
@@ -51,33 +51,13 @@ const Categories = () => {
     }
     // delete data
     const handledelete = async (id) => {
-        try {
-            const confirmed = await Swal.fire({
-                title: 'Are you sure?',
-                text: 'This action cannot be undone.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!',
-            });
+        const data=await DeleteEntity('Category',id);
+        // Fetch the updated data from the server and update the local state
+        const response = await axios.get("http://localhost:8081/categories");
 
-            if (confirmed.isConfirmed) {
-                // Delete the item
-                await axios.delete(`http://localhost:8081/categorydelete/${id}`);
-                NotificationManager.success("successfully!  deleted data");
-                // Fetch the updated data from the server and update the local state
-                const response = await axios.get("http://localhost:8081/categories");
-
-                setcategorydata(response.data);
-                setFilterData(response.data);
-            } else {
-                // Do nothing
-                NotificationManager.error("Data not deletd  successfully!");
-            }
-        } catch (error) {
-            console.error(error);
-        }
+        setcategorydata(response.data);
+        setFilterData(response.data);
+           
     }
 
     const toggleclick = async (id, status) => {

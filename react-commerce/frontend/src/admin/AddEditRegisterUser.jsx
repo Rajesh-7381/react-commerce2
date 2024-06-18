@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import zxcvbn from 'zxcvbn';
+import { DeleteEntity } from './CRUDENTITY/DeleteEntity';
 
 const AddEditRegisterUser = (args) => {
    
@@ -49,7 +50,7 @@ const AddEditRegisterUser = (args) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8081/alldata");
+        const response = await axios.get("http://localhost:8081/getAllAdminSubadminUsers");
         setData(response.data);
         setFilterData(response.data);  // Initialize filterData as well
       } catch (error) {
@@ -170,7 +171,7 @@ const AddEditRegisterUser = (args) => {
       await axios.put(`http://localhost:8081/update/${id}`, values);
       NotificationManager.success("Form updated successfully!");
       // Fetch the updated data from the server and update the local state
-      const response = await axios.get("http://localhost:8081/alldata");
+      const response = await axios.get("http://localhost:8081/getAllAdminSubadminUsers");
       setData(response.data);
       setFilterData(response.data);
       setModal2(false); // Close the modal after successful submission
@@ -192,32 +193,12 @@ const AddEditRegisterUser = (args) => {
 
 //   delete functionality
 const handledelete = async (id) => {
-    try {
-      const confirmed = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'This action cannot be undone.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-      });
-  
-      if (confirmed.isConfirmed) {
-        // Delete the item
-        await axios.delete(`http://localhost:8081/deletesingledata/${id}`);
-        NotificationManager.success("successfully!  deleted data");
-        // Fetch the updated data from the server and update the local state
-        const response = await axios.get("http://localhost:8081/alldata");
-        setData(response.data);
-        setFilterData(response.data);
-      } else {
-        // Do nothing
-        NotificationManager.error("Data not deletd  successfully!");
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    const data=await DeleteEntity('Admin',id);  
+    // Fetch the updated data from the server and update the local state
+    const response = await axios.get("http://localhost:8081/getAllAdminSubadminUsers");
+    setData(response.data);
+    setFilterData(response.data);
+      
   };
   
  // Function to handle password change and update password strength

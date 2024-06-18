@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { NotificationContainer, NotificationManager } from "react-notifications";
 import { Link, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
+import { DeleteEntity } from "../CRUDENTITY/DeleteEntity";
 const Brands = () => {
     const navigate=useNavigate();
     const [brandData,setbrandData]=useState([]);
@@ -30,34 +30,10 @@ const Brands = () => {
 
     const DeleteBrand=async(id)=>{
       // alert(id)
-      try {
-        const confirmed = await Swal.fire({
-            title: 'Are you sure?',
-            text: 'This action cannot be undone.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-        });
-
-        if (confirmed.isConfirmed) {
-            // Delete the item
-            await axios.delete(`http://localhost:8081/branddelete/${id}`);
-            // alert("de")
-            NotificationManager.success("successfully!  deleted data");
+            const data=await DeleteEntity('Brand',id);
             // Fetch the updated data from the server and update the local state
             const response = await axios.get("http://localhost:8081/getAllBrands");
-
             setbrandData(response.data);
-            // setFilterData(response.data);
-        } else {
-            // Do nothing
-            NotificationManager.error("Data not deletd  successfully!");
-        }
-    } catch (error) {
-        console.error(error);
-    }
     }
     // for status change
     const StatusChange = async (id, status) => {

@@ -283,12 +283,12 @@ app.get('/countsubadmin', (req, res) => {
 
 
 // show all user data
-app.get('/getAllUsers', (req, res) => {
+app.get('/getAllAdminSubadminUsers', (req, res) => {
   const sql = "SELECT * FROM AdminUser where deleted_at is null";
   db.query(sql, (err, data) => {
       if (err) {
           console.error('🚫 '+err);
-          return res.status(500).json({ message: "🚫Internal server error" });
+          return res.status(500).json({ message: "🚫 Internal server error" });
       }
       return res.json(data);
   });
@@ -348,7 +348,7 @@ app.put("/update/:id", (req, res) => {
 });
 
 // delete functionality
-app.delete("/deletesingledata/:id",(req,res)=>{
+app.delete("/deleteAdminSubAdminUser/:id",(req,res)=>{
   const id=req.params.id;
   const query="UPDATE AdminUser SET deleted_at = CURRENT_TIMESTAMP WHERE id=?";
   db.query(query,id,(err,result)=>{
@@ -397,7 +397,7 @@ app.get("/registerUserfromrDateTotodate/:fromdate/:todate", (req, res) => {
 
 
 // subadmins see all subadmins and user data
-app.get("/subadmindata",(req,res)=>{
+app.get("/getAllSubAdminData",(req,res)=>{
   const query ="select * from  AdminUser where role in('subadmin' ,'user')";
   db.query(query,(err,result)=>{
     if(err){
@@ -437,7 +437,7 @@ app.put("/handlecmspagestatus/:id",(req,res)=>{
 });
 
 // cms page delete data
-app.delete("/cmspagedelete/:id",(req,res)=>{
+app.delete("/cmsdelete/:id",(req,res)=>{
   const id=req.params.id;
   const query="update cmspages set deleted_at=CURRENT_TIMESTAMP where id=?";
   db.query(query,id,(err,result)=>{
@@ -827,7 +827,7 @@ app.get("/allproductcount",(req, res) => {
 
 
 // for products image
-app.get("/productsimage",(req,res)=>{
+app.get("/getAllproductsImages",(req,res)=>{
   const query="select * from products_image where deleted_at is null";
   db.query(query,(err,data)=>{
     if(err){
@@ -852,7 +852,7 @@ app.put("/handleproductsstatus/:id",(req,res)=>{
 });
 
 // delete products image
-app.delete("/productsimagedelete/:id",(req,res)=>{
+app.delete("/ProductsImageDelete/:id",(req,res)=>{
   const id=req.params.id;
   const query="update products_image set deleted_at=current_timestamp where id=?";
   db.query(query,id,(err,data)=>{
@@ -1067,9 +1067,9 @@ app.get("/getAllBanners",(req,res)=>{
 // banner inserting
 app.post("/AddBanners", upload.single("BannerImage"), (req, res) => {
   const BannerImage = req.file ? req.file.filename : null;
-  console.log(BannerImage);
+  // console.log(BannerImage);
   const { type, link, alt } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   const query = "insert into banners (type, image, link, alt) values(?,?,?,?)";
 
   db.query(query, [type, BannerImage, link, alt], (err, data) => {

@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { NotificationManager, NotificationContainer } from 'react-notifications';
-import Swal from 'sweetalert2';
+import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 
 
 const Cmspages = () => {
@@ -15,7 +15,7 @@ const Cmspages = () => {
     },[]);
 
     const cmspagetabledata=async()=>{
-        const response=await axios.get("http://localhost:8081/cmspagedata");
+        const response=await axios.get("http://localhost:8081/getAllCmss");
         setcmspagedata(response.data);
         setfilterdata(response.data);
     }
@@ -45,34 +45,13 @@ const Cmspages = () => {
     }
     // delete
     const handlecmspagedelete=async(id)=>{
-        // alert(id)
-        try {
-            const confirmed = await Swal.fire({
-                title: 'Are you sure?',
-                text: 'This action cannot be undone.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!',
-            });
-
-            if (confirmed.isConfirmed) {
-                // Delete the item
-                await axios.delete(`http://localhost:8081/cmspagedelete/${id}`);
-                NotificationManager.success("successfully!  deleted data");
-                // Fetch the updated data from the server and update the local state
-                const response = await axios.get("http://localhost:8081/cmspagedata");
-
-                setcmspagedata(response.data);
-                setfilterdata(response.data);
-            } else {
-                // Do nothing
-                NotificationManager.error("Data not deletd  successfully!");
-            }
-        } catch (error) {
-            console.error(error);
-        }
+        // alert(id)           
+        const data=await DeleteEntity('Cms',id);
+        // Fetch the updated data from the server and update the local state
+        const response = await axios.get("http://localhost:8081/getAllCmss");
+        setcmspagedata(response.data);
+        setfilterdata(response.data);
+           
     }
     // status change
     const handlecmspagetoggle=async(id,status)=>{
