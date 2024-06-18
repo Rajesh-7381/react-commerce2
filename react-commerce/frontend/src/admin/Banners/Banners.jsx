@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { NotificationContainer,NotificationManager } from 'react-notifications'
 import { Link, useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2';
+import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 
 const Banners = () => {
     const [bannerData,setbannerData]=useState([]);
@@ -14,7 +14,7 @@ const Banners = () => {
 
     const BannerData=async()=>{
         try {
-            const response=await axios.get("http://localhost:8081/AllBannerData");
+            const response=await axios.get("http://localhost:8081/getAllBanners");
             setbannerData(response.data);
             // console.log(bannerData)
             
@@ -35,28 +35,10 @@ const Banners = () => {
 
     // banner delete
     const BannerDelete=async(id)=>{
-      try {
-        // alert(id)
-        const confirmed = await Swal.fire({
-          title: 'Are you sure?',
-          text: 'This action cannot be undone.',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!',
-      });
-      if(confirmed.isConfirmed){
-        await axios.delete(`http://localhost:8081/DeleteBanners/${id}`);
-        NotificationManager.success("Banner deleted successfully!");
-
-        const response=await axios.get("http://localhost:8081/AllBannerData");
-            setbannerData(response.data);
-      }
-
-      } catch (error) {
-        
-      }
+      const data=await DeleteEntity('Banner',id);
+      const response=await axios.get("http://localhost:8081/getAllBanners");
+      setbannerData(response.data);
+      
     }
 
     const BannerStatusChange=async(id,status)=>{

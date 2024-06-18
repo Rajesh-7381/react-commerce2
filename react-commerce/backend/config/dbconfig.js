@@ -5,6 +5,7 @@
 // If you need to execute a large number of queries or need to improve the performance of your application, you should use createPool. If you only need to execute a few queries or need to perform a one-time operation, you can use createConnection.
 require('dotenv').config();
 const mysql2=require("mysql2");
+const {DATABASERROR}=require("../Error/AppError");
 
 const db = mysql2.createPool({
     // connectionLimit: 10, // Number of connections to create at once
@@ -15,31 +16,39 @@ const db = mysql2.createPool({
     port: process.env.PORT
   });
 
-//   for multiple database
-const db2 = mysql2.createPool({
-    // connectionLimit: 10, // Number of connections to create at once
-    host: process.env.LOCALHOST2, 
-    user: process.env.USER2,
-    password: process.env.PASSWORD2,
-    database: process.env.DATABASE2,
-    port: process.env.PORT2
-  });
+  function handleConnectionError(err){
+    console.error('Error connecting to the database:', err);
+    throw new DATABASERROR('Failed to connect to the database');
+  }
   
   // Check if the pool was created successfully
   db.getConnection((err, connection) => {
     if (err) {
-      console.error('Error connecting to the database:', err);
+      handleConnectionError(err);
+      // console.error('Error connecting to the database:', err);
       return;
     }
     if (connection) {
     //   console.log('Connected to the database');
       connection.release(); // Release the connection back to the pool
     } else {
-        console.error('No connection available');
+        // console.error('No connection available');
+        handleConnectionError(new Error('No connection available'));
         // Call this function when you need to end the pool, for example, during application shutdown
         endConnectionPool();
     }
   });
+
+  //   for multiple database
+// const db2 = mysql2.createPool({
+//     // connectionLimit: 10, // Number of connections to create at once
+//     host: process.env.LOCALHOST2, 
+//     user: process.env.USER2,
+//     password: process.env.PASSWORD2,
+//     database: process.env.DATABASE2,
+//     port: process.env.PORT2
+//   });
+
 
   // for multiple databse connection purpose
 //   db2.getConnection((err, connection) => {
@@ -70,4 +79,4 @@ const db2 = mysql2.createPool({
   
 
 // module.exports={db,db2};
-module.exports=db;
+module.exports={db,endConnectionPool};
