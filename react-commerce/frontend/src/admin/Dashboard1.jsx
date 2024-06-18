@@ -305,7 +305,9 @@ const Dashboard1 = () => {
       {/* Sidebar user panel (optional) */}
       <div className="user-panel mt-3 pb-3 mb-3 d-flex">
         <div className="image">
-        <img src={`http://localhost:8081/profile/${userData && userData.image}`} style={{width:'50%'}} className="img-circle elevation-2" alt={userData && userData.name} />
+            <Link to={`http://localhost:8081/profile/${userData && userData.image}`} target='_blank'>
+              <img src={`http://localhost:8081/profile/${userData && userData.image}`} style={{width:'50%'}} className="img-circle elevation-2" alt={userData && userData.name} />
+            </Link>
         </div>
         <div className='text-light '>{userData && userData.name}</div>
         <div className="info">
@@ -454,7 +456,7 @@ const Dashboard1 = () => {
               <div className="icon">
                 <i className="ion ion-person-add" />
               </div>
-              <Link href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
+              <Link to={'/registeruser'} className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
             </div>
           </div>
           {/* ./col */}

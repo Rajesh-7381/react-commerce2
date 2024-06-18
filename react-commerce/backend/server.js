@@ -326,8 +326,10 @@ app.get("/editdata/:id", (req, res) => {
 // Add update user endpoint
 app.put("/update/:id", (req, res) => {
   const id = req.params.id;
+
   // console.log(id)
   const { name, mobile, email, password, role } = req.body;
+  // console.log(req.body)
   const query = "UPDATE AdminUser SET name=?, mobile=?, email=?, password=?, role=? WHERE id=?";
 
   db.query(query, [name, mobile, email, password, role, id], (err, result) => {
