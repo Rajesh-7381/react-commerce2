@@ -1,37 +1,26 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import STACK from 'react-apexcharts';
+import fetchDataEntity from '../CRUDENTITY/FetchDataEntity';
 
 const STACKEDChart = () => {
-  const [userCount, setUserCount] = useState(0);
-  const [adminCount, setAdminCount] = useState(0);
-  const [subadminCount, setSubadminCount] = useState(0);
-  const [categoriesCount, setCategoriesCount] = useState(0);
-  const [allProductCount, setAllProductCount] = useState(0);
-  const [allBrandCount, setAllBrandCount] = useState(0);
+  const [counts, setCounts] = useState({
+    userCount: 0,
+    adminCount: 0,
+    subAdminCount: 0,
+    categoriesCount: 0,
+    allProductCount: 0,
+    allBrandCount: 0,
+});
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userResponse = await axios.get("http://localhost:8081/countuser");
-        const adminResponse = await axios.get("http://localhost:8081/countadmin");
-        const subadminResponse = await axios.get("http://localhost:8081/countsubadmin");
-        const uniquecategoriesResponse = await axios.get("http://localhost:8081/uniquecategories");
-        const productcountResponse = await axios.get("http://localhost:8081/allproductcount");
-        const BrandcountResponse = await axios.get("http://localhost:8081/AllBrandCount");
-        setUserCount(userResponse.data.count);
-        setAdminCount(adminResponse.data.Admincount);
-        setSubadminCount(subadminResponse.data.subaAdmincount);
-        setCategoriesCount(uniquecategoriesResponse.data.catcount);
-        setAllProductCount(productcountResponse.data.productcount);
-        setAllBrandCount(BrandcountResponse.data.Brandcount);
-      } catch (error) {
-        console.error("Error fetching count data:", error);
-      }
+useEffect(() => {
+    const getCounts = async () => {
+        const data = await fetchDataEntity();
+        if (data) setCounts(data);
     };
 
-    fetchData();
-  }, []);
+    getCounts();
+}, []);
 
   return (
     <div>
@@ -39,27 +28,27 @@ const STACKEDChart = () => {
         series={[
           {
             name: "Admin",
-            data: [adminCount]
+            data: [counts.adminCount]
           },
           {
             name: "SubAdmin",
-            data: [subadminCount]
+            data: [counts.subAdminCount]
           },
           {
             name: "User",
-            data: [userCount]
+            data: [counts.userCount]
           },
           {
             name: "Categories",
-            data: [categoriesCount]
+            data: [counts.categoriesCount]
           },
           {
             name: "Products",
-            data: [allProductCount]
+            data: [counts.allProductCount]
           },
           {
             name: "Brands",
-            data: [allBrandCount]
+            data: [counts.allBrandCount]
           }
         ]}
 
