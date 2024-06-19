@@ -146,7 +146,7 @@ app.post("/register",upload.single("image"), async (req, res) => {
 
 app.post("/login",(req, res,next) => {
   const { email, password, check } = req.body;
-  console.log(req.body)
+  // console.log(req.body)
   if (!email || !password) {
     return res.status(400).json({ status: 0, message: "Email and password are required" });
   }
@@ -177,8 +177,8 @@ app.post("/login",(req, res,next) => {
       { expiresIn: "24h" }
     );
 
-    console.log('Generated Token:', token); // Log the generated token for debugging
-    console.log('Secret Key:', process.env.JWT_SECRET); // Log the JWT secret key for debugging
+    // console.log('Generated Token:', token); // Log the generated token for debugging
+    // console.log('Secret Key:', process.env.JWT_SECRET); // Log the JWT secret key for debugging
 
     res.status(200).json({
       status: 1,
@@ -422,7 +422,7 @@ app.get("/getAllCmss",(req,res)=>{
 });
 
 // cms page staus change
-app.put("/handlecmspagestatus/:id",(req,res)=>{
+app.put("/handlecmsstatus/:id",(req,res)=>{
   const id=req.params.id;
   const {status}=req.body;
   const query="update cmspages set status=? where id =?";
@@ -570,7 +570,7 @@ app.delete("/categorydelete/:id", (req, res) => {
 });
 
 // update category status
-app.put("/updatecategorystatus/:id", (req, res) => {
+app.put("/handlecategorystatus/:id", (req, res) => {
   const id = req.params.id;
   const { status } = req.body;
   const query = "UPDATE categories SET status = ? WHERE id = ?";
@@ -788,7 +788,7 @@ app.delete("/productdelete/:id",(req,res)=>{
 });
 
 // toggle status
-app.put("/updatestatus/:id",(req,res)=>{
+app.put("/handleproductstatus/:id",(req,res)=>{
   const id=req.params.id;
   const { status } = req.body;
   const query="update products set status=? where id=?";
@@ -1039,19 +1039,21 @@ app.delete("/branddelete/:id", (req, res) => {
 });
 
 // brand status change
-app.put("/BrandStatusChange/:id",(req,res)=>{
-  const id=req.params.id;
-  const {status}=req.body;
-  const newStatus=status==='Active'? 1 : 0;
-  const query="update brands set status=? where id=?";
-  db.query(query,[id,newStatus],(err,data)=>{
-    if(err){
-          console.error('🚫 '+err);
-          return res.status(500).json({ message: "Internal Server Error" });
+app.put("/handlebrandstatus/:id", (req, res) => {
+  const id = req.params.id;
+  const { status } = req.body;
+  const newStatus=status === 'Active' ? 1 : 0;
+  const query = "UPDATE brands SET status=? WHERE id=?";
+  
+  db.query(query, [newStatus, id], (err, data) => {
+    if (err) {
+      console.error('🚫 ' + err);
+      return res.status(500).json({ message: "Internal Server Error" });
     }
     return res.status(200).json({ message: "Status Updated Successfully" });
-  })
-})
+  });
+});
+
 
 // for banners table
 app.get("/getAllBanners",(req,res)=>{
@@ -1169,7 +1171,7 @@ app.delete("/DeleteBanners/:id", (req, res) => {
 });
 
 // banners status change
-app.put("/BannersStatusChange/:id",(req,res)=>{
+app.put("/handlebannerstatus/:id",(req,res)=>{
   const id=req.params.id;
   const {status}=req.body;
   const newStatus=status === 'Active' ? 1 : 0;

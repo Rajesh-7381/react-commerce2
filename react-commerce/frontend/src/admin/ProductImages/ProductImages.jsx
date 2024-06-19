@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { NotificationManager, NotificationContainer } from 'react-notifications';
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
+import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 
 
 const ProductImages = () => {
@@ -34,22 +35,7 @@ const ProductImages = () => {
     }
     // status change
     const handleProductsToggleStatus=async(id,status)=>{
-        try {
-            const newstatus=status===1 ? 0 : 1;
-            // alert(id)
-            // alert(status)
-             await axios.put(`http://localhost:8081/handleproductsstatus/${id}`,{status:newstatus});
-             const updatedata=filterdata.map(item=>{
-                if(item.id === id){
-                    return {...item ,status:newstatus};
-                }
-                return item;
-        })
-        setfilterdata(updatedata)
-        } catch (error) {
-            console.error(error);
-        }
-        
+        await StatusEntity('ProductsImageStatus', id, status, setfilterdata, filterdata);
     }
 
   return (

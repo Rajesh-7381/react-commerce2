@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import jsPDF, {JsPdf} from 'jspdf';
 import 'jspdf-autotable';
 import { DeleteEntity } from './CRUDENTITY/DeleteEntity';
+import { StatusEntity } from './CRUDENTITY/StatusEntity';
 
 const Subadmin = (args) => {
     const navigate=useNavigate();
@@ -91,12 +92,6 @@ const Subadmin = (args) => {
         setFilterData(response.data);
          
       };
-      
-
-    //   status change or role change
-    const handleStatusChange=async(id)=>{
-        
-    }
 
     // print page
     const printpage=()=>{
@@ -179,7 +174,6 @@ const Subadmin = (args) => {
                                                 <th className='bg-dark text-light'>ROLE</th>
                                                 <th className='bg-dark text-light'>Created At</th>
                                                 <th className='bg-dark text-light'>ACTIONS</th>
-                                                <th className='bg-dark text-light'>Type</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -197,7 +191,6 @@ const Subadmin = (args) => {
                                                         <button className='btn btn-success btn-sm mr-2' onClick={()=> handleupdate(item.id)}><i className='fas fa-pencil-alt'></i></button>
                                                         <button className='btn btn-danger btn-sm' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
                                                     </td>
-                                                    <td className={item.role === 'subadmin' ? 'bg-info' : 'bg-primary'}> <i className={item.role === 'subadmin' ? 'fas fa-toggle-on' : 'fas fa-toggle-off'} style={{ color: item.role === 'subadmin' ? 'black' : '' }} onClick={() => handleStatusChange(item.id)} ></i></td>               
                                                </tr>
                                             ))}
                                         </tbody>

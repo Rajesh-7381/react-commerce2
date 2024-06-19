@@ -4,6 +4,7 @@ import { NotificationContainer, NotificationManager } from 'react-notifications'
 import { Link, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2';
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
+import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 
 const Products = () => {
     const navigate=useNavigate();
@@ -36,20 +37,7 @@ const Products = () => {
     }
 
     const toggleclick = async (status, id) => {
-        // alert(status)
-        const newStatus = status === 'Active' ? 'Inactive' : 'Active';
-        try {
-          await axios.put(`http://localhost:8081/updatestatus/${id}`, { status: newStatus });
-          const updatedData = productdata.map((item) => {
-            if (item.id === id) {
-              return { ...item, status: newStatus };
-            }
-            return item;
-          });
-          setproductdata(updatedData);
-        } catch (error) {
-          console.error(error);
-        }
+        await StatusEntity('ProductStatus',id,status,setproductdata,productdata)
       };
       
     const [currentpage,setCurrentPage]=useState(1);

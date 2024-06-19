@@ -4,6 +4,7 @@ import axios from 'axios';
 import { DeleteEntity} from '../CRUDENTITY/DeleteEntity';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
+import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 
 const Categories = () => {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ const Categories = () => {
     }, []);
 
     const handlecategorydata = async () => {
-        const response = await axios.get("http://localhost:8081/categories")
+        const response = await axios.get("http://localhost:8081/getAllCategorys")
         setcategorydata(response.data);
         setFilterData(response.data);
     }
@@ -53,7 +54,7 @@ const Categories = () => {
     const handledelete = async (id) => {
         const data=await DeleteEntity('Category',id);
         // Fetch the updated data from the server and update the local state
-        const response = await axios.get("http://localhost:8081/categories");
+        const response = await axios.get("http://localhost:8081/getAllCategorys");
 
         setcategorydata(response.data);
         setFilterData(response.data);
@@ -61,26 +62,7 @@ const Categories = () => {
     }
 
     const toggleclick = async (id, status) => {
-        try {
-            // Determine the new status based on the current status
-            const newstatus = status === 1 ? 0 : 1;
-
-            // Send a PUT request to update the category status
-            await axios.put(`http://localhost:8081/updatecategorystatus/${id}`, { status: newstatus });
-
-            // Update the local state with the new status
-            const updatedata = filterData.map(item => {
-                if (item.id === id) {
-                    return { ...item, status: newstatus };
-                }
-                return item;
-            })
-            setFilterData(updatedata);
-        } catch (error) {
-            // Handle error if the request fails
-            console.error(error);
-            NotificationManager.error("Failed to update status!");
-        }
+        await StatusEntity('CategoryStatus',id,status,setFilterData,filterData);
     }
 
     // for pagination
