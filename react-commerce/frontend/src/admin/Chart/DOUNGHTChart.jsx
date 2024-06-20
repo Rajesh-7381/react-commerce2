@@ -2,37 +2,26 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import  DoughnutChart  from 'react-apexcharts';
+import  fetchData from '../CRUDENTITY/FetchDataEntity';
+
 
 const DoughnutChartComponent = () => {
-  const [userCount, setUserCount] = useState(0);
-  const [adminCount, setAdminCount] = useState(0);
-  const [subadminCount, setSubadminCount] = useState(0);
-  const [categoriesCount, setCategoriesCount] = useState(0);
-  const [allProductCount, setAllProductCount] = useState(0);
-  const [allBrandCount, setAllBrandCount] = useState(0);
+  const [counts, setCounts] = useState({
+    userCount: 0,
+    adminCount: 0,
+    subAdminCount: 0,
+    categoriesCount: 0,
+    allProductCount: 0,
+    allBrandCount: 0,
+});
+useEffect(() => {
+  const getCounts = async () => {
+      const data = await fetchData();
+      if (data) setCounts(data);
+  };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userResponse = await axios.get("http://localhost:8081/countuser");
-        const adminResponse = await axios.get("http://localhost:8081/countadmin");
-        const subadminResponse = await axios.get("http://localhost:8081/countsubadmin");
-        const uniquecategoriesResponse = await axios.get("http://localhost:8081/uniquecategories");
-        const productcountResponse = await axios.get("http://localhost:8081/allproductcount");
-        const BrandcountResponse = await axios.get("http://localhost:8081/AllBrandCount");
-        setUserCount(userResponse.data.count);
-        setAdminCount(adminResponse.data.Admincount);
-        setSubadminCount(subadminResponse.data.subaAdmincount);
-        setCategoriesCount(uniquecategoriesResponse.data.catcount);
-        setAllProductCount(productcountResponse.data.productcount);
-        setAllBrandCount(BrandcountResponse.data.Brandcount);
-      } catch (error) {
-        console.error("Error fetching count data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  getCounts();
+}, []);
 
   return (
     <div>
@@ -40,7 +29,14 @@ const DoughnutChartComponent = () => {
         series={[
           {
             name: "",
-            data: [adminCount, subadminCount, userCount, categoriesCount, allProductCount, allBrandCount]
+            data: [
+                            counts.adminCount,
+                            counts.subAdminCount,
+                            counts.userCount,
+                            counts.categoriesCount,
+                            counts.allProductCount,
+                            counts.allBrandCount
+                        ]
           }
         ]}
 

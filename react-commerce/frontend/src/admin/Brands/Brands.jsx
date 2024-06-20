@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { NotificationContainer, NotificationManager } from "react-notifications";
 import { Link, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
+import { DeleteEntity } from "../CRUDENTITY/DeleteEntity";
+import { StatusEntity } from "../CRUDENTITY/StatusEntity";
 const Brands = () => {
     const navigate=useNavigate();
     const [brandData,setbrandData]=useState([]);
@@ -30,62 +31,14 @@ const Brands = () => {
 
     const DeleteBrand=async(id)=>{
       // alert(id)
-      try {
-        const confirmed = await Swal.fire({
-            title: 'Are you sure?',
-            text: 'This action cannot be undone.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-        });
-
-        if (confirmed.isConfirmed) {
-            // Delete the item
-            await axios.delete(`http://localhost:8081/branddelete/${id}`);
-            // alert("de")
-            NotificationManager.success("successfully!  deleted data");
+            const data=await DeleteEntity('Brand',id);
             // Fetch the updated data from the server and update the local state
             const response = await axios.get("http://localhost:8081/getAllBrands");
-
             setbrandData(response.data);
-            // setFilterData(response.data);
-        } else {
-            // Do nothing
-            NotificationManager.error("Data not deletd  successfully!");
-        }
-    } catch (error) {
-        console.error(error);
-    }
     }
     // for status change
-    const StatusChange = async (id, status) => {
-      try {
-        // alert(id + ""+status)
-          // console.log(`Initial status: ${status}`);
-          const newStatus = status === 1 ? 0 : 1; // Toggle status
-          // alert(newStatus)
-          // console.log(`New status: ${newStatus}`);
-  
-          const response = await axios.put(`http://localhost:8081/BrandStatusChange/${id}`, { status: newStatus });
-          // console.log('Response from backend:', response.data);
-  
-          // Update local state with the new status
-          const updatedStatus = brandData.map(item => {
-              if (item.id === id) {
-                  // console.log(`Updating item with id: ${id}`);
-                  return { ...item, status: newStatus }; // Create a new object with the updated status
-              }
-              return item; // Return the original item if the id does not match
-          });
-  
-          // console.log('Updated brandData:', updatedStatus);
-          NotificationManager.success("Status Update successfully!"); // Show success notification
-          setbrandData(updatedStatus); // Update the state with the new array
-      } catch (error) {
-          console.error('Error updating status:', error); // Log any errors
-      }
+    const BrandStatusChange = async (id, status) => {
+     await StatusEntity('BrandStatus',id,status,setbrandData,brandData)
   }
   
   const searchfunction = (event) => {
@@ -516,7 +469,7 @@ const Brands = () => {
                               <td>
                               <NotificationContainer />
                               <button className='btn btn-success btn-sm  mr-1' onClick={()=>BrandsAddEdit(item.id)}><i className='fas  fa-pencil-alt'></i></button>
-                              <button className='btn btn-dark btn-sm  mr-1' onClick={()=>StatusChange(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
+                              <button className='btn btn-dark btn-sm  mr-1' onClick={()=>BrandStatusChange(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
                               <button className='btn btn-danger btn-sm ' onClick={()=>DeleteBrand(item.id)}><i className='fas fa-trash'></i></button>
                               </td>
                             </tr>
