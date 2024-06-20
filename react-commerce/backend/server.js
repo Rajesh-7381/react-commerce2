@@ -3,7 +3,9 @@ const cors=require("cors");
 // const mysql2=require("mysql2");
 
 // db
-const db=require("./config/dbconfig");
+const {db}=require("./config/dbconfig");
+const errhandler=require("./Middleware/ErrorHandler");
+const {DatabaseError}=require("./Error/AppError");
 
 // for multiple database
 // const {db,db2}=require("./config/dbconfig");
@@ -63,6 +65,9 @@ app.use('/brandlogo', express.static(path.join(__dirname, 'uploads/Brands/BrandL
 app.use("/bannerImage",express.static(path.join(__dirname,'uploads/banners')));
 
 
+
+app.use(errhandler)
+
 // register user data
 app.post("/register",upload.single("image"), async (req, res) => {
   // console.log(req.body); // Log the incoming request body to check data
@@ -75,28 +80,28 @@ app.post("/register",upload.single("image"), async (req, res) => {
       [name, mobile, email, hashedpassword,req.file.filename],
       (err, data) => {
           if (err) {
-              console.error("Error submitting form", err);
-              return res.status(500).json({ message: "Internal server error" });
+              console.error("🚫 Error submitting form", err);
+              return res.status(500).json({ message: "🚫 Internal server error" });
           } else {
               res.json({ message: "User created successfully!" });
           }
       }
   );
-  const mailOptions={
-    from : process.env.EMAIL, // Your email address
-    to : email, // reciver email
-    subject: 'Welcome to Our Service!',
-    text: `Hello ${name},\n\nThank you for registering at our service! We are excited to have you.\n\nBest regards,\nYour Company`,
+  // const mailOptions={
+  //   from : process.env.EMAIL, // Your email address
+  //   to : email, // reciver email
+  //   subject: 'Welcome to Our Service!',
+  //   text: `Hello ${name},\n\nThank you for registering at our service! We are excited to have you.\n\nBest regards,\nYour Company`,
 
-  };
-  transpoter.sendMail(mailOptions,(error,info)=>{
-    if (error) {
-      console.error('Error sending email:', error);
-      return res.status(500).json({ message: 'Internal Server Error' });
-    }
-    console.log('Email sent:', info.response);
-    res.status(200).json({ message: 'Registration successful and email sent!' });
-  })
+  // };
+  // transpoter.sendMail(mailOptions,(error,info)=>{
+  //   if (error) {
+  //     console.error('Error sending email:', error);
+  //     return res.status(500).json({ message: 'Internal Server Error' });
+  //   }
+  //   console.log('Email sent:', info.response);
+  //   res.status(200).json({ message: 'Registration successful and email sent!' });
+  // })
 });
 
 // app.post("/register", upload.single("image"), async (req, res) => {
@@ -141,7 +146,7 @@ app.post("/register",upload.single("image"), async (req, res) => {
 
 app.post("/login",(req, res,next) => {
   const { email, password, check } = req.body;
-  console.log(req.body)
+  // console.log(req.body)
   if (!email || !password) {
     return res.status(400).json({ status: 0, message: "Email and password are required" });
   }
@@ -150,7 +155,7 @@ app.post("/login",(req, res,next) => {
   db.query(query, [email], async (err, data) => {
     if (err) {
       console.error("Login unsuccessful:", err);
-      return res.status(500).json({ status: 0, message: "Internal server error" });
+      return res.status(500).json({ status: 0, message: "🚫 Internal server error" });
     }
 
     if (data.length === 0) {
@@ -172,8 +177,8 @@ app.post("/login",(req, res,next) => {
       { expiresIn: "24h" }
     );
 
-    console.log('Generated Token:', token); // Log the generated token for debugging
-    console.log('Secret Key:', process.env.JWT_SECRET); // Log the JWT secret key for debugging
+    // console.log('Generated Token:', token); // Log the generated token for debugging
+    // console.log('Secret Key:', process.env.JWT_SECRET); // Log the JWT secret key for debugging
 
     res.status(200).json({
       status: 1,
@@ -193,8 +198,8 @@ app.get("/checkemail/:email", (req, res) => {
   const query = "SELECT * FROM AdminUser WHERE email=?";
   db.query(query, [email], (err, result) => {
     if (err) {
-      console.error('Error checking email', err);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error('🚫 Error checking email', err);
+      res.status(500).json({ error: '🚫 Internal Server Error' });
       return;
     }
     const exists = result.length > 0;
@@ -213,14 +218,14 @@ app.post("/passwordforgot/:email", async (req, res) => {
     const query = "UPDATE AdminUser SET password=? WHERE email=?";
     db.query(query, [hashedPassword, email], (err, result) => {
       if (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Internal server error" });
+        console.error('🚫 '+err);
+        return res.status(500).json({ error: "🚫 Internal server error" });
       }
       return res.status(200).json({ message: "Updated successfully!" });
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "🚫 Internal server error" });
   }
 });
 
@@ -229,7 +234,7 @@ app.get('/countuser', (req, res) => {
   const query = "SELECT COUNT(id) AS total FROM AdminUser where role='user'"; // Alias 'count(id)' as 'total'
   db.query(query, (err, data) => {
     if (err) {
-      return res.status(500).json({message: "Internal server error"});
+      return res.status(500).json({message: "🚫 Internal server error"});
     } else {
       const count = data[0].total; // Access using the alias 'total'
       // const count2 = data[0].email; // Access using the alias 'total'
@@ -246,7 +251,7 @@ app.get('/countadmin', (req, res) => {
   const query = "SELECT COUNT(id) AS total FROM AdminUser where role='admin'"; // Alias 'count(id)' as 'total'
   db.query(query, (err, data) => {
     if (err) {
-      return res.status(500).json({message: "Internal server error"});
+      return res.status(500).json({message: "🚫 Internal server error"});
     } else {
       const Admincount = data[0].total; // Access using the alias 'total'
       // const count2 = data[0].email; // Access using the alias 'total'
@@ -263,7 +268,7 @@ app.get('/countsubadmin', (req, res) => {
   const query = "SELECT COUNT(id) AS total FROM AdminUser where role='subadmin'"; // Alias 'count(id)' as 'total'
   db.query(query, (err, data) => {
     if (err) {
-      return res.status(500).json({message: "Internal server error"});
+      return res.status(500).json({message: "🚫Internal server error"});
     } else {
       const subaAdmincount = data[0].total; // Access using the alias 'total'
       // const count2 = data[0].email; // Access using the alias 'total'
@@ -278,12 +283,12 @@ app.get('/countsubadmin', (req, res) => {
 
 
 // show all user data
-app.get('/alldata', (req, res) => {
+app.get('/getAllAdminSubadminUsers', (req, res) => {
   const sql = "SELECT * FROM AdminUser where deleted_at is null";
   db.query(sql, (err, data) => {
       if (err) {
-          console.error(err);
-          return res.status(500).json({ message: "Internal server error" });
+          console.error('🚫 '+err);
+          return res.status(500).json({ message: "🚫 Internal server error" });
       }
       return res.json(data);
   });
@@ -297,11 +302,11 @@ app.get("/singledata/:id",(req,res)=>{
   const query="select * from AdminUser where id=?";
   db.query(query,id,(err,result)=>{
     if(err){
-      console.error("error fetching data",err);
-      return res.status(500).json({message:"internal server error"});
+      console.error("🚫 error fetching data",err);
+      return res.status(500).json({message:"🚫 internal server error"});
     }
     if(result.length===0){
-      return res.status(404).json({message:"data not found!"});
+      return res.status(404).json({message:"🚫 data not found!"});
     }
     return res.status(200).json({message:"data fetched successfully!",data:result[0]});
 
@@ -316,11 +321,11 @@ app.get("/editdata/:id", (req, res) => {
   const query = "select * from AdminUser where id=?";
   db.query(query, [id], (err, result) => {
       if (err) {
-          console.error("error fetching data", err);
-          return res.status(500).json({ message: "internal server error" });
+          console.error("🚫 error fetching data", err);
+          return res.status(500).json({ message: "🚫 internal server error" });
       }
       if (result.length === 0) {
-          return res.status(404).json({ message: "data not found!" });
+          return res.status(404).json({ message: "🚫 data not found!" });
       }
       return res.status(200).json({ message: "data fetched successfully!", data: result[0] });
   });
@@ -335,21 +340,21 @@ app.put("/update/:id", (req, res) => {
 
   db.query(query, [name, mobile, email, password, role, id], (err, result) => {
     if (err) {
-      console.error("Error updating data", err);
-      return res.status(500).json({ message: "Internal server error" });
+      console.error("🚫 Error updating data", err);
+      return res.status(500).json({ message: "🚫 Internal server error" });
     }
     return res.status(200).json({ message: "Data updated successfully!" });
   });
 });
 
 // delete functionality
-app.delete("/deletesingledata/:id",(req,res)=>{
+app.delete("/deleteAdminSubAdminUser/:id",(req,res)=>{
   const id=req.params.id;
   const query="UPDATE AdminUser SET deleted_at = CURRENT_TIMESTAMP WHERE id=?";
   db.query(query,id,(err,result)=>{
     if(err){
-      console.error(err);
-      return res.status(500).json({message:"internal server error"})
+      console.error('🚫 '+err);
+      return res.status(500).json({message:"🚫 internal server error"})
     }
     return res.status(200).json({message:"deleted sucessfully!"})
   })
@@ -367,8 +372,8 @@ app.get("/registerUserParticularDate/:date", (req, res) => {
   db.query(query, [date], (err, data) => {
   // db.query(query, [formattedDate], (err, data) => {
     if (err) {
-      console.error(err);
-      res.status(500).json({ message: "Internal server error" });
+      console.error('🚫 '+err);
+      res.status(500).json({ message: "🚫 Internal server error" });
     } else {
       res.json(data[0]);
     }
@@ -382,8 +387,8 @@ app.get("/registerUserfromrDateTotodate/:fromdate/:todate", (req, res) => {
   const query = "SELECT COUNT(*) AS count FROM AdminUser WHERE created_at BETWEEN ? AND ?";
   db.query(query, [fromdate, todate], (err, data) => {
     if (err) {
-      console.error(err);
-      res.status(500).json({ message: "Internal server error" });
+      console.error('🚫 '+err);
+      res.status(500).json({ message: "🚫 Internal server error" });
     } else {
       res.json(data[0]);
     }
@@ -392,12 +397,12 @@ app.get("/registerUserfromrDateTotodate/:fromdate/:todate", (req, res) => {
 
 
 // subadmins see all subadmins and user data
-app.get("/subadmindata",(req,res)=>{
+app.get("/getAllSubAdminData",(req,res)=>{
   const query ="select * from  AdminUser where role in('subadmin' ,'user')";
   db.query(query,(err,result)=>{
     if(err){
-      console.error(err);
-      return res.status(500).json({message:"internal server error"});
+      console.error('🚫 '+err);
+      return res.status(500).json({message:"🚫 internal server error"});
     }
     // return res.status(200).json({message:"data get successfully!"})
     return res.json(result);
@@ -405,11 +410,11 @@ app.get("/subadmindata",(req,res)=>{
 });
 
 // cms page data
-app.get("/cmspagedata",(req,res)=>{
+app.get("/getAllCmss",(req,res)=>{
   const query="select * from cmspages where deleted_at is null";
   db.query(query,(err,data)=>{
     if(err){
-      console.error(err);
+      console.error('🚫 '+err);
 
     }
     return res.json(data)
@@ -417,14 +422,14 @@ app.get("/cmspagedata",(req,res)=>{
 });
 
 // cms page staus change
-app.put("/handlecmspagestatus/:id",(req,res)=>{
+app.put("/handlecmsstatus/:id",(req,res)=>{
   const id=req.params.id;
   const {status}=req.body;
   const query="update cmspages set status=? where id =?";
   db.query(query,[status,id],(err,result)=>{
     if(err){
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+      console.error('🚫 '+err);
+      return res.status(500).json({ message: "🚫 Internal server error" });
     }
     return res.status(200).json({message:"status updated successfully!"});
 
@@ -432,13 +437,13 @@ app.put("/handlecmspagestatus/:id",(req,res)=>{
 });
 
 // cms page delete data
-app.delete("/cmspagedelete/:id",(req,res)=>{
+app.delete("/cmsdelete/:id",(req,res)=>{
   const id=req.params.id;
   const query="update cmspages set deleted_at=CURRENT_TIMESTAMP where id=?";
   db.query(query,id,(err,result)=>{
     if(err){
-      console.error(err)
-      return res.status(500).json({message:"internal server error"});
+      console.error('🚫 '+err)
+      return res.status(500).json({message:"🚫 internal server error"});
     }
     return res.status(200).json({message:"deleted successfully!"});
   })
@@ -452,8 +457,8 @@ app.put("/cmsupdatepage/:id", upload.none(), (req, res) => {
   const query = "UPDATE cmspages SET title=?, url=?, description=?, meta_title=?, meta_keywords=?, meta_description=? WHERE id =?";
   db.query(query, [title, url, description, meta_title, meta_keywords, meta_description, id], (err, result) => {
       if (err) {
-          console.error(err);
-          return res.status(500).json({ message: "Internal server error" });
+          console.error('🚫 '+err);
+          return res.status(500).json({ message: "🚫 Internal server error" });
       }
       return res.status(200).json({ message: "Update successful" });
   })
@@ -466,8 +471,8 @@ app.post("/cmsaddpage", upload.none(), (req, res) => {
   const query = "INSERT INTO cmspages (title, url, description, meta_title, meta_keywords, meta_description) VALUES (?, ?, ?, ?, ?, ?)";
   db.query(query, [title, url, description, meta_title, meta_keywords, meta_description], (err, result) => {
       if (err) {
-          console.error(err);
-          return res.status(500).json({ message: "Internal server error" });
+          console.error('🚫 '+err);
+          return res.status(500).json({ message: "🚫 Internal server error" });
       }
       return res.status(200).json({ message: "Insertion successful" });
   })
@@ -479,23 +484,23 @@ app.get("/cmspageeditdata/:id",(req,res)=>{
   const query="SELECT * FROM cmspages WHERE id=?";
   db.query(query,id,(err,result)=>{
     if(err){
-      console.error(err);
-      return res.status(500).json({message:"Internal server error"});
+      console.error('🚫 '+err);
+      return res.status(500).json({message:"🚫 Internal server error"});
     }
     if(result.length===0){
-      return res.status(404).json({ message: "Data not found!" });
+      return res.status(404).json({ message: "🚫 Data not found!" });
     }
     return res.status(200).json({ data: result[0] });
   })
 });
 
 // FOR CATEGORIES
-app.get("/categories", (req, res) => {
+app.get("/getAllCategorys", (req, res) => {
   const query = "SELECT * FROM categories WHERE deleted_at IS NULL";
   db.query(query, (err, data) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+      console.error('🚫 '+err);
+      return res.status(500).json({ message: "🚫 Internal server error" });
     }
     return res.json(data);
   });
@@ -509,8 +514,8 @@ app.post("/addcategory",upload.single("category_image"), (req, res) => {
   const query = "INSERT INTO categories (category_name,parent_id,category_image, category_discount, description, url, meta_title, meta_description, meta_keyword) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)";
   db.query(query, [category_name,parent_id,category_image, category_discount, description, url, meta_title, meta_description, meta_keyword], (err, result) => {
     if (err) {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+      console.error('🚫 '+err);
+      res.status(500).json({ error: "🚫Internal server error" });
       return;
     }
     res.status(200).json({ message: "Data inserted successfully!" });
@@ -523,11 +528,11 @@ app.get("/categoryeditdata/:id",(req,res)=>{
   const query="select * from categories where id=?";
   db.query(query,id,(err,result)=>{
     if(err){
-      console.error(err);
-      return res.status(500).json({message:"internal server error"});
+      console.error('🚫 '+err);
+      return res.status(500).json({message:"🚫 internal server error"});
     }
     if(result.length===0){
-      return res.status(404).json({ message: "data not found!" });
+      return res.status(404).json({ message: "🚫data not found!" });
     }
     const data={...result[0],category_image:`http://localhost:8081/uploads/categories/${result[0].category_image}`}
     // console.log(data)
@@ -544,8 +549,8 @@ app.put("/updatecategory/:id", upload.single("category_image"), (req, res) => {
   const query = "UPDATE categories SET category_name=?, parent_id=?, category_image=?, category_discount=?, description=?, url=?, meta_title=?, meta_description=?, meta_keyword=? WHERE id=?";
   db.query(query, [category_name, parent_id, category_image, category_discount, description, url, meta_title, meta_description, meta_keyword, id], (err, result) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+      console.error('🚫 '+err);
+      return res.status(500).json({ message: "🚫 Internal server error" });
     }
     return res.status(200).json({ message: "Update successful!" });
   });
@@ -557,22 +562,22 @@ app.delete("/categorydelete/:id", (req, res) => {
   const query = "UPDATE categories SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
   db.query(query, id, (err, result) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+      console.error('🚫 '+err);
+      return res.status(500).json({ message: "🚫 Internal server error" });
     }
     return res.status(200).json({ message: "Data deleted successfully!" });
   });
 });
 
 // update category status
-app.put("/updatecategorystatus/:id", (req, res) => {
+app.put("/handlecategorystatus/:id", (req, res) => {
   const id = req.params.id;
   const { status } = req.body;
   const query = "UPDATE categories SET status = ? WHERE id = ?";
   db.query(query, [status, id], (err, result) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+      console.error('🚫 '+err);
+      return res.status(500).json({ message: "🚫 Internal server error" });
     }
     return res.status(200).json({ message: "Status updated successfully!" });
   });
@@ -583,8 +588,8 @@ app.get("/uniquecategories", (req, res) => {
   const query = "SELECT COUNT(DISTINCT category_name) AS total FROM categories";
   db.query(query, (err, data) => {
     if (err) {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+      console.error('🚫 '+err);
+      res.status(500).json({ error: "🚫 Internal server error" });
     } else {
       const catcount = data[0].total;
       res.json({ catcount: catcount });
@@ -597,8 +602,8 @@ app.get("/categories2", (req, res) => {
   // const query = "SELECT distinct parent_id FROM categories WHERE deleted_at IS NULL  ";
   db.query(query, (err, data) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+      console.error('🚫 '+err);
+      return res.status(500).json({ message: "🚫 Internal server error" });
     }
     return res.json(data);
   });
@@ -609,11 +614,11 @@ app.get("/parentcategory/:parentId", (req, res) => {
   const query = "SELECT category_name FROM categories WHERE id = ? AND deleted_at IS NULL";
   db.query(query, parentId, (err, data) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+      console.error('🚫 '+err);
+      return res.status(500).json({ message: "🚫 Internal server error" });
     }
     if (data.length === 0) {
-      return res.status(404).json({ message: "Parent category not found" });
+      return res.status(404).json({ message: "🚫 Parent category not found" });
     }
     return res.json(data[0]);
   });
@@ -621,15 +626,15 @@ app.get("/parentcategory/:parentId", (req, res) => {
 
 
 // all products data
-app.get("/allproducts", (req, res) => {
+app.get("/getAllProducts", (req, res) => {
   const query = `
     SELECT  p.*,  c.category_name AS category_name, pc.category_name AS parent_category_name
     FROM products p LEFT JOIN  categories c ON p.category_id = c.id LEFT JOIN 
       categories pc ON c.parent_id = pc.id WHERE p.deleted_at IS NULL `;
   db.query(query, (err, data) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal Server Error" });
+      console.error('🚫 '+err);
+      return res.status(500).json({ error: "🚫 Internal Server Error" });
     }
     // Map through the data to replace null category_name and parent_category_name with 'No Category' and 'No Parent Category' respectively
     const products = data.map((product) => ({
@@ -658,8 +663,8 @@ app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, 
       const query = "INSERT INTO products (category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       db.query(query, [category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured_val], async (err, result) => {
           if (err) {
-              console.error(err);
-              return res.status(500).json({ message: "Internal Server Error" });
+              console.error('🚫 '+err);
+              return res.status(500).json({ message: "🚫 Internal Server Error" });
           }
 
           const productId = result.insertId;
@@ -700,8 +705,8 @@ app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, 
 
               db.query(imagesQuery, [imageValues], (err, data) => {
                   if (err) {
-                      console.error(err);
-                      return res.status(500).json({ message: "Internal Server Error" });
+                      console.error('🚫 '+err);
+                      return res.status(500).json({ message: "🚫 Internal Server Error" });
                   }
               });
           }
@@ -718,8 +723,8 @@ app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, 
 
               db.query(attributesQuery, [attributeValues], (err, data) => {
                   if (err) {
-                      console.error(err);
-                      return res.status(500).json({ message: "Internal Server Error" });
+                      console.error('🚫 '+err);
+                      return res.status(500).json({ message: "🚫 Internal Server Error" });
                   }
               });
           }
@@ -728,8 +733,8 @@ app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, 
       });
 
   } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error('🚫 '+error);
+      return res.status(500).json({ message: " 🚫 Internal Server Error" });
   }
 });
 
@@ -743,8 +748,8 @@ app.put("/updateproducts/:id",upload.single("product_video"), (req, res) => {
   db.query(
     query,[category_id,product_name,product_code,product_color,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,product_video,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured,id],(err, result) => {
       if (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Internal Server Error" });
+        console.error('🚫 '+err);
+        return res.status(500).json({ message: "🚫 Internal Server Error" });
       }
       return res.status(200).json({ message: "Updated successfully!" });
     }
@@ -757,11 +762,11 @@ app.get("/productedit/:id",(req,res)=>{
   const query="select * from products where id=?";
   db.query(query,id,(err,result)=>{
     if(err){
-      console.error(err);
-      return res.status(500).json({message:"internal server error"});
+      console.error('🚫 '+err);
+      return res.status(500).json({message:"🚫 internal server error"});
     }
     if(result.length===0){
-      return res.status(404).json({ message: "data not found!" });
+      return res.status(404).json({ message: "🚫 data not found!" });
     }
     const data={...result[0],category_image:`http://localhost:8081/uploads/categories/${result[0].category_image}`}
     // console.log(data)
@@ -776,20 +781,20 @@ app.delete("/productdelete/:id",(req,res)=>{
   const query ="update products set deleted_at=current_timestamp where id=?";
   db.query(query,id,(err,result)=>{
     if(err){
-      console.error(err);
+      console.error('🚫 '+err);
     }
     return res.status(200).json({ message: "Data deleted successfully!" });
   })
 });
 
 // toggle status
-app.put("/updatestatus/:id",(req,res)=>{
+app.put("/handleproductstatus/:id",(req,res)=>{
   const id=req.params.id;
   const { status } = req.body;
   const query="update products set status=? where id=?";
   db.query(query,[status,id],(err,result)=>{
     if(err){
-      console.error(err);
+      console.error('🚫 '+err);
     }
     return res.status(200).json({message:"status updated successfully!"});
   })
@@ -800,7 +805,7 @@ app.get("/productcolor" ,(req,res)=>{
   const query="select * from colors";
   db.query(query,(err,data)=>{
     if(err){
-      console.error(err);
+      console.error('🚫 '+err);
     }
     res.json(data);
   })
@@ -811,7 +816,7 @@ app.get("/allproductcount",(req, res) => {
 
   db.query(query, (err, data) => {
     if (err) {
-      console.error(err);
+      console.error('🚫 '+err);
       res.status(500).json({ error: "Internal server error" });
     } else {
       const productcount = data[0].total;
@@ -822,11 +827,11 @@ app.get("/allproductcount",(req, res) => {
 
 
 // for products image
-app.get("/productsimage",(req,res)=>{
+app.get("/getAllproductsImages",(req,res)=>{
   const query="select * from products_image where deleted_at is null";
   db.query(query,(err,data)=>{
     if(err){
-      console.log(err);
+      console.log('🚫 '+err);
     }
     return res.json(data);
   })
@@ -840,18 +845,18 @@ app.put("/handleproductsstatus/:id",(req,res)=>{
   const query="update products_image set status=? where id=?";
   db.query(query,[status,id],(err,data)=>{
     if(err){
-      console.log(err);
+      console.log('🚫 '+err);
     }
     return res.status(200).json({message:"status updated successfully!"});
   })
 });
 
 // delete products image
-app.delete("/productsimagedelete/:id",(req,res)=>{
+app.delete("/ProductsImageDelete/:id",(req,res)=>{
   const id=req.params.id;
   const query="update products_image set deleted_at=current_timestamp where id=?";
   db.query(query,id,(err,data)=>{
-    // console.log(err);
+    console.log('🚫 '+err);
   });
   return res.status(200).json({ message: "Data deleted successfully!" });
 });
@@ -863,7 +868,7 @@ app.get("/editproductattributes/:id",(req,res)=>{
   const query="select * from product_attributes where product_id=?";
   db.query(query,id,(err,data)=>{
     if(err){
-      console.log(err)
+      console.log('🚫 '+err)
     }
     return res.status(200).json({message:"data fetched!",data});
   });
@@ -879,8 +884,8 @@ app.put("/ProductAttributesStatusChange/:id", (req, res) => {
 
   db.query(query, [newStatus, productID], (err, data) => {
       if (err) {
-          console.error(err);
-          return res.status(500).json({ message: "Internal Server Error" });
+          console.error('🚫 '+err);
+          return res.status(500).json({ message: "🚫 Internal Server Error" });
       }
       return res.status(200).json({ message: "Status Updated Successfully" });
   });
@@ -893,8 +898,8 @@ app.delete("/deleteattribute/:id", (req, res) => {
   const query = "UPDATE product_attributes SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
   db.query(query, [id], (err, data) => {
       if (err) {
-          console.error(err);
-          return res.status(500).json({ message: "Internal Server Error" });
+          console.error('🚫 '+err);
+          return res.status(500).json({ message: "🚫 Internal Server Error" });
       }
       return res.status(200).json({ message: "Data deleted successfully!" });
   });
@@ -906,8 +911,8 @@ app.get("/allproductsAttributes", (req, res) => {
   const query = "SELECT * FROM product_attributes WHERE deleted_at IS NULL";
   db.query(query, (err, data) => {
       if (err) {
-          console.error(err);
-          return res.status(500).json({ message: "Internal Server Error" });
+          console.error('🚫 '+err);
+          return res.status(500).json({ message: " 🚫 Internal Server Error" });
       }
       return res.json(data);
   });
@@ -918,7 +923,7 @@ app.get("/getAllBrands",(req,res)=>{
   const query="select * from brands where deleted_at is null";
   db.query(query,(err,data)=>{
     if(err){
-      console.log(err)
+      console.log('🚫 '+err)
     }
     res.json(data);
   })
@@ -930,7 +935,7 @@ app.get("/GetSingleBrandDetals/:id",(req,res)=>{
   const query="select * from brands where id=?";
   db.query(query,id,(err,data)=>{
     if(err){
-      console.log(err);
+      console.log('🚫 '+err);
     }
     return res.status(200).json({message:"data fetched!",data});
   })
@@ -947,7 +952,7 @@ app.post("/AddBrand", upload.fields([{ name: 'brand_image', maxCount: 1 }, { nam
   
   db.query(query, [brand_name, brand_image, brand_logo, brand_discount, description, url, meta_title, meta_description, meta_keyword], (err, data) => {
       if (err) {
-          console.log(err);
+          console.log('🚫 '+err);
           return res.status(500).json({ message: "Database error" });
       }
       return res.status(200).json({ message: "Inserted successfully!" });
@@ -960,7 +965,7 @@ app.get("/AllBrandCount",(req,res)=>{
   // const query="select  count(*) as total  from brands";
   db.query(query,(err,data)=>{
     if (err) {
-      return res.status(500).json({message: "Internal server error"});
+      return res.status(500).json({message: "🚫 Internal server error"});
     } else {
       const Brandcount = data[0].total; // Access using the alias 'total'
       // const count2 = data[0].email; // Access using the alias 'total'
@@ -980,8 +985,8 @@ app.delete("/branddelete/:id", (req, res) => {
   const query = "SELECT brand_image, brand_logo FROM brands WHERE id = ?";
   db.query(query, [id], (err, data) => {
     if (err) {
-      console.log(err);
-      return res.status(500).json({ message: "Error retrieving brand data" });
+      console.log('🚫 '+err);
+      return res.status(500).json({ message: "🚫 Error retrieving brand data" });
     }
 
     if (data.length === 0) {
@@ -996,13 +1001,13 @@ app.delete("/branddelete/:id", (req, res) => {
       if (fs.existsSync(filePath)) {
         fs.unlink(filePath, (err) => {
           if (err) {
-            console.log(err);
+            console.log('🚫 '+err);
           } else {
             // console.log(`File deleted: ${filePath}`);
           }
         });
       } else {
-        // console.log(`File does not exist: ${filePath}`);
+        console.log(`🚫 File does not exist: ${filePath}`);
       }
     };
 
@@ -1024,8 +1029,8 @@ app.delete("/branddelete/:id", (req, res) => {
     const deleteQuery = "DELETE FROM brands WHERE id = ?";
     db.query(deleteQuery, [id], (err) => {
       if (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Error deleting brand" });
+        console.log('🚫 '+err);
+        return res.status(500).json({ message: "🚫 Error deleting brand" });
       }
 
       res.status(200).json({ message: "Brand deleted successfully!" });
@@ -1034,26 +1039,28 @@ app.delete("/branddelete/:id", (req, res) => {
 });
 
 // brand status change
-app.put("/BrandStatusChange/:id",(req,res)=>{
-  const id=req.params.id;
-  const {status}=req.body;
-  const newStatus=status==='Active'? 1 : 0;
-  const query="update brands set status=? where id=?";
-  db.query(query,[id,newStatus],(err,data)=>{
-    if(err){
-          console.error(err);
-          return res.status(500).json({ message: "Internal Server Error" });
+app.put("/handlebrandstatus/:id", (req, res) => {
+  const id = req.params.id;
+  const { status } = req.body;
+  const newStatus=status === 'Active' ? 1 : 0;
+  const query = "UPDATE brands SET status=? WHERE id=?";
+  
+  db.query(query, [newStatus, id], (err, data) => {
+    if (err) {
+      console.error('🚫 ' + err);
+      return res.status(500).json({ message: "Internal Server Error" });
     }
     return res.status(200).json({ message: "Status Updated Successfully" });
-  })
-})
+  });
+});
+
 
 // for banners table
-app.get("/AllBannerData",(req,res)=>{
+app.get("/getAllBanners",(req,res)=>{
   const query="select * from banners where deleted_at is null";
   db.query(query,(err,data)=>{
     if(err) {
-      console.log(err);
+      console.log('🚫 '+err);
     }
     res.json(data);
   });
@@ -1062,15 +1069,15 @@ app.get("/AllBannerData",(req,res)=>{
 // banner inserting
 app.post("/AddBanners", upload.single("BannerImage"), (req, res) => {
   const BannerImage = req.file ? req.file.filename : null;
-  console.log(BannerImage);
+  // console.log(BannerImage);
   const { type, link, alt } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   const query = "insert into banners (type, image, link, alt) values(?,?,?,?)";
 
   db.query(query, [type, BannerImage, link, alt], (err, data) => {
     if (err) {
-      console.log(err);
-      return res.status(500).json({ message: "Database error" });
+      console.log('🚫 '+err);
+      return res.status(500).json({ message: "🚫 Database error" });
     }
     return res.status(200).json({ message: "Inserted successfully!" });
   });
@@ -1082,7 +1089,7 @@ app.get("/EditBannerDetails/:id", (req, res) => {
   const query = "SELECT * FROM banners WHERE id = ?";
   db.query(query, [id], (err, data) => {
     if (err) {
-      // console.log("Database query error:", err);
+      console.log("🚫 Database query error:", err);
       res.status(500).json({ message: "Internal server error" });
       return;
     }
@@ -1103,7 +1110,7 @@ app.put("/UpdateBanners/:id",upload.single("BannerImage"),(req,res)=>{
   const query="update banners set type=?,image=?,link=?,alt=?";
   db.query(query,[id,type,BannerImage,link,alt],(err,data)=>{
     if(err){
-      console.log(err);
+      console.log('🚫 '+err);
 
     }
     return res.status(200).json({message:"Banner updated successfully!"});
@@ -1119,7 +1126,7 @@ app.delete("/DeleteBanners/:id", (req, res) => {
   
   db.query(query, [id], (err, data) => {
     if (err) {
-      console.log(err);
+      console.log('🚫 '+err);
       return res.status(500).json({ message: "Database error" });
     }
 
@@ -1135,7 +1142,7 @@ app.delete("/DeleteBanners/:id", (req, res) => {
       if (fs.existsSync(imagePath)) {
         fs.unlink(imagePath, (err) => {
           if (err) {
-            console.log(err);
+            console.log('🚫 '+err);
           } else {
             // console.log(`File deleted: ${imagePath}`);
           }
@@ -1155,8 +1162,8 @@ app.delete("/DeleteBanners/:id", (req, res) => {
     const deleteQuery = "DELETE FROM banners WHERE id=?";
     db.query(deleteQuery, [id], (err, data) => {
       if (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Error deleting banner" });
+        console.log('🚫 '+err);
+        return res.status(500).json({ message: `🚫 Error deleting banner` });
       }
       return res.status(200).json({ message: "Banner deleted successfully!" });
     });
@@ -1164,7 +1171,7 @@ app.delete("/DeleteBanners/:id", (req, res) => {
 });
 
 // banners status change
-app.put("/BannersStatusChange/:id",(req,res)=>{
+app.put("/handlebannerstatus/:id",(req,res)=>{
   const id=req.params.id;
   const {status}=req.body;
   const newStatus=status === 'Active' ? 1 : 0;
@@ -1173,7 +1180,7 @@ app.put("/BannersStatusChange/:id",(req,res)=>{
   const query="update banners set status=? where id=?";
   db.query(query,[id,newStatus],(err,data)=>{
     if(err){
-      console.log(err);
+      console.log('🚫 '+err);
     }
     return res.status(200).json({ message: "Status Updated Successfully" });
 

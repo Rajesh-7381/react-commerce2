@@ -2,7 +2,8 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { NotificationManager, NotificationContainer } from 'react-notifications';
-import Swal from 'sweetalert2';
+import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
+import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 
 
 const ProductImages = () => {
@@ -15,64 +16,26 @@ const ProductImages = () => {
     },[]);
 
     const productsimagetabledata=async()=>{
-        const response=await axios.get("http://localhost:8081/productsimage");
+        const response=await axios.get("http://localhost:8081/getAllproductsImages");
         // console.log(response.data)
         setproductsimage(response.data);
         setfilterdata(response.data);
     }
     
     // delete
-    const handlecmspagedelete=async(id)=>{
+    const HandleProductsImageDelete=async(id)=>{
         // alert(id)
-        try {
-            const confirmed = await Swal.fire({
-                title: 'Are you sure?',
-                text: 'This action cannot be undone.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!',
-            });
-
-            if (confirmed.isConfirmed) {
-                // Delete the item
-                await axios.delete(`http://localhost:8081/productsimagedelete/${id}`);
-                NotificationManager.success("successfully!  deleted data");
-                // Fetch the updated data from the server and update the local state
-                // const response = await axios.get("http://localhost:8081/productsimage");
-
-                // Update the state immediately
-                // after successfully deleting the item from the server, we immediately update the state using setfilterdata and setproductsimage to filter out the deleted item.
-                //  This ensures that the UI reflects the deletion instantly without needing to refresh the page.
-                setfilterdata(filterdata.filter(item => item.id !== id));
-                setproductsimage(productsimage.filter(item => item.id !== id));
-            } else {
-                // Do nothing
-                NotificationManager.error("Data not deletd  successfully!");
-            }
-        } catch (error) {
-            console.error(error);
-        }
+        const data=await DeleteEntity('ProductsImage',id);
+        // Fetch the updated data from the server and update the local state
+        // Update the state immediately
+        // after successfully deleting the item from the server, we immediately update the state using setfilterdata and setproductsimage to filter out the deleted item.
+        //  This ensures that the UI reflects the deletion instantly without needing to refresh the page.
+        setfilterdata(filterdata.filter(item => item.id !== id));
+        setproductsimage(productsimage.filter(item => item.id !== id));            
     }
     // status change
-    const handlecmspagetoggle=async(id,status)=>{
-        try {
-            const newstatus=status===1 ? 0 : 1;
-            // alert(id)
-            // alert(status)
-             await axios.put(`http://localhost:8081/handleproductsstatus/${id}`,{status:newstatus});
-             const updatedata=filterdata.map(item=>{
-                if(item.id === id){
-                    return {...item ,status:newstatus};
-                }
-                return item;
-        })
-        setfilterdata(updatedata)
-        } catch (error) {
-            console.error(error);
-        }
-        
+    const handleProductsToggleStatus=async(id,status)=>{
+        await StatusEntity('ProductsImageStatus', id, status, setfilterdata, filterdata);
     }
 
   return (
@@ -139,8 +102,8 @@ const ProductImages = () => {
                                                     <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> <span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
                                                     <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}>
                                                     <NotificationContainer />
-                                                        <button className='btn btn-sm btn-danger mr-1' title='delete' onClick={()=>handlecmspagedelete(item.id)}><i className='fas fa-trash'></i></button>
-                                                        <button className='btn btn-sm btn-dark' title='toggle off/on' onClick={()=>handlecmspagetoggle(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
+                                                        <button className='btn btn-sm btn-danger mr-1' title='delete' onClick={()=>HandleProductsImageDelete(item.id)}><i className='fas fa-trash'></i></button>
+                                                        <button className='btn btn-sm btn-dark' title='toggle off/on' onClick={()=>handleProductsToggleStatus(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
                                                     </td>
                                                 </tr>
                                             ))

@@ -2,19 +2,21 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { NotificationContainer,NotificationManager } from 'react-notifications'
 import { Link, useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2';
+import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
+import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 
 const Banners = () => {
     const [bannerData,setbannerData]=useState([]);
     const navigate=useNavigate();
 
     useEffect(()=>{
+      document.title='Banners';
         BannerData();
     },[]);
 
     const BannerData=async()=>{
         try {
-            const response=await axios.get("http://localhost:8081/AllBannerData");
+            const response=await axios.get("http://localhost:8081/getAllBanners");
             setbannerData(response.data);
             // console.log(bannerData)
             
@@ -35,46 +37,14 @@ const Banners = () => {
 
     // banner delete
     const BannerDelete=async(id)=>{
-      try {
-        // alert(id)
-        const confirmed = await Swal.fire({
-          title: 'Are you sure?',
-          text: 'This action cannot be undone.',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!',
-      });
-      if(confirmed.isConfirmed){
-        await axios.delete(`http://localhost:8081/DeleteBanners/${id}`);
-        NotificationManager.success("Banner deleted successfully!");
-
-        const response=await axios.get("http://localhost:8081/AllBannerData");
-            setbannerData(response.data);
-      }
-
-      } catch (error) {
-        
-      }
+      const data=await DeleteEntity('Banner',id);
+      const response=await axios.get("http://localhost:8081/getAllBanners");
+      setbannerData(response.data);
+      
     }
 
     const BannerStatusChange=async(id,status)=>{
-        try {
-          const newStatus=status === 1 ? 0 : 1;
-          const response=await axios.put(`http://localhost:8081/BannersStatusChange/${id}`,{status:newStatus});
-
-          const updatedData=bannerData.map(item=>{
-            if(item.id === id){
-              return {...item ,status:newStatus};
-            }
-            return item;
-            
-          });
-          setbannerData(updatedData)
-        } catch (error) {
-            console.log(error)
-        }      
+        await StatusEntity('BannerStatus',id,status,setbannerData,bannerData);
     }
   return (
     <div>
