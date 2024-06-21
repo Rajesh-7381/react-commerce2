@@ -360,7 +360,7 @@ const Banners = () => {
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link to={"/banners"} className="nav-link">
+                    <Link to={"/brands"} className="nav-link">
                         <i className="far fa-circle nav-icon" />
                         <p>Brands</p>
                     </Link>
@@ -461,7 +461,7 @@ const Banners = () => {
                           <td><Link to={item.link}>{item.link}</Link> </td>
                           <td>{item.alt} </td>
                           <td>{item.sort} </td>
-                          <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 'Active' ? 'Active' : 'Inactive'}</span> </td>
+                          <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span> </td>
                           <td>
                           <NotificationContainer />
                           <button className='btn btn-success btn-sm  mr-1'onClick={()=>BannersAddEdit(item.id)} ><i className='fas  fa-pencil-alt'></i></button>

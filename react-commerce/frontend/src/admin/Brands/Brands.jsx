@@ -373,6 +373,12 @@ const Brands = () => {
                         <p>Brands</p>
                       </Link>
                     </li>
+                      <li className="nav-item">
+                      <Link to={"/banners"} className="nav-link">
+                        <i className="far fa-circle nav-icon" />
+                        <p>Banners</p>
+                      </Link>
+                    </li>
                     </ul>
                   </li>
                 </ul>
@@ -465,7 +471,7 @@ const Brands = () => {
                               </td>
                               <td>{item.brand_discount} </td>
                               <td><Link to={item.url}>{item.url} </Link></td>
-                              <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 'Active' ? 'Active' : 'Inactive'}</span> </td>
+                              <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span> </td>
                               <td>
                               <NotificationContainer />
                               <button className='btn btn-success btn-sm  mr-1' onClick={()=>BrandsAddEdit(item.id)}><i className='fas  fa-pencil-alt'></i></button>

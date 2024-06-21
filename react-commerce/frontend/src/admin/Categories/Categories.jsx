@@ -153,7 +153,11 @@ const Categories = () => {
                                                                 }
                                                             </td>
 
-                                                                                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}><img src={item.category_image} alt={item.category_name} className="img-fluid" style={{ maxWidth: "100px" }} /></td>
+                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>
+                                                                <Link to={`http://localhost:8081/CategoryImage/`+item.category_image} target='_blank'>
+                                                                <img src={`http://localhost:8081/CategoryImage/`+item.category_image} alt={item.category_name} width={50} height={50} />
+                                                                </Link>
+                                                            </td>
                                                             <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.category_discount}</td>
                                                             <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.description}</td>
                                                             <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.url}</td>
