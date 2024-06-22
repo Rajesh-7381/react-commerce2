@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { NotificationManager, NotificationContainer } from 'react-notifications';
+import {  NotificationContainer } from 'react-notifications';
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 
@@ -24,8 +24,7 @@ const ProductImages = () => {
     
     // delete
     const HandleProductsImageDelete=async(id)=>{
-        // alert(id)
-        const data=await DeleteEntity('ProductsImage',id);
+        await DeleteEntity('ProductsImage',id);
         // Fetch the updated data from the server and update the local state
         // Update the state immediately
         // after successfully deleting the item from the server, we immediately update the state using setfilterdata and setproductsimage to filter out the deleted item.

@@ -51,7 +51,7 @@ app.use('/profile', express.static(path.join(__dirname, 'uploads/profile')));
 app.use('/products',express.static(path.join(__dirname,'uploads/products')));
 
 // Serve static files for category images
-app.use('/categories',express.static(path.join(__dirname,'uploads/categories')));
+app.use('/CategoryImage',express.static(path.join(__dirname,'uploads/categories')));
 // Serve static files for product images
 // for image showing in frontend
 app.use('/productsimage', express.static(path.join(__dirname, 'uploads/productImages/medium')));
@@ -790,11 +790,15 @@ app.delete("/productdelete/:id",(req,res)=>{
 // toggle status
 app.put("/handleproductstatus/:id",(req,res)=>{
   const id=req.params.id;
-  const { status } = req.body;
+  const status=req.body['statu'];
+  // console.log(status)
+  const newStatus = status === 1 ? 1 : 2;
+  // console.log(newStatus)
   const query="update products set status=? where id=?";
-  db.query(query,[status,id],(err,result)=>{
+  db.query(query,[newStatus,id],(err,result)=>{
     if(err){
       console.error('🚫 '+err);
+      return res.status(500).json(err)
     }
     return res.status(200).json({message:"status updated successfully!"});
   })
@@ -838,7 +842,7 @@ app.get("/getAllproductsImages",(req,res)=>{
 });
 
 // handle productsimage status
-app.put("/handleproductsstatus/:id",(req,res)=>{
+app.put("/handleproductImagesstatus/:id",(req,res)=>{
   // console.log(req.body)
   const id=req.params.id;
   const {status}=req.body;
@@ -1042,10 +1046,10 @@ app.delete("/branddelete/:id", (req, res) => {
 app.put("/handlebrandstatus/:id", (req, res) => {
   const id = req.params.id;
   const { status } = req.body;
-  const newStatus=status === 'Active' ? 1 : 0;
+  // const newStatus=status === 'Active' ? 1 : 0;
   const query = "UPDATE brands SET status=? WHERE id=?";
   
-  db.query(query, [newStatus, id], (err, data) => {
+  db.query(query, [status, id], (err, data) => {
     if (err) {
       console.error('🚫 ' + err);
       return res.status(500).json({ message: "Internal Server Error" });
@@ -1171,21 +1175,21 @@ app.delete("/DeleteBanners/:id", (req, res) => {
 });
 
 // banners status change
-app.put("/handlebannerstatus/:id",(req,res)=>{
-  const id=req.params.id;
-  const {status}=req.body;
-  const newStatus=status === 'Active' ? 1 : 0;
-  // console.log(newStatus)
+app.put("/handlebannerstatus/:id", (req, res) => {
+  const id = req.params.id;
+  const { status } = req.body;
+  // const newStatus = status === 'Active' ? 1 : 0;
 
-  const query="update banners set status=? where id=?";
-  db.query(query,[id,newStatus],(err,data)=>{
-    if(err){
-      console.log('🚫 '+err);
+  const query = "UPDATE banners SET status = ? WHERE id = ?";
+  db.query(query, [status, id], (err, data) => {
+    if (err) {
+      console.log('Error updating status:', err);
+      res.status(500).json({ message: 'Error updating status' });
+    } else {
+      res.status(200).json({ message: 'Status updated successfully' });
     }
-    return res.status(200).json({ message: "Status Updated Successfully" });
-
-  })
-})
+  });
+});
 
 app.listen(process.env.SERVERPORT,()=>{
     console.log(`server listening at port ${process.env.SERVERPORT}`);

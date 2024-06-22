@@ -4,11 +4,9 @@ import { NotificationContainer,NotificationManager } from 'react-notifications';
 import { CSVLink } from 'react-csv';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import Swal from 'sweetalert2';
-import jsPDF, {JsPdf} from 'jspdf';
+import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { DeleteEntity } from './CRUDENTITY/DeleteEntity';
-import { StatusEntity } from './CRUDENTITY/StatusEntity';
 
 const Subadmin = (args) => {
     const navigate=useNavigate();
@@ -85,7 +83,7 @@ const Subadmin = (args) => {
 
     // delete functionality
     const handledelete = async (id) => {
-        const data=await DeleteEntity('SubAdmin',id)
+        await DeleteEntity('SubAdmin',id)
         // Fetch the updated data from the server and update the local state
         const response = await axios.get("http://localhost:8081/getAllAdminSubadminUsers");
         setData(response.data);

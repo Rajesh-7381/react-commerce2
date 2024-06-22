@@ -1,8 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { NotificationContainer, NotificationManager } from 'react-notifications';
+import { NotificationContainer } from 'react-notifications';
 import { Link, useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2';
+
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 
@@ -37,7 +37,12 @@ const Products = () => {
     }
 
     const toggleclick = async (status, id) => {
-        await StatusEntity('ProductStatus',id,status,setproductdata,productdata)
+        try {
+            await StatusEntity('ProductStatus',id,status,setproductdata,productdata)
+            
+        } catch (error) {
+            alert(`Error: ${error.message}`)
+        }        
       };
       
     const [currentpage,setCurrentPage]=useState(1);
@@ -120,7 +125,7 @@ const Products = () => {
                             </form>
 
                             <div className="table-responsive">
-                                <table className="table table-bordered table-striped">
+                                <table className="table table-bordered table-striped ">
                                     <thead>
                                         <tr>
                                             <th className='bg-dark text-light'>SL NO.</th>
@@ -139,38 +144,31 @@ const Products = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {
-                                            productdata.slice((currentpage-1) * recordsPerPage , currentpage * recordsPerPage).map((item, index) => (
-                                                <tr key={item.id} className={item.status === 'Active' ? 'bg-primary' : ''}>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'} style={{ width: "1px" }}>{index + 1 + (currentpage - 1) * recordsPerPage}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_name}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>
-                                                        {item.category_name}
-                                                    </td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>
-                                                        {item.parent_category_name}
-                                                    </td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_code}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_color}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.family_color}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.group_code}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_price}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_weight}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_discount}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}><span className={`badge badge-${item.status === 'Active' ? 'success' : 'danger'}`}>{item.status === 'Active' ? 'Active' : 'Inactive'}</span></td>
-                                                    
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>
-                                                        <NotificationContainer />
-                                                        <button className='btn btn-success btn-sm ' onClick={()=>handleedit(item.id)}><i className='fas fa-pencil-alt'></i></button>
-                                                        <NotificationContainer />
-                                                        <button className='btn btn-danger btn-sm' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
-                                                        <NotificationContainer />
-                                                        <button className='btn btn-dark btn-sm' onClick={()=>toggleclick(item.status,item.id)}><i className={item.status === 'Active' ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        }
-                                    </tbody>
+                                            {
+                                                productdata.slice((currentpage-1) * recordsPerPage , currentpage * recordsPerPage).map((item, index) => (
+                                                    <tr key={item.id} className={item.status === 'Active' ? 'bg-primary' : ''}>
+                                                        <td style={{ width: "1px" }}>{index + 1 + (currentpage - 1) * recordsPerPage}</td>
+                                                        <td>{item.product_name}</td>
+                                                        <td>{item.category_name}</td>
+                                                        <td>{item.parent_category_name}</td>
+                                                        <td>{item.product_code}</td>
+                                                        <td>{item.product_color}</td>
+                                                        <td>{item.family_color}</td>
+                                                        <td>{item.group_code}</td>
+                                                        <td>{item.product_price}</td>
+                                                        <td>{item.product_weight}</td>
+                                                        <td>{item.product_discount}</td>
+                                                        <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
+                                                        <td>
+                                                            <NotificationContainer />
+                                                            <button className='btn btn-success btn-sm ' onClick={()=>handleedit(item.id)}><i className='fas fa-pencil-alt'></i></button>
+                                                            <button className='btn btn-danger btn-sm' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
+                                                            <button className='btn btn-dark btn-sm' onClick={()=>toggleclick(item.status,item.id)}><i className={item.status === 'Active' ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            }
+                                        </tbody>
                                 </table>
                                 <br></br>
                                 <nav className='float-right'>

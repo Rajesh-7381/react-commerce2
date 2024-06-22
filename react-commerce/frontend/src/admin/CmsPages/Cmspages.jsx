@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { NotificationManager, NotificationContainer } from 'react-notifications';
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 
@@ -46,8 +45,7 @@ const Cmspages = () => {
     }
     // delete
     const handlecmspagedelete=async(id)=>{
-        // alert(id)           
-        const data=await DeleteEntity('Cms',id);
+        await DeleteEntity('Cms',id);
         // Fetch the updated data from the server and update the local state
         const response = await axios.get("http://localhost:8081/getAllCmss");
         setcmspagedata(response.data);

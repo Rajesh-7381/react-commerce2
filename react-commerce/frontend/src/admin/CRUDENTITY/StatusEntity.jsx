@@ -10,7 +10,7 @@ export const StatusEntity = async (entityType, id, currentStatus, setData, data)
         switch (entityType) {
            
             case 'ProductsImageStatus':
-                url = `http://localhost:8081/handleproductsstatus/${id}`;
+                url = `http://localhost:8081/handleproductImagesstatus/${id}`;
                 break;
 
             case 'CategoryStatus':
