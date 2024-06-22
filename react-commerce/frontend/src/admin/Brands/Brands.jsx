@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { NotificationContainer, NotificationManager } from "react-notifications";
+import { NotificationContainer } from "react-notifications";
 import { Link, useNavigate } from "react-router-dom";
 import { DeleteEntity } from "../CRUDENTITY/DeleteEntity";
 import { StatusEntity } from "../CRUDENTITY/StatusEntity";
@@ -26,7 +25,6 @@ const Brands = () => {
     const BrandsAddEdit=async(id)=>{
         // alert(id)
         navigate("/addeditbrands",{state :{id:id}});
-
     }
 
     const DeleteBrand=async(id)=>{
@@ -42,7 +40,6 @@ const Brands = () => {
   }
   
   const searchfunction = (event) => {
-    // alert("1")
     const searchdata = event.target.value.toLowerCase().trim();
     if (searchdata === "") {
       setbrandData(brandData);

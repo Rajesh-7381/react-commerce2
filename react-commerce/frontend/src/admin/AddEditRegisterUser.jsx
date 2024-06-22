@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import Swal from 'sweetalert2';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import zxcvbn from 'zxcvbn';
@@ -193,7 +192,7 @@ const AddEditRegisterUser = (args) => {
 
 //   delete functionality
 const handledelete = async (id) => {
-    const data=await DeleteEntity('Admin',id);  
+    await DeleteEntity('Admin',id);  
     // Fetch the updated data from the server and update the local state
     const response = await axios.get("http://localhost:8081/getAllAdminSubadminUsers");
     setData(response.data);

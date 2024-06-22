@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { NotificationManager, NotificationContainer,} from "react-notifications";
 import ReactImageMagnify from "@blacklab/react-image-magnify";
 import Swal from "sweetalert2";
-import $ from "jquery";
 
 const AddEditProducts = () => {
   const navigate = useNavigate();

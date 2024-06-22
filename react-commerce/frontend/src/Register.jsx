@@ -27,10 +27,10 @@ const Register = () => {
         mobile: Yup.string().max(10).min(10).required("Mobile number required!"),
         email: Yup.string().max(100).min(2).required("Please enter your email!"),
         password: Yup.string().max(30).min(6).required("Please enter your password!"),
-        image: Yup.mixed().test("fileFormat","supported file format is png,webp,jpeg and jpg",(value)=>{
-            if(value){
+        image: Yup.mixed().test("fileFormat","supported file format is png,webp,jpeg and jpg",(value)=>{ //to contain file details
+            if(value){ //if file exist
                 const supportedfileformat =["image/png", "image/webp", "image/jpeg", "image/jpg"];
-                return supportedfileformat.includes(value.type);
+                return supportedfileformat.includes(value.type); //value also contain value.name and value.size
             }
             return true;
         }).required("Please upload your image!"),
@@ -50,7 +50,7 @@ const Register = () => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            console.log(response.data);
+            // console.log(response.data);
             NotificationManager.success("Form submitted successfully!");
             setTimeout(() => {
                 action.resetForm();

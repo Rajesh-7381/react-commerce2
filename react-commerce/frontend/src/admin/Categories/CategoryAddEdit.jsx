@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
@@ -11,6 +11,7 @@ const CategoryAddEdit = () => {
     const [categories, setCategories] = useState([]);
     const id = location.state ? location.state.id : null;
     const navigate = useNavigate();
+    const imageRef=useRef(null);
 
     useEffect(() => {
         document.title = 'AddEditCategories';
@@ -99,6 +100,13 @@ const CategoryAddEdit = () => {
             console.log(error);
         }
     };
+    console.log(data)
+    function zoomIn(){
+
+    }
+    function zoomOut(){
+
+    }
 
     return (
         <div>
@@ -143,6 +151,13 @@ const CategoryAddEdit = () => {
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputCategoryfile">Category Image<span className='text-danger'>*</span></label>
                                                         <input type="file" className="form-control" id="exampleInputCategoryfile" name='category_image' {...register("category_image", { "required": !id })} />
+                                                        {data && data.category_image && (
+                                                            <div>
+                                                                <img ref={imageRef} src={`http://localhost:8081/CategoryImage/${data.category_image}`} width={50} height={50} alt='' style={{transition :'width 0.5s,height 0.5s'}} />
+                                                                <button className='btn btn-success mr-1' onClick={zoomIn}>+</button>
+                                                                <button className='btn btn-danger' onClick={zoomOut}>-</button>
+                                                            </div>
+                                                        )}
                                                         {errors.category_image && <span className="text-danger">category image is required </span>}
 
                                                     </div>

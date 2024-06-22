@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { DeleteEntity} from '../CRUDENTITY/DeleteEntity';
-import { NotificationManager, NotificationContainer } from 'react-notifications';
+import {  NotificationContainer } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 
@@ -52,7 +52,7 @@ const Categories = () => {
     }
     // delete data
     const handledelete = async (id) => {
-        const data=await DeleteEntity('Category',id);
+         DeleteEntity('Category',id);
         // Fetch the updated data from the server and update the local state
         const response = await axios.get("http://localhost:8081/getAllCategorys");
 
@@ -155,7 +155,7 @@ const Categories = () => {
 
                                                             <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>
                                                                 <Link to={`http://localhost:8081/CategoryImage/`+item.category_image} target='_blank'>
-                                                                <img src={`http://localhost:8081/CategoryImage/`+item.category_image} alt={item.category_name} width={50} height={50} />
+                                                                    <img src={`http://localhost:8081/CategoryImage/`+item.category_image} alt={item.category_name} width={50} height={50} />
                                                                 </Link>
                                                             </td>
                                                             <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.category_discount}</td>

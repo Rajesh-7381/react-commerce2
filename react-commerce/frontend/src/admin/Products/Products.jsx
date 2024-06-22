@@ -1,8 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { NotificationContainer, NotificationManager } from 'react-notifications';
+import { NotificationContainer } from 'react-notifications';
 import { Link, useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2';
+
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 
@@ -37,9 +37,8 @@ const Products = () => {
     }
 
     const toggleclick = async (status, id) => {
-        // console.log(status)
         try {
-            const response=await StatusEntity('ProductStatus',id,status,setproductdata,productdata)
+            await StatusEntity('ProductStatus',id,status,setproductdata,productdata)
             
         } catch (error) {
             alert(`Error: ${error.message}`)

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { NotificationContainer, NotificationManager } from 'react-notifications';
+import {  NotificationManager } from 'react-notifications';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 
 const AddEditBrands = () => {
@@ -25,7 +25,6 @@ const AddEditBrands = () => {
             const response = await axios.get(`http://localhost:8081/GetSingleBrandDetals/${id}`);
             const brandData = response.data.data[0];
             setBrandData(brandData);
-
             // Set form values
             setValue('brand_name', brandData.brand_name);
             setValue('brand_discount', brandData.brand_discount);

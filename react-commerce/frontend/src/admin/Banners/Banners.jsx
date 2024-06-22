@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { NotificationContainer,NotificationManager } from 'react-notifications'
+import { NotificationContainer } from 'react-notifications'
 import { Link, useNavigate } from 'react-router-dom'
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
