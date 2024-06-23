@@ -12,6 +12,7 @@ const AddEditBanners = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title="AddEditBanners"
     if (id) {
       GetBannerDetails(id);
     }

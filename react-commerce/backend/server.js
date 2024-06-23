@@ -597,17 +597,6 @@ app.get("/uniquecategories", (req, res) => {
   });
 });
 
-app.get("/categories2", (req, res) => {
-  const query = "SELECT id FROM categories WHERE deleted_at IS NULL  ";
-  // const query = "SELECT distinct parent_id FROM categories WHERE deleted_at IS NULL  ";
-  db.query(query, (err, data) => {
-    if (err) {
-      console.error('🚫 '+err);
-      return res.status(500).json({ message: "🚫 Internal server error" });
-    }
-    return res.json(data);
-  });
-});
 
 app.get("/parentcategory/:parentId", (req, res) => {
   const parentId = req.params.parentId;

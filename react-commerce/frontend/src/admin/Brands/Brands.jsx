@@ -9,6 +9,7 @@ const Brands = () => {
     const [brandData,setbrandData]=useState([]);
     
     useEffect(()=>{
+      document.title="Brands";
         GETALLBRANDS();
     },[]);
 

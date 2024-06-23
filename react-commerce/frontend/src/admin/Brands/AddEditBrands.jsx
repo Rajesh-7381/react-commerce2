@@ -15,6 +15,7 @@ const AddEditBrands = () => {
    
 
     useEffect(() => {
+        document.title="AddEditBrands"
         if (id) {
             GetSingleBrands(id);
         }

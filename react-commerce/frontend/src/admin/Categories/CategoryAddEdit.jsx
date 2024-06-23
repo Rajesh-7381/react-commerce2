@@ -12,7 +12,7 @@ const CategoryAddEdit = () => {
     const id = location.state ? location.state.id : null;
     const navigate = useNavigate();
     const imageRef=useRef(null);
-
+    console.log(categories[0])
     useEffect(() => {
         document.title = 'AddEditCategories';
         if (id) {
@@ -23,7 +23,7 @@ const CategoryAddEdit = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`http://localhost:8081/categories2`);
+            const response = await axios.get(`http://localhost:8081/getAllCategorys`);
             setCategories(response.data);
         } catch (error) {
             console.log(error);
@@ -48,18 +48,21 @@ const CategoryAddEdit = () => {
             console.log(error);
         }
     };
-    const renderCategories = (categories, level = 0) => {
+    const renderCategories = (categories, selectedParentId, level = 0) => {
         return categories.map(category => {
             const paddingLeft = level * 20; // Adjust the padding based on the level
             return (
-                <option key={category.id} value={category.id} style={{ paddingLeft: `${paddingLeft}px` }}>
-                    {level === 0 ? '' : '->'.repeat(level)} {category.category_name}
-                </option>
+                <React.Fragment key={category.id}>
+                    <option value={category.id} selected={category.id === selectedParentId} style={{ paddingLeft: `${paddingLeft}px` }}>
+                        {level === 0 ? '' : '->'.repeat(level)} {category.category_name}
+                    </option>
+                    {category.children && renderCategories(category.children, selectedParentId, level + 1)}
+                </React.Fragment>
             );
         });
     };
     
-
+    
     const onSubmit = async (formData) => {
         try {
             const form = new FormData();
@@ -100,7 +103,7 @@ const CategoryAddEdit = () => {
             console.log(error);
         }
     };
-    console.log(data)
+    // console.log(data)
     function zoomIn(){
 
     }
@@ -177,7 +180,7 @@ const CategoryAddEdit = () => {
                                                             defaultValue={data.parent_id ? data.parent_id : ""}
                                                         >
                                                             <option value="">Main Category</option>
-                                                            {renderCategories(categories)}
+                                                            {renderCategories(categories, data.parent_id)}
                                                         </select>
                                                     </div>
                                                 </div>
