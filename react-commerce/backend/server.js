@@ -6,7 +6,8 @@ const cors=require("cors");
 const {db}=require("./config/dbconfig");
 const errhandler=require("./Middleware/ErrorHandler");
 const {DatabaseError}=require("./Error/AppError");
-
+// for backend validation
+const { registerSchema,passwordForgotSchema }=require("./utils/Validation");
 // for multiple database
 // const {db,db2}=require("./config/dbconfig");
 
@@ -69,39 +70,34 @@ app.use("/bannerImage",express.static(path.join(__dirname,'uploads/banners')));
 app.use(errhandler)
 
 // register user data
-app.post("/register",upload.single("image"), async (req, res) => {
-  // console.log(req.body); // Log the incoming request body to check data
+
+app.post("/register", upload.single("image"), async (req, res) => {
+  // Combine req.body and req.file for validation
+  const combinedData = {
+    ...req.body,
+    image: req.file,
+  };
+  const { error } = registerSchema.validate(combinedData)
+  if (error) {
+    return res.status(400).json({ message: "Invalid request body", error: error.details });
+  }
+  // Validation successful, proceed with registration
   const { name, mobile, email, password } = req.body;
   const salt = await bcrypt.genSalt(10);
-  const hashedpassword = await bcrypt.hash(password, salt);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
   db.query(
-      "INSERT INTO AdminUser (name, mobile, email, password,image) VALUES (?, ?, ?, ?,?)",
-      [name, mobile, email, hashedpassword,req.file.filename],
-      (err, data) => {
-          if (err) {
-              console.error("🚫 Error submitting form", err);
-              return res.status(500).json({ message: "🚫 Internal server error" });
-          } else {
-              res.json({ message: "User created successfully!" });
-          }
+    "INSERT INTO AdminUser (name, mobile, email, password, image) VALUES (?, ?, ?, ?, ?)",
+    [name, mobile, email, hashedPassword, req.file ? req.file.filename : null],
+    (err, data) => {
+      if (err) {
+        console.error("🚫 Error submitting form", err);
+        return res.status(500).json({ message: "🚫 Internal server error" });
+      } else {
+        res.json({ message: "User created successfully!" });
       }
+    }
   );
-  // const mailOptions={
-  //   from : process.env.EMAIL, // Your email address
-  //   to : email, // reciver email
-  //   subject: 'Welcome to Our Service!',
-  //   text: `Hello ${name},\n\nThank you for registering at our service! We are excited to have you.\n\nBest regards,\nYour Company`,
-
-  // };
-  // transpoter.sendMail(mailOptions,(error,info)=>{
-  //   if (error) {
-  //     console.error('Error sending email:', error);
-  //     return res.status(500).json({ message: 'Internal Server Error' });
-  //   }
-  //   console.log('Email sent:', info.response);
-  //   res.status(200).json({ message: 'Registration successful and email sent!' });
-  // })
 });
 
 // app.post("/register", upload.single("image"), async (req, res) => {
@@ -208,20 +204,25 @@ app.get("/checkemail/:email", (req, res) => {
 });
 
 // afetr forgotting password    
-const saltRounds = process.env.SALTROUNDS;
+const saltRounds = parseInt(process.env.SALTROUNDS);
 app.post("/passwordforgot/:email", async (req, res) => {
-  const { email } = req.params;
-  const { password } = req.body;
+  const { error } = passwordForgotSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: "invalid request body", error: error.details });
+  }
+  const email = req.params.email;
+  const newPassword = req.body.password;
   try {
+    
     const salt = await bcrypt.genSalt(saltRounds);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
     const query = "UPDATE AdminUser SET password=? WHERE email=?";
-    db.query(query, [hashedPassword, email], (err, result) => {
+    db.query(query, [hashedNewPassword, email], (err, result) => {
       if (err) {
-        console.error('🚫 '+err);
+        console.error('🚫 Internal server error');
         return res.status(500).json({ error: "🚫 Internal server error" });
       }
-      return res.status(200).json({ message: "Updated successfully!" });
+      return res.status(200).json({ message: "Password updated successfully!" });
     });
   } catch (error) {
     console.error(error);

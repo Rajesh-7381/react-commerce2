@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
@@ -13,6 +13,10 @@ const Register = () => {
     const [passwordVisibility, setPasswordVisibility] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [cap,setcap]=useState(null);
+    
+    useEffect(()=>{
+        document.title="Registration";
+    })
 
     const initialValues = {
         name: "",
@@ -24,9 +28,10 @@ const Register = () => {
 
     const validationSchema = Yup.object({
         name: Yup.string().max(100).min(3).required("Please enter your name!"),
-        mobile: Yup.string().max(10).min(10).required("Mobile number required!"),
-        email: Yup.string().max(100).min(2).required("Please enter your email!"),
-        password: Yup.string().max(30).min(6).required("Please enter your password!"),
+        mobile: Yup.string().max(10).min(10).matches(/^[0-9]{10}$/,"Mobile number must be 10 digits!").required("Mobile number required!"),
+        email: Yup.string().max(100).min(2).email("Invalid Email Format!").required("Please enter your email!"),
+        password: Yup.string().max(25).min(8)
+                .matches(/^[a-zA-Z0-9#?!@$%^&*\\-]{8,25}$/, "Password must be 8-25 characters and can contain letters, numbers, and special characters").required("Please enter your password!"),
         image: Yup.mixed().test("fileFormat","supported file format is png,webp,jpeg and jpg",(value)=>{ //to contain file details
             if(value){ //if file exist
                 const supportedfileformat =["image/png", "image/webp", "image/jpeg", "image/jpg"];

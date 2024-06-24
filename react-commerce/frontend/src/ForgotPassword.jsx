@@ -14,7 +14,8 @@ const ForgotPassword = () => {
 
     const validationSchema = Yup.object({
         email: Yup.string().email('Invalid email format').required('Email is required'),
-        password: Yup.string().max(30).min(6).required("Please enter your password!"),
+        password: Yup.string().max(25).min(8)
+            .matches(/^[a-zA-Z0-9#?!@$%^&*\\-]{8,25}$/, "Password must be 8-25 characters and can contain letters, numbers, and special characters").required("Please enter your password!"),
     });
 
     const onSubmitForm = async (values) => {
@@ -31,7 +32,7 @@ const ForgotPassword = () => {
               },3000);
             //   navigate("/");
             } catch (error) {
-                NotificationManager.danger("Password Updated not Successfully!")
+                NotificationManager.error("Password Updated not Successfully!")
 
               console.error(error);
             }
