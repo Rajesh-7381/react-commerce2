@@ -7,7 +7,7 @@ const {db}=require("./config/dbconfig");
 const errhandler=require("./Middleware/ErrorHandler");
 const {DatabaseError}=require("./Error/AppError");
 // for backend validation
-const { registerSchema,passwordForgotSchema }=require("./utils/Validation");
+const { registerSchema,passwordForgotSchema,CmsPageSchema,CategorySchema,ProductSchema,BrandSchema,BannerSchema }=require("./utils/Validation");
 // for multiple database
 // const {db,db2}=require("./config/dbconfig");
 
@@ -452,6 +452,10 @@ app.delete("/cmsdelete/:id",(req,res)=>{
 
 // update cmspage
 app.put("/cmsupdatepage/:id", upload.none(), (req, res) => {
+  const { error }=CmsPageSchema.validate(req.body);
+  if(error){
+    return res.status(400).json({message:"Invalid Request body!",error:error.details});
+  }
   const id = req.params.id;
   const { title, url, description, meta_title, meta_keywords, meta_description } = req.body;
 
@@ -467,6 +471,10 @@ app.put("/cmsupdatepage/:id", upload.none(), (req, res) => {
 
 // add cms pages
 app.post("/cmsaddpage", upload.none(), (req, res) => {
+  const { error }=CmsPageSchema.validate(req.body);
+  if(error){
+    return res.status(400).json({message:"Invalid Request body!",error:error.details});
+  }
   const { title, url, description, meta_title, meta_keywords, meta_description } = req.body;
 
   const query = "INSERT INTO cmspages (title, url, description, meta_title, meta_keywords, meta_description) VALUES (?, ?, ?, ?, ?, ?)";
@@ -510,6 +518,13 @@ app.get("/getAllCategorys", (req, res) => {
 
 // add category
 app.post("/addcategory",upload.single("category_image"), (req, res) => {
+  
+  const combinedData={...req.body,category_image:req.file};
+  const { error }=CategorySchema.validate(combinedData);
+  if(error){
+    return res.status(400).json({message:"Invalid request body!",error:error.details});
+  }
+
   const { category_name,parent_id, category_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
   const category_image=req.file.filename;
   const query = "INSERT INTO categories (category_name,parent_id,category_image, category_discount, description, url, meta_title, meta_description, meta_keyword) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)";
@@ -544,6 +559,11 @@ app.get("/categoryeditdata/:id",(req,res)=>{
 
 // update categories
 app.put("/updatecategory/:id", upload.single("category_image"), (req, res) => {
+  const combinedData={...req.body,category_image:req.file};
+  const { error }=CategorySchema.validate(combinedData);
+  if(error){
+    return res.status(400).json({message:"Invalid request body!",error:error.details});
+  }
   const id = req.params.id;
   const category_image = req.file.filename;
   const { category_name, parent_id, category_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
@@ -637,6 +657,12 @@ app.get("/getAllProducts", (req, res) => {
 });
 
 app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, { name: 'product_image', maxCount: 20 }]), async (req, res) => {
+  const combinedData={...req.body,product_video:req.files['product_video'][0],product_image:req.files['product_image'][0]};
+  const { error }=ProductSchema.validate(combinedData);
+  if(error){
+    return res.status(400).json({message:"Invalid request body!",error:error.details});
+  }
+
   try {
       const {
           category_id, product_name, product_code, product_color, family_color, group_code,
@@ -730,7 +756,14 @@ app.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, 
 
 
 //update products
-app.put("/updateproducts/:id",upload.single("product_video"), (req, res) => {
+app.put("/updateproducts/:id",upload.fields([{ name: 'product_video', maxCount: 1 }, { name: 'product_image', maxCount: 20 }]), async(req, res) => {
+
+  const combinedData={...req.body,category_image:req.files['product_video'][0],product_image:req.files['product_image'][0]};
+  const { error }=ProductSchema.validate(combinedData);
+  if(error){
+    return res.status(400).json({message:"Invalid request body!",error:error.details});
+  }
+
   const id = req.params.id;
   const product_video=req.file.filename;
   const {category_id,product_name,product_code,product_color,family_color,group_code,product_price,product_weight,product_discount,discount_type,final_price,description,washcare,keywords,fabric,pattern,sleeve,fit,meta_keywords,meta_description,meta_title,occassion,is_featured} = req.body;
@@ -938,15 +971,21 @@ app.get("/GetSingleBrandDetals/:id",(req,res)=>{
 
 // add all brands
 app.post("/AddBrand", upload.fields([{ name: 'brand_image', maxCount: 1 }, { name: 'brand_logo', maxCount: 1 }]), (req, res) => {
-  const { brand_name, brand_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
-  const brand_image = req.files['brand_image'] ? req.files['brand_image'][0].filename : null;
-  const brand_logo = req.files['brand_logo'] ? req.files['brand_logo'][0].filename : null;
+  const combinedData = {...req.body, brand_image: req.files['brand_image'][0], brand_logo: req.files['brand_logo'][0] };
+  const { error } = BrandSchema.validate(combinedData);
+  if (error) {
+    return res.status(400).json({ message: "Invalid request body!", error: error.details });
+  }
 
-  const query = "INSERT INTO brands (brand_name, brand_image, brand_logo, brand_discount, description, url, meta_title, meta_descriptions, meta_keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  const { brand_name, brand_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
+  const brand_image = req.files['brand_image'][0].filename;
+  const brand_logo = req.files['brand_logo'][0].filename;
+
+  const query = "INSERT INTO brands (brand_name, brand_image, brand_logo, brand_discount, description, url, meta_title, meta_descriptions, meta_keywords) VALUES (?,?,?,?,?,?,?,?,?)";
   
   db.query(query, [brand_name, brand_image, brand_logo, brand_discount, description, url, meta_title, meta_description, meta_keyword], (err, data) => {
       if (err) {
-          console.log('🚫 '+err);
+          console.log(' '+err);
           return res.status(500).json({ message: "Database error" });
       }
       return res.status(200).json({ message: "Inserted successfully!" });
@@ -1062,18 +1101,23 @@ app.get("/getAllBanners",(req,res)=>{
 
 // banner inserting
 app.post("/AddBanners", upload.single("BannerImage"), (req, res) => {
-  const BannerImage = req.file ? req.file.filename : null;
-  // console.log(BannerImage);
+  const combinedData = { ...req.body, BannerImage: req.file };
+  const { error } = BannerSchema.validate(combinedData);
+  if (error) {
+    return res.status(400).json({ message: "Invalid request body!", error: error.details });
+  }
+
   const { type, link, alt } = req.body;
-  // console.log(req.body);
+  const BannerImage = req.file.filename;
+
   const query = "insert into banners (type, image, link, alt) values(?,?,?,?)";
 
   db.query(query, [type, BannerImage, link, alt], (err, data) => {
     if (err) {
-      console.log('🚫 '+err);
+      console.log('🚫 ' + err);
       return res.status(500).json({ message: "🚫 Database error" });
     }
-    return res.status(200).json({ message: "Inserted successfully!" });
+    return res.status(201).json({ message: "Inserted successfully!" });
   });
 });
 
@@ -1098,6 +1142,12 @@ app.get("/EditBannerDetails/:id", (req, res) => {
 
 // update banner details
 app.put("/UpdateBanners/:id",upload.single("BannerImage"),(req,res)=>{
+  const combinedData={...req.body,BannerImage:req.file};
+  const { error }=BannerSchema.validate(combinedData);
+  if(error){
+    return res.status(400).json({message:"Invalid request body!",error:error.details});
+  }
+
   const id=req.params.id;
   const BannerImage = req.file ? req.file.filename : null;
   const { type, link, alt } = req.body;

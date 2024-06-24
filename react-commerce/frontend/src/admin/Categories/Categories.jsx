@@ -128,11 +128,8 @@ const Categories = () => {
                                                     <th className='bg-dark text-light'>CATEGORY NAME</th>
                                                     <th className='bg-dark text-light'>PARENT CATEGORY </th>
                                                     <th className='bg-dark text-light'>CATEGORY IMAGE</th>
-                                                    <th className='bg-dark text-light'>CATEGORY DISCOUNT</th>
-                                                    <th className='bg-dark text-light'>DESCRIPTION</th>
-                                                    <th className='bg-dark text-light'>URL</th>
-                                                    <th className='bg-dark text-light'>META TITLE</th>
-                                                    <th className='bg-dark text-light'>META KEYWORD </th>
+                                                    <th className='bg-dark text-light'>CATEGORY DISCOUNT</th>                                                  
+                                                    <th className='bg-dark text-light'>URL</th>                                              
                                                     <th className='bg-dark text-light'>STATUS</th>
                                                     <th className='bg-dark text-light'>ACTIONS</th>
                                                 </tr>
@@ -141,9 +138,9 @@ const Categories = () => {
                                                 {
                                                     filterData.slice((currentpage - 1) * recordsPerPage , currentpage * recordsPerPage).map((item, index) => (
                                                         <tr key={item.id} className={item.status === 1 ? 'bg-primary' : ''}>
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'} style={{ width: "1px" }}>{index + 1 + (currentpage - 1) * recordsPerPage}</td>
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.category_name}</td>
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>
+                                                            <td  style={{ width: "1px" }}>{index + 1 + (currentpage - 1) * recordsPerPage}</td>
+                                                            <td >{item.category_name}</td>
+                                                            <td >
                                                                 {/* Check if the category has a parent */}
                                                                 {item.parent_id ? 
                                                                     // If the category has a parent, find the parent category in the categorydata array
@@ -153,20 +150,17 @@ const Categories = () => {
                                                                 }
                                                             </td>
 
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>
+                                                            <td >
                                                                 <Link to={`http://localhost:8081/CategoryImage/`+item.category_image} target='_blank'>
                                                                     <img src={`http://localhost:8081/CategoryImage/`+item.category_image} alt={item.category_name} width={50} height={50} />
                                                                 </Link>
                                                             </td>
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.category_discount}</td>
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.description}</td>
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.url}</td>
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.meta_title}</td>
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>{item.meta_keyword}</td>
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
-                                                            <td className={item.status === 1 ? 'bg-primary' : 'bg-warning'}>
-                                                                <button className='btn btn-success btn-sm ' onClick={() => handladdedit(item.id)}><i className='fas fa-pencil-alt'></i></button>
-                                                                <button className='btn btn-danger btn-sm' onClick={() => handledelete(item.id)}><i className='fas fa-trash'></i></button>
+                                                            <td >{item.category_discount}</td>
+                                                            <td >{item.url}</td>
+                                                            <td ><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
+                                                            <td >
+                                                                <button className='btn btn-success btn-sm mr-1' onClick={() => handladdedit(item.id)}><i className='fas fa-pencil-alt'></i></button>
+                                                                <button className='btn btn-danger btn-sm mr-1' onClick={() => handledelete(item.id)}><i className='fas fa-trash'></i></button>
                                                                 <button className='btn btn-dark btn-sm' onClick={() => toggleclick(item.id, item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
                                                             </td>
                                                         </tr>

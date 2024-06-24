@@ -86,20 +86,20 @@ const ProductImages = () => {
                                     <tbody>
                                         {
                                             filterdata.map((item,index)=>(
-                                                <tr className={item.status === 1 ? 'bg-primary' : 'bg-info'} key={item.id}>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {index+1}</td>
+                                                <tr  key={item.id}>
+                                                    <td > {index+1}</td>
 
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}>
+                                                    <td >
                                                         <Link to={`http://localhost:8081/productsimage/`+  item.image} target="_blank" id='image-constrained'>
                                                             <img src={`http://localhost:8081/productsimage/` + item.image} width={50} height={50} alt="" />
                                                         </Link>
                                                     </td>
 
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.product_id}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.image_sort}</td>
+                                                    <td > {item.product_id}</td>
+                                                    <td > {item.image_sort}</td>
                                                     
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> <span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}>
+                                                    <td > <span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
+                                                    <td >
                                                     <NotificationContainer />
                                                         <button className='btn btn-sm btn-danger mr-1' title='delete' onClick={()=>HandleProductsImageDelete(item.id)}><i className='fas fa-trash'></i></button>
                                                         <button className='btn btn-sm btn-dark' title='toggle off/on' onClick={()=>handleProductsToggleStatus(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
