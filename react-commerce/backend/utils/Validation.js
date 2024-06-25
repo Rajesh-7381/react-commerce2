@@ -57,42 +57,58 @@ const CategorySchema=Joi.object({
 });
 
 // for product
-const ProductSchema=Joi.object({
-  product_name:Joi.string().trim().required().label('Product Name'),
-  product_code:Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Product Code'),
-  group_code:Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Group Code'),
-  product_price:Joi.number().required().label('Product Price'),
-  product_weight:Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Product Weight'),
-  product_discount:Joi.number().required().label('Product Discount'),
-  discount_type:Joi.string().trim().required().label('Discount Type'),
-  final_price:Joi.number().required().label('Final Price'),
-  description:Joi.string().trim().required().label('Description'),
-  washcare:Joi.string().trim().required().label('WashCare'),
-  keywords:Joi.string().trim().required().label('Keywords'),
-  meta_keywords:Joi.string().trim().required().label('Meta Keywords'),
-  meta_description:Joi.string().trim().required().label('Meta Description'),
-  meta_title:Joi.string().trim().required().label('Meta Title'),
-  product_video:Joi.object({
-        fieldname: Joi.string().required(),
-        originalname: Joi.string().required(),
-        encoding: Joi.string().required(),
-        mimetype: Joi.string().valid('image/png', 'image/webp', 'image/jpeg', 'image/jpg').required(),
-        destination: Joi.string().required(),
-        filename: Joi.string().required(),
-        path: Joi.string().required(),
-        size: Joi.number().required(),
+const ProductSchema = Joi.object({
+  category_id: Joi.string().trim().required().label('Category ID'),
+  product_name: Joi.string().trim().required().label('Product Name'),
+  product_code: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Product Code'),
+  family_color: Joi.string().trim().required().label('Family Color'),
+  product_color: Joi.string().trim().required().label('Product Code'),
+  group_code: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Group Code'),
+  product_price: Joi.number().required().label('Product Price'),
+  product_weight: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Product Weight'),
+  product_discount: Joi.number().required().label('Product Discount'),
+  discount_type: Joi.string().trim().required().label('Discount Type'),
+  final_price: Joi.number().required().label('Final Price'),
+  description: Joi.string().trim().required().label('Description'),
+  washcare: Joi.string().trim().required().label('WashCare'),
+  keywords: Joi.string().trim().required().label('Keywords'),
+  fabric: Joi.string().trim().required().label('Fabric'),
+  pattern: Joi.string().trim().required().label('Pattern'),
+  sleeve: Joi.string().trim().required().label('Sleeve'),
+  fit: Joi.string().trim().required().label('Fit'),
+  occassion: Joi.string().trim().required().label('Occassion'),
+  meta_keywords: Joi.string().trim().required().label('Meta Keywords'),
+  meta_description: Joi.string().trim().required().label('Meta Description'),
+  meta_title: Joi.string().trim().required().label('Meta Title'),
+  is_featured: Joi.string().trim().required().label('Is Featured'),
+  product_video: Joi.object({
+    fieldname: Joi.string().required(),
+    originalname: Joi.string().required(),
+    encoding: Joi.string().required(),
+    mimetype: Joi.string().valid('image/png', 'image/webp', 'image/jpeg', 'image/jpg').required(),
+    destination: Joi.string().required(),
+    filename: Joi.string().required(),
+    path: Joi.string().required(),
+    size: Joi.number().required(),
   }).unknown().required().label('Product Video'),
 
-  product_image:Joi.object({
-        fieldname: Joi.string().required(),
-        originalname: Joi.string().required(),
-        encoding: Joi.string().required(),
-        mimetype: Joi.string().valid('image/png', 'image/webp', 'image/jpeg', 'image/jpg').required(),
-        destination: Joi.string().required(),
-        filename: Joi.string().required(),
-        path: Joi.string().required(),
-        size: Joi.number().required(),
-  }).unknown().required().label('Product Image')
+  product_image: Joi.object({
+    fieldname: Joi.string().required(),
+    originalname: Joi.string().required(),
+    encoding: Joi.string().required(),
+    mimetype: Joi.string().valid('image/png', 'image/webp', 'image/jpeg', 'image/jpg').required(),
+    destination: Joi.string().required(),
+    filename: Joi.string().required(),
+    path: Joi.string().required(),
+    size: Joi.number().required(),
+  }).unknown().required().label('Product Image'),
+
+  attributes: Joi.array().items(Joi.object({
+    size: Joi.string().trim().required().label('Size'),
+    sku: Joi.string().trim().required().label('SKU'),
+    price: Joi.number().required().label('Price'),
+    stock: Joi.number().required().label('Stock'),
+  })).required().label('Attributes'),
 });
 
 // for brand
@@ -142,5 +158,6 @@ const BannerSchema=Joi.object({
         path: Joi.string().required(),
         size: Joi.number().required(),
   }).unknown().required().label('Brand Logo')
-})
+});
+
 module.exports={registerSchema,passwordForgotSchema,CmsPageSchema,CategorySchema,ProductSchema,BrandSchema,BannerSchema}  

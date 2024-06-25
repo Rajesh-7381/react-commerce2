@@ -124,7 +124,7 @@ const AddEditProducts = () => {
   };
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`http://localhost:8081/categories`);
+      const response = await axios.get(`http://localhost:8081/getAllCategorys`);
       setCategories(response.data);
     } catch (error) {
       console.error(error);
