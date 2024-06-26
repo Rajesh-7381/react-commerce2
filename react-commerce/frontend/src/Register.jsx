@@ -42,7 +42,18 @@ const Register = () => {
     });
 
     const onSubmitForm = async (values, action) => {
+        if (passwordStrength !== 4) {
+            NotificationManager.error("Password strength is not strong enough!");
+            return;
+          }
+        
         try {
+            const { email } = values; // Destructuring values
+        
+          const response2 = await axios.get(`http://localhost:8081/checkemail/${email}`);
+          if (response2.data.exists) {
+            NotificationManager.error("This email is already registered! please try with different email!")
+          }else{
             const formData = new FormData();
             formData.append('name', values.name);
             formData.append('mobile', values.mobile);
@@ -61,6 +72,8 @@ const Register = () => {
                 action.resetForm();
                 navigate("/");
             }, 3000);
+          } 
+            
         } catch (error) {
             console.log("Error submitting form", error);
             NotificationManager.error("Form submission was not successful!");

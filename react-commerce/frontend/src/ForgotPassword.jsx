@@ -1,12 +1,14 @@
 import axios from 'axios';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
+import zxcvbn from 'zxcvbn';
 
 const ForgotPassword = () => {
     const navigate=useNavigate();
+    const [passwordStrength, setPasswordStrength] = useState(0);
     const initialValues = {
         email: '',
         password: ''
@@ -19,6 +21,10 @@ const ForgotPassword = () => {
     });
 
     const onSubmitForm = async (values) => {
+        if (passwordStrength !== 4) {
+            NotificationManager.error("Password strength is not strong enough!");
+            return;
+          }
         const { email, password } = values; // Destructuring values
         try {
           const response = await axios.get(`http://localhost:8081/checkemail/${email}`);
@@ -52,6 +58,10 @@ const ForgotPassword = () => {
         validationSchema: validationSchema,
         onSubmit: onSubmitForm
     });
+    const calculatePasswordStrength=(password)=>{
+        const result=zxcvbn(password);
+        setPasswordStrength(result.score);
+    }
 
     return (
         <div>
@@ -121,18 +131,36 @@ const ForgotPassword = () => {
                                                     </div>
                                                     <div className="u-s-m-b-30">
                                                         <label className="gl-label float-start" htmlFor="reset-email">PASSWORD <span className='text-danger'>*</span></label>
-                                                        <input
+                                                        <div className="position-relative">
+                                                            <input
                                                             className={`input-text input-text--primary-style ${formik.errors.password && formik.touched.password && 'is-invalid'}`}
                                                             type="password"
                                                             name='password'
                                                             id="reset-password"
                                                             placeholder="Enter Password"
-                                                            onChange={formik.handleChange}
+                                                            onChange={(e)=>{formik.handleChange(e);
+                                                                 calculatePasswordStrength(e.target.value)}}
                                                             onBlur={formik.handleBlur}
                                                             value={formik.values.password}
                                                             autoComplete='current-password'
-                                                        />
+                                                             /> 
+                                                        </div>
                                                         {formik.touched.password && formik.errors.password ? <div className="invalid-feedback">{formik.errors.password}</div> : null}
+                                                        <div className="progress mt-2">
+                                                    <div
+                                                        className={`progress-bar ${passwordStrength === 0 ? 'bg-danger' : passwordStrength === 1 ? 'bg-warning' : passwordStrength === 2 ? 'bg-info' : passwordStrength === 3 ? 'bg-primary' : 'bg-success'}`}
+                                                        role="progressbar"
+                                                        style={{ width: `${(passwordStrength + 1) * 25}%` }}
+                                                        aria-valuenow={(passwordStrength + 1) * 25}
+                                                        aria-valuemin="0"
+                                                        aria-valuemax="100">
+                                                        {passwordStrength === 0 && "0%"}
+                                                        {passwordStrength === 1 && "25%"}
+                                                        {passwordStrength === 2 && "50%"}
+                                                        {passwordStrength === 3 && "75%"}
+                                                        {passwordStrength === 4 && "100%"}
+                                                    </div>
+                                                </div>
                                                     </div>
                                                     <div className="u-s-m-b-30">
                                                     <NotificationContainer />

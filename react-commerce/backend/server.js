@@ -968,6 +968,25 @@ app.get("/GetSingleBrandDetals/:id",(req,res)=>{
   })
 });
 
+app.put("/UpdateBrand/:id", upload.fields([{ name: 'brand_image', maxCount: 1 }, { name: 'brand_logo', maxCount: 1 }]),async(req,res)=>{
+  const combinedData = {...req.body, brand_image: req.files['brand_image'][0], brand_logo: req.files['brand_logo'][0] };
+  const { error } = BrandSchema.validate(combinedData);
+  if (error) {
+    return res.status(400).json({ message: "Invalid request body!", error: error.details });
+  }
+
+  const id=req.params.id;
+  console.log(id);
+  const brand_image = req.files['brand_image'][0].filename;
+  const brand_logo = req.files['brand_logo'][0].filename;
+  const query="update brands brand_name=?,brand_image=?,brand_logo=?,brand_discount=?,description=?,url=?,meta_title=?,meta_description=?,meta_keyword=? where id=?";
+  db.query(query,[id],(err,data)=>{
+    if(err){
+      console.log('🚫 '+err);
+    }
+    return res.status(200).json({message:"Brand Updated Successfully!"})
+  })
+});
 
 // add all brands
 app.post("/AddBrand", upload.fields([{ name: 'brand_image', maxCount: 1 }, { name: 'brand_logo', maxCount: 1 }]), (req, res) => {

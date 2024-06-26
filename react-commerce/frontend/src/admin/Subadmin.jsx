@@ -176,15 +176,14 @@ const Subadmin = (args) => {
                                         </thead>
                                         <tbody>
                                             {filterData.slice((currentPage -1) * recordsPerPage ,currentPage * recordsPerPage).map((item, index) => (
-                                                <tr key={item.id} className={item.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>
-                                                    <td className={item.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{index + 1 +(currentPage -1) * recordsPerPage}</td>
-                                                    <td className={item.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{item.name}</td>
-                                                    <td className={item.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{item.mobile}</td>
-                                                    <td className={item.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{item.email}</td>
-                                                    <td className={item.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{item.role}</td>
-                                                    <td className={item.role === 'admin' ? 'bg-warning' : item.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{item.created_at}</td>
-
-                                                    <td className={item.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>
+                                                <tr key={item.id}>
+                                                    <td>{index + 1 +(currentPage -1) * recordsPerPage}</td>
+                                                    <td>{item.name}</td>
+                                                    <td>{item.mobile}</td>
+                                                    <td>{item.email}</td>
+                                                    <td><span className={`badge badge-${item.role === 'user' ? 'primary' : item.role === 'subadmin' ? 'warning' : 'success'}`}>{item.role === 'admin' ? 'ADMIN' : item.role === 'subadmin' ? 'SUBADMIN' : 'USER'}</span></td>
+                                                   <td>{item.created_at}</td>
+                                                    <td>
                                                         <button className='btn btn-dark btn-sm mr-2' onClick={()=> toggle(item.id)}><i className='fas fa-eye'></i></button>
                                                         <button className='btn btn-success btn-sm mr-2' onClick={()=> handleupdate(item.id)}><i className='fas fa-pencil-alt'></i></button>
                                                         <button className='btn btn-danger btn-sm' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>

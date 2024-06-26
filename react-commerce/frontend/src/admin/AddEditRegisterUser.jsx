@@ -166,6 +166,10 @@ const AddEditRegisterUser = (args) => {
 
 
   const handleSubmit = async (values) => {
+    if (passwordstrength !== 4) {
+      NotificationManager.error("Password strength is not strong enough!");
+      return;
+    }
     try {
       await axios.put(`http://localhost:8081/update/${id}`, values);
       NotificationManager.success("Form updated successfully!");
@@ -250,17 +254,15 @@ const handledelete = async (id) => {
                     <tbody>
                       {filterData.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage).map((dt, index) => (
 
-                        <tr key={dt.id} className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>
+                        <tr key={dt.id}>
 
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{(currentPage - 1) * recordsPerPage + index + 1}</td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{dt.name}</td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{dt.mobile}</td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{dt.email}</td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>
-                            {dt.role === 'admin' ? 'ADMIN' : dt.role === 'subadmin' ? 'SUBADMIN' : 'USER'}
-                          </td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{dt.created_at}</td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>
+                          <td>{(currentPage - 1) * recordsPerPage + index + 1}</td>
+                          <td>{dt.name}</td>
+                          <td>{dt.mobile}</td>
+                          <td>{dt.email}</td>
+                          <td><span className={`badge badge-${dt.role === 'user' ? 'primary' : dt.role === 'subadmin' ? 'warning' : 'success'}`}>{dt.role === 'admin' ? 'ADMIN' : dt.role === 'subadmin' ? 'SUBADMIN' : 'USER'}</span></td>
+                          <td>{dt.created_at}</td>
+                          <td>
                             <button className='btn btn-dark btn-sm mr-2' onClick={() => toggle(dt.id)}><i className='fas fa-eye'></i></button>
                             <NotificationContainer />
                             <button className='btn btn-success btn-sm mr-2' onClick={() => toggle2(dt.id)}><i className='fas fa-pencil-alt'></i></button>
@@ -382,7 +384,7 @@ const handledelete = async (id) => {
                       </div>
                       {/* /.card-body */}
                       <div className="card-footer">
-                        <button  type="submit" className="btn btn-success">Submit</button>
+                        <button  type="submit" className="btn btn-success">Update</button>
                       </div>
                     </form>
                   </div>
