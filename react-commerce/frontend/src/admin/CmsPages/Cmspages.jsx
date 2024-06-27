@@ -114,16 +114,16 @@ const Cmspages = () => {
                                     <tbody>
                                         {
                                             filterdata.map((item,index)=>(
-                                                <tr className={item.status === 1 ? 'bg-primary' : 'bg-info'} key={item.id}>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {index+1}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.title}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.description}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.url}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.meta_title}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.meta_description}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.meta_keywords}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}> {item.status}</td>
-                                                    <td className={item.status === 1 ? 'bg-primary' : 'bg-info'}>
+                                                <tr  key={item.id}>
+                                                    <td > {index+1}</td>
+                                                    <td > {item.title}</td>
+                                                    <td > {item.description}</td>
+                                                    <td > <Link to={item.url} target='_blank'>{item.url}</Link></td>
+                                                    <td > {item.meta_title}</td>
+                                                    <td > {item.meta_description}</td>
+                                                    <td > {item.meta_keywords}</td>
+                                                    <td > <span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
+                                                    <td >
                                                         <button className='btn btn-sm btn-success mr-1' title='edit' onClick={()=>handladdeditcmspage(item.id)}><i className='fas fa-pencil-alt'></i></button>
                                                         <button className='btn btn-sm btn-danger mr-1' title='delete' onClick={()=>handlecmspagedelete(item.id)}><i className='fas fa-trash'></i></button>
                                                         <button className='btn btn-sm btn-dark' title='toggle off/on' onClick={()=>handlecmspagetoggle(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>

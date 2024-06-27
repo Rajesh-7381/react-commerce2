@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
@@ -13,6 +13,10 @@ const Register = () => {
     const [passwordVisibility, setPasswordVisibility] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [cap,setcap]=useState(null);
+    
+    useEffect(()=>{
+        document.title="Registration";
+    })
 
     const initialValues = {
         name: "",
@@ -24,9 +28,10 @@ const Register = () => {
 
     const validationSchema = Yup.object({
         name: Yup.string().max(100).min(3).required("Please enter your name!"),
-        mobile: Yup.string().max(10).min(10).required("Mobile number required!"),
-        email: Yup.string().max(100).min(2).required("Please enter your email!"),
-        password: Yup.string().max(30).min(6).required("Please enter your password!"),
+        mobile: Yup.string().max(10).min(10).matches(/^[0-9]{10}$/,"Mobile number must be 10 digits!").required("Mobile number required!"),
+        email: Yup.string().max(100).min(2).email("Invalid Email Format!").required("Please enter your email!"),
+        password: Yup.string().max(25).min(8)
+                .matches(/^[a-zA-Z0-9#?!@$%^&*\\-]{8,25}$/, "Password must be 8-25 characters and can contain letters, numbers, and special characters").required("Please enter your password!"),
         image: Yup.mixed().test("fileFormat","supported file format is png,webp,jpeg and jpg",(value)=>{ //to contain file details
             if(value){ //if file exist
                 const supportedfileformat =["image/png", "image/webp", "image/jpeg", "image/jpg"];
@@ -37,7 +42,18 @@ const Register = () => {
     });
 
     const onSubmitForm = async (values, action) => {
+        if (passwordStrength !== 4) {
+            NotificationManager.error("Password strength is not strong enough!");
+            return;
+          }
+        
         try {
+            const { email } = values; // Destructuring values
+        
+          const response2 = await axios.get(`http://localhost:8081/checkemail/${email}`);
+          if (response2.data.exists) {
+            NotificationManager.error("This email is already registered! please try with different email!")
+          }else{
             const formData = new FormData();
             formData.append('name', values.name);
             formData.append('mobile', values.mobile);
@@ -56,6 +72,8 @@ const Register = () => {
                 action.resetForm();
                 navigate("/");
             }, 3000);
+          } 
+            
         } catch (error) {
             console.log("Error submitting form", error);
             NotificationManager.error("Form submission was not successful!");
@@ -161,14 +179,14 @@ const Register = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="u-s-m-b-15">
+                                            <div  className="u-s-m-b-15">
                                                 <ReCAPTCHA
                                                     ref={recaptchaRef}
                                                     sitekey="6Lf0AcopAAAAABiOyhyphLfETW8tsx8KW9Xxs5ah" //r........2@gm....com
                                                     onChange={(val)=>setcap(val)}
                                                 />
                                                 <NotificationContainer />
-                                                <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary w-75" disabled={!cap} type="submit">CREATE</button>
+                                                <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary w-75"  disabled={!cap}  type="submit">CREATE</button>
                                             </div>
                                             <Link className="gl-link"  to={'/'}>Already have an Account? Login Now</Link>
                                         </form>

@@ -133,8 +133,6 @@ const Products = () => {
                                             <th className='bg-dark text-light'>CATEGORY</th>
                                             <th className='bg-dark text-light'>PARENT CATEGORY</th>
                                             <th className='bg-dark text-light'>PRODUCT CODE </th>
-                                            <th className='bg-dark text-light'>PRODUCT COLOR</th>
-                                            <th className='bg-dark text-light'>FAMILY COLOR </th>
                                             <th className='bg-dark text-light'>GROUP CODE</th>
                                             <th className='bg-dark text-light'>PRODUCT PRICE</th>
                                             <th className='bg-dark text-light'>PRODUCT WEIGHT</th>
@@ -150,10 +148,8 @@ const Products = () => {
                                                         <td style={{ width: "1px" }}>{index + 1 + (currentpage - 1) * recordsPerPage}</td>
                                                         <td>{item.product_name}</td>
                                                         <td>{item.category_name}</td>
-                                                        <td>{item.parent_category_name}</td>
+                                                        <td><span className={`badge badge-${item.parent_category_name === 'No Parent Category' ? 'warning' : 'dark'}`}>{item.parent_category_name}</span></td>
                                                         <td>{item.product_code}</td>
-                                                        <td>{item.product_color}</td>
-                                                        <td>{item.family_color}</td>
                                                         <td>{item.group_code}</td>
                                                         <td>{item.product_price}</td>
                                                         <td>{item.product_weight}</td>
@@ -161,8 +157,8 @@ const Products = () => {
                                                         <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
                                                         <td>
                                                             <NotificationContainer />
-                                                            <button className='btn btn-success btn-sm ' onClick={()=>handleedit(item.id)}><i className='fas fa-pencil-alt'></i></button>
-                                                            <button className='btn btn-danger btn-sm' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
+                                                            <button className='btn btn-success btn-sm mr-1' onClick={()=>handleedit(item.id)}><i className='fas fa-pencil-alt'></i></button>
+                                                            <button className='btn btn-danger btn-sm mr-1' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
                                                             <button className='btn btn-dark btn-sm' onClick={()=>toggleclick(item.status,item.id)}><i className={item.status === 'Active' ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
                                                         </td>
                                                     </tr>

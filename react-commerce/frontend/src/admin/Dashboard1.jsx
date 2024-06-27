@@ -456,7 +456,7 @@ const Dashboard1 = () => {
               <div className="icon">
                 <i className="ion ion-person-add" />
               </div>
-              <Link href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
+              <Link to={"/registeruser"} className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
             </div>
           </div>
           {/* ./col */}

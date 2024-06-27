@@ -458,7 +458,7 @@ const Banners = () => {
                                 </Link>
                           </td>
                           
-                          <td><Link to={item.link}>{item.link}</Link> </td>
+                          <td><Link to={item.link} target='_blank'>{item.link}</Link> </td>
                           <td>{item.alt} </td>
                           <td>{item.sort} </td>
                           <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span> </td>

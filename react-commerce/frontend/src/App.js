@@ -1,4 +1,4 @@
-import { BrowserRouter , Routes, Route, useParams } from 'react-router-dom';
+import { BrowserRouter , Routes, Route } from 'react-router-dom';
 import './App.css';
 import 'react-notifications/lib/notifications.css';
 import Login from './Login';
@@ -14,7 +14,6 @@ import Cmspages from './admin/CmsPages/Cmspages';
 import CmspageAddEdit from './admin/CmsPages/CmspageAddEdit';
 import Products from './admin/Products/Products';
 import AddEditProducts from './admin/Products/AddEditProducts';
-
 import ForgotPassword from './ForgotPassword';
 import NotFound from './NotFound';
 import ProductImages from './admin/ProductImages/ProductImages';
