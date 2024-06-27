@@ -361,6 +361,19 @@ app.delete("/deleteAdminSubAdminUser/:id",(req,res)=>{
   })
 });
 
+// search using
+app.get("/SearchAdminSubAdminUser/:searchTerm", (req, res) => {
+  const searchTerm = req.params.searchTerm;
+  const query = "SELECT * FROM AdminUser WHERE name LIKE? OR email LIKE?";
+  db.query(query, [`%${searchTerm}%`, `%${searchTerm}%`], (err, results) => {
+    if (err) {
+      console.error('🚫 Error searching for users', err);
+      res.status(500).json({ error: '🚫 internal Server Error' });
+      return;
+    }
+    res.json(results);
+  });
+});
 // particular date through user data show 
 app.get("/registerUserParticularDate/:date", (req, res) => {
   const date = req.params.date;
@@ -1243,7 +1256,7 @@ app.put("/handlebannerstatus/:id", (req, res) => {
   db.query(query, [status, id], (err, data) => {
     if (err) {
       console.log('Error updating status:', err);
-      res.status(500).json({ message: 'Error updating status' });
+      res.status(500).json({ message: '🚫 Error updating status' });
     } else {
       res.status(200).json({ message: 'Status updated successfully' });
     }

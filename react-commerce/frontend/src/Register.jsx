@@ -179,14 +179,14 @@ const Register = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="u-s-m-b-15">
+                                            <div  className="u-s-m-b-15">
                                                 <ReCAPTCHA
                                                     ref={recaptchaRef}
                                                     sitekey="6Lf0AcopAAAAABiOyhyphLfETW8tsx8KW9Xxs5ah" //r........2@gm....com
                                                     onChange={(val)=>setcap(val)}
                                                 />
                                                 <NotificationContainer />
-                                                <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary w-75" disabled={!cap} type="submit">CREATE</button>
+                                                <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary w-75"  disabled={!cap}  type="submit">CREATE</button>
                                             </div>
                                             <Link className="gl-link"  to={'/'}>Already have an Account? Login Now</Link>
                                         </form>

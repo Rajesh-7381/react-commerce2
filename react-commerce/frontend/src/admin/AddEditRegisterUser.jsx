@@ -59,19 +59,24 @@ const AddEditRegisterUser = (args) => {
     fetchData();
   }, []);
 
-  const searchFunction = (event) => {
-    const searchTerm = event.target.value.toLowerCase().trim();
-    if (searchTerm === "") {
-      setFilterData(data);
-    } else {
-      const filtered = data.filter(item =>
-        item.name.toLowerCase().includes(searchTerm) ||
-        item.email.toLowerCase().includes(searchTerm) ||
-        item.role.toLowerCase().includes(searchTerm)
+  const searchFunction = async (event,searchentity) => {
+  const searchTerm = event.target.value.toUpperCase().trim();
+  try {
+    const response = await axios.get(`http://localhost:8081/SearchAdminSubAdminUser/${searchTerm}`);
+    // console.log(response.data);
+    let filteredData = response.data;
+    if (searchTerm!== "") {
+      filteredData = filteredData.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.role.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilterData(filtered);
     }
-  };
+    setFilterData(filteredData);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   // csv download
   const headers = [
@@ -224,7 +229,7 @@ const handledelete = async (id) => {
                 <div className="card-body">
                   <form className='d-flex align-items-center justify-content-end'>
                     <div className="input-group">
-                      <input className="mr-2" type="search" placeholder="Search" aria-label="Search" onKeyUp={searchFunction} />
+                      <input className="mr-2" type="search" placeholder="Search" aria-label="Search" onChange={searchFunction} />
                       <div className="input-group-append">
                         <button className="btn btn-outline-success mr-5" type="button" >Search</button>
                         <NotificationContainer />
@@ -267,7 +272,7 @@ const handledelete = async (id) => {
                             <NotificationContainer />
                             <button className='btn btn-success btn-sm mr-2' onClick={() => toggle2(dt.id)}><i className='fas fa-pencil-alt'></i></button>
                             <NotificationContainer />
-                            <button className='btn btn-danger btn-sm' onClick={() => handledelete(dt.id)}><i className='fas fa-trash'></i></button>
+                            <button  className='btn btn-danger btn-sm' onClick={() => handledelete(dt.id)}><i className='fas fa-trash'></i></button>
                           </td>
                         </tr>
                       ))}
