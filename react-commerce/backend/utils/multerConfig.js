@@ -1,15 +1,15 @@
 const multer = require("multer");
 const path = require("path");
-const moment = require("moment"); //moment library working with date and times
+const moment = require("moment"); // moment library working with date and times
 
-const allowedTypes=['image/png','image/jpg','image/jpeg','image/webp'];
-
+const allowedTypes = ["image/png", "image/jpg", "image/jpeg", "image/webp"];
 // for category image inserting
 // Multer is a middleware for handling multipart/form-data, which is primarily used for uploading files in Node.js applications
 const storage = multer.diskStorage({
-  //this specifies how  files should be stored on disk
+  // this specifies how files should be stored on disk
   destination: (req, file, cb) => {
-    //destination function within diskStorage determines the directory where the uploaded files will be stored based on the fieldname of the file
+    // destination function within diskStorage determines the directory where the uploaded files will be stored based on the fieldname of the file
+
     if (file.fieldname === "image") {
       cb(null, "uploads/profile/");
     } else if (file.fieldname === "category_image") {
@@ -27,25 +27,30 @@ const storage = multer.diskStorage({
     }
   },
   filename: (req, file, cb) => {
-    //filename function determines the name of the file to be saved
-    const ext = path.extname(file.originalname); //extracts orignal file extension
-    cb(null, Date.now() + ext); //constructs the new filename by appending the current timestamp to the file extension, ensuring a unique filename
+    if (!allowedTypes.includes(file.mimetype)) {
+      cb(new Error("Invalid File type!")); // explain in note.txt
+    }
+    // filename function determines the name of the file to be saved
+    const ext = path.extname(file.originalname); // extracts original file extension
+    // cb(null, Date.now() + ext); // constructs the new filename by appending the current timestamp to the file extension, ensuring a unique filename
+    cb(null, `image-${Date.now()}.${file.originalname}`); // constructs the new filename by appending the current timestamp to the file extension, ensuring a unique filename
   },
 });
 
-
-
-// second way
-// const storage=multer.diskStorage({
-//   destination:(req,file,cb)=>{
-//     let uploadPath = "uploads/";
-//     switch(file.fieldname){
-//       case 'image':
-//         uploadPath +="profile/";
-//         break;
-//     }
-//   }
-// })
-const upload = multer({ storage: storage }); //The upload constant is created using multer({storage: storage}), which initializes Multer with the defined storage configuration.
+const upload = multer({
+  storage: storage,
+  fileFilter(req, file, cb) {
+    // every time it's called when a file is uploaded
+    if (file.size > 5 * 1024 * 1024) {
+      return cb(new Error("File size exceeds 5MB"));
+    }
+    cb(null, true); // here true means indicate that the file is valid
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+    files: 10, // maximum 10 files
+    fields: 10, // maximum 10 non-file fields (default infinity)
+  },
+}); // The upload constant is created using multer({storage: storage}), which initializes Multer with the defined storage configuration.
 
 module.exports = upload;
