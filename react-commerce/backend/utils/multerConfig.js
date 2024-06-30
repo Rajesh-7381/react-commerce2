@@ -49,7 +49,7 @@ const upload = multer({
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB
     files: 10, // maximum 10 files
-    fields: 10, // maximum 10 non-file fields (default infinity)
+    fields: Infinity, //  infinity non-file fields (default infinity)
   },
 }); // The upload constant is created using multer({storage: storage}), which initializes Multer with the defined storage configuration.
 

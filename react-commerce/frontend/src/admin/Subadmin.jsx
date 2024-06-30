@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { DeleteEntity } from './CRUDENTITY/DeleteEntity';
 
+
 const Subadmin = (args) => {
     const navigate=useNavigate();
     const [data, setData] = useState([]);
@@ -23,8 +24,7 @@ const Subadmin = (args) => {
     const firstIndex=lastIndex - recordsPerPage;
     const totalPages=Math.ceil(filterData.length / recordsPerPage);
     const numbers=[...Array(totalPages + 1).keys()].slice(1);
-  
-
+    
     useEffect(() => {
         document.title='SubAdmin';
         handleData();
@@ -162,10 +162,10 @@ const Subadmin = (args) => {
                                             </div>
                                         </div>
                                     </form>
-                                    <table id="example1" className="table table-bordered table-striped">
+                                    <table id="Table" className="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th className='bg-dark text-light'>ID</th>
+                                                <th className='bg-dark text-light'>SL NO</th>
                                                 <th className='bg-dark text-light'>NAME</th>
                                                 <th className='bg-dark text-light'>MOBILE</th>
                                                 <th className='bg-dark text-light'>EMAIL</th>
@@ -219,27 +219,64 @@ const Subadmin = (args) => {
       
 
 
-    <Modal isOpen={modal} toggle={toggle} {...args}>
-        <ModalHeader toggle={toggle}>Hi <span className='bg-warning '>{modaldata.name}</span>This is Your Personal Information</ModalHeader>
-        <ModalBody>
-        <p style={{ fontWeight: "bolder" }}> ID: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span></p>
-        <hr />
-        <p style={{ fontWeight: "bolder" }}> Name: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span></p>
-        <p style={{ fontWeight: "bolder" }}> Mobile: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.mobile}</span></p>
-        <hr />
-        <p style={{ fontWeight: "bolder" }}> Email: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span></p>
-        <hr />
-        <p style={{ fontWeight: "bolder" }}> Role: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span></p>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={toggle}>
-            Ok
-          </Button>{' '}
-          <Button color="danger" onClick={toggle}>
-            Cancel
-          </Button>
-        </ModalFooter>
-      </Modal>
+            <Modal isOpen={modal} toggle={toggle} {...args}>
+            <ModalHeader toggle={toggle} className="bg-primary text-white">
+              Hi <span className='bg-warning'>{modaldata.name}</span> 
+            </ModalHeader>
+            <div className="text-center">
+              <img src={`http://localhost:8081/profile/${modaldata.image}`} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
+            </div>
+            <ModalBody>
+              <div className="container">
+                <div className="row">
+                  <div className="col-md-12">
+                    <h5 className="text-primary">Personal Information</h5>
+                    <hr />
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-4">
+                    <p style={{ fontWeight: "bolder" }}>ID:</p>
+                  </div>
+                  <div className="col-md-4">
+                    <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span></p>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-4">
+                    <p style={{ fontWeight: "bolder" }}>Name:</p>
+                  </div>
+                  <div className="col-md-4">
+                    <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span></p>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-4">
+                    <p style={{ fontWeight: "bolder" }}>Email:</p>
+                  </div>
+                  <div className="col-md-4">
+                    <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span></p>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-4">
+                    <p style={{ fontWeight: "bolder" }}>Role:</p>
+                  </div>
+                  <div className="col-md-4">
+                    <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span></p>
+                  </div>
+                </div>
+              </div>
+            </ModalBody>
+            <ModalFooter className="bg-light">
+              <Button color="primary" onClick={toggle}>
+                Ok
+              </Button>{' '}
+              <Button color="danger" onClick={toggle}>
+                Cancel
+              </Button>
+            </ModalFooter>
+            </Modal>
         </div>
     );
 }

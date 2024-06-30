@@ -48,7 +48,7 @@ const app = express(); //create express.js(framework) instance
 app.use(cors()); //enables Cross-Origin Resource Sharing (CORS) to allow requests from different origins.
 app.use(express.json()); // parses incoming requests with JSON payloads.
 // Use Morgan middleware for logging HTTP requests
-app.use(morgan("combined")); //logs HTTP requests in a concise format.
+// app.use(morgan("combined")); //logs HTTP requests in a concise format.
 
 // bodyParser.json() and bodyParser.urlencoded({ extended: true }): parse incoming request bodies in JSON and URL-encoded formats, respectively.
 app.use(bodyParser.json());
@@ -104,23 +104,56 @@ app.post("/register", upload.single("image"), async (req, res) => {
       .status(400)
       .json({ message: "🚫 Invalid request body", error: error.details });
   }
-  // Validation successful, proceed with registration
-  const { name, mobile, email, password } = req.body;
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
 
-  db.query(
-    "INSERT INTO AdminUser (name, mobile, email, password, image) VALUES (?, ?, ?, ?, ?)",
-    [name, mobile, email, hashedPassword, req.file ? req.file.filename : null],
-    (err, data) => {
-      if (err) {
-        console.error("🚫 Error submitting form", err);
-        return res.status(500).json({ message: "🚫 Internal server error" });
-      } else {
-        res.json({ message: "✅ User created successfully!" });
-      }
+  const { name, mobile, email, password } = req.body;
+  const UserExistQuery =
+    "SELECT COUNT(*) AS count FROM AdminUser WHERE email = ? OR mobile = ?";
+
+  try {
+    // Check if the user already exists
+    const userExistsResult = await new Promise((resolve, reject) => {
+      db.query(UserExistQuery, [email, mobile], (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(results[0].count);
+      });
+    });
+
+    if (userExistsResult > 0) {
+      return res
+        .status(400)
+        .json({ message: "🚫 Email or mobile number already exists" });
     }
-  );
+
+    // Proceed with user registration
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await new Promise((resolve, reject) => {
+      db.query(
+        "INSERT INTO AdminUser (name, mobile, email, password, image) VALUES (?, ?, ?, ?, ?)",
+        [
+          name,
+          mobile,
+          email,
+          hashedPassword,
+          req.file ? req.file.filename : null,
+        ],
+        (err, results) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(results);
+        }
+      );
+    });
+
+    res.json({ message: "✅ User created successfully!" });
+  } catch (err) {
+    console.error("🚫 Error submitting form", err);
+    res.status(500).json({ message: "🚫 Internal server error" });
+  }
 });
 
 //========================================END====================================================
@@ -225,20 +258,37 @@ app.post("/login", (req, res, next) => {
 
 //========================================END====================================================
 
-//===============================================// forgot password before check email already exist in database or not============================
+//===============================================// forgot password before check email already exist in database or not and registering time to check this email is already exists or not============================
 
-app.get("/checkemail/:email", (req, res) => {
-  const email = req.params.email;
-  const query = "SELECT * FROM AdminUser WHERE email=?";
-  db.query(query, [email], (err, result) => {
-    if (err) {
-      console.error("🚫 Error checking email", err);
-      res.status(500).json({ error: "🚫 Internal Server Error" });
-      return;
-    }
-    const exists = result.length > 0;
-    return res.json({ exists });
-  });
+app.get("/checkemail/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+    const query = "SELECT * FROM AdminUser WHERE email=?";
+    const result = await db.promise().query(query, [email]);
+
+    const emailExists = result[0].length > 0;
+    res.json({ emailExists });
+  } catch (error) {
+    console.error("Error checking email:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+//========================================END====================================================
+
+//===============================================Mobile exist check============================
+app.get("/checkmobile/:mobile", async (req, res) => {
+  try {
+    const mobile = req.params.mobile;
+    const query = "SELECT * FROM AdminUser WHERE mobile =?";
+    const result = await db.promise().query(query, [mobile]);
+
+    const mobileExists = result[0].length > 0;
+    res.json({ mobileExists });
+  } catch (error) {
+    console.error("Error checking mobile:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 //========================================END====================================================
@@ -510,7 +560,7 @@ app.get("/getAllSubAdminData", (req, res) => {
 
 //========================================END====================================================
 
-//===============================================// cms page data============================
+//===============================================// GET ALL cms page data============================
 
 app.get("/getAllCmss", (req, res) => {
   const query = "select * from cmspages where deleted_at is null";
@@ -539,7 +589,10 @@ app.put("/handlecmsstatus/:id", (req, res) => {
   });
 });
 
-// cms page delete data
+//========================================END====================================================
+
+//===============================================DELETE CMS PAGE DATA============================
+
 app.delete("/cmsdelete/:id", (req, res) => {
   const id = req.params.id;
   const query = "update cmspages set deleted_at=CURRENT_TIMESTAMP where id=?";
@@ -554,7 +607,7 @@ app.delete("/cmsdelete/:id", (req, res) => {
 
 //========================================END====================================================
 
-//===============================================delete status change============================
+//===============================================UPDATE CMS PAGE DATA============================
 // update cmspage
 app.put("/cmsupdatepage/:id", upload.none(), (req, res) => {
   const { error } = CmsPageSchema.validate(req.body);
@@ -590,7 +643,7 @@ app.put("/cmsupdatepage/:id", upload.none(), (req, res) => {
 
 //========================================END====================================================
 
-//===============================================delete status change============================
+//===============================================ADD CMS PAGE DATA============================
 // add cms pages
 app.post("/cmsaddpage", upload.none(), (req, res) => {
   const { error } = CmsPageSchema.validate(req.body);
@@ -625,7 +678,7 @@ app.post("/cmsaddpage", upload.none(), (req, res) => {
 
 //========================================END====================================================
 
-//===============================================delete status change============================
+//===============================================EDIT CMS PAGE DATA============================
 // cms edit data
 app.get("/cmspageeditdata/:id", (req, res) => {
   const id = req.params.id;
@@ -644,7 +697,7 @@ app.get("/cmspageeditdata/:id", (req, res) => {
 
 //========================================END====================================================
 
-//===============================================delete status change============================
+//===============================================SEARCH CMS PAGE DATA============================
 // for searching
 app.get("/SearchCMSPageData/:searchTerm", (req, res) => {
   const searchTerm = req.params.searchTerm;
@@ -661,7 +714,7 @@ app.get("/SearchCMSPageData/:searchTerm", (req, res) => {
 
 //========================================END====================================================
 
-//===============================================delete status change============================
+//===============================================GET ALL CATEGORYS============================
 // FOR CATEGORIES
 app.get("/getAllCategorys", (req, res) => {
   const query = "SELECT * FROM categories WHERE deleted_at IS NULL";
@@ -913,7 +966,7 @@ app.get("/getAllProducts", (req, res) => {
 
 //========================================END====================================================
 
-//===============================================delete status change============================
+//===============================================Add PRODUCT============================
 app.post(
   "/addproducts",
   upload.fields([
@@ -1109,7 +1162,11 @@ app.post(
 
 //========================================END====================================================
 
-//===============================================delete status change============================
+//===============================================UPDATE PRODUCT ============================
+// const [existingProduct] = await db.query('SELECT id FROM products WHERE link = ? AND id != ?', [link, id]);
+//       if (existingProduct) {
+//         return res.status(400).json({ message: '🚫 Link already exists!' });
+//       }
 //update products
 app.put(
   "/updateproducts/:id",
@@ -1157,6 +1214,7 @@ app.put(
       occassion,
       is_featured,
     } = req.body;
+    // console.log(req.body)
     const query =
       "UPDATE products SET category_id=?, product_name=?, product_code=?,product_color=?, family_color=?, group_code=?, product_price=?, product_weight=?, product_discount=?, discount_type=?, final_price=?,product_video=?, description=?, washcare=?, keywords=?, fabric=?, pattern=?, sleeve=?, fit=?, meta_keywords=?, meta_description=?, meta_title=?, occassion=?, is_featured=? WHERE id=?";
     db.query(
