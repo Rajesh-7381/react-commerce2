@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { NotificationManager } from 'react-notifications';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Header from '../Component/Header';
+import Footer from '../Component/Footer';
 
 const AddEditBanners = () => {
   const location = useLocation(); 
@@ -65,6 +67,7 @@ const AddEditBanners = () => {
   };
   return (
     <div>
+    <Header></Header>
         <div className="wrapper">
         <div className="content-wrapper">
             <section className="content-header">
@@ -154,6 +157,7 @@ const AddEditBanners = () => {
             </section>
         </div>
         </div>
+    <Footer></Footer>    
     </div>
   )
 }

@@ -1818,7 +1818,8 @@ const Dashboard2 = () => {
                           <a href="about.html">About us</a>
                         </li>
                         <li>
-                          <a href="contact.html">Contact us</a>
+                        <Link to={"/contactus"}>Contact Us</Link>
+                          
                         </li>
                         <li>
                           <a href="faq.html">FAQ</a>
@@ -1923,7 +1924,7 @@ const Dashboard2 = () => {
   </div>
   {/*====== End - Main App ======*/}
   {/*====== Google Analytics: change UA-XXXXX-Y to be your site's ID ======*/}
-</div>
+    </div>
 
     </div>
   )

@@ -21,6 +21,7 @@ import Brands from './admin/Brands/Brands';
 import AddEditBrands from './admin/Brands/AddEditBrands';
 import Banners from './admin/Banners/Banners';
 import AddEditBanners from './admin/Banners/AddEditBanners';
+import Contact from './user/Contact';
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
                   
 
           <Route path='/userdashboard2' element={< Dashboard2/>}></Route>
+          <Route path='/contactus' element={< Contact/>}></Route>
           
         </Routes>
       </BrowserRouter>
