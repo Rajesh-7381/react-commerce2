@@ -27,58 +27,70 @@ const Register = () => {
     };
 
     const validationSchema = Yup.object({
-        name: Yup.string().max(100).min(3).required("Please enter your name!"),
+        name: Yup.string().max(100).min(3).matches(/^[a-zA-Z]+$/,"Please remove digits and special characters!").required("Please enter your name!"), //+ means(greedy quantifier) matches one or more of these letters and $ means  end of the string
         mobile: Yup.string().max(10).min(10).matches(/^[0-9]{10}$/,"Mobile number must be 10 digits!").required("Mobile number required!"),
         email: Yup.string().max(100).min(2).email("Invalid Email Format!").required("Please enter your email!"),
         password: Yup.string().max(25).min(8)
                 .matches(/^[a-zA-Z0-9#?!@$%^&*\\-]{8,25}$/, "Password must be 8-25 characters and can contain letters, numbers, and special characters").required("Please enter your password!"),
-        image: Yup.mixed().test("fileFormat","supported file format is png,webp,jpeg and jpg",(value)=>{ //to contain file details
-            if(value){ //if file exist
-                const supportedfileformat =["image/png", "image/webp", "image/jpeg", "image/jpg"];
-                return supportedfileformat.includes(value.type); //value also contain value.name and value.size
-            }
-            return true;
-        }).required("Please upload your image!"),
+        image: Yup.mixed()
+            .test("fileFormat","supported file format is png,webp,jpeg and jpg",(value)=>{ //to contain file details
+                // console.log(value)
+                if(value){ //if file exist
+                    const supportedfileformat =["image/png", "image/webp", "image/jpeg", "image/jpg"];
+                    return supportedfileformat.includes(value.type); //value also contain value.name and value.size
+                }
+                return true;
+            })
+            .test("fileSize","File size must be less than 500KB",(value)=>{
+                if(value){
+                    return value.size < 0.5 * 1024 * 1024; //500kb
+                }
+                return true;
+            })
+            .required("Please upload your image!"),
     });
 
     const onSubmitForm = async (values, action) => {
         if (passwordStrength !== 4) {
-            NotificationManager.error("Password strength is not strong enough!");
-            return;
-          }
-        
+          NotificationManager.error("Password strength is not strong enough!");
+          return;
+        }
+      
         try {
-            const { email } = values; // Destructuring values
-        
-          const response2 = await axios.get(`http://localhost:8081/checkemail/${email}`);
-          if (response2.data.exists) {
-            NotificationManager.error("This email is already registered! please try with different email!")
-          }else{
+          const { email, mobile } = values; // Destructuring values
+      
+          const Emailresponse = await axios.get(`http://localhost:8081/checkemail/${email}`);
+          const Mobileresponse = await axios.get(`http://localhost:8081/checkmobile/${mobile}`);
+      
+          if (Emailresponse.data.emailExists) { 
+            NotificationManager.error("This email is already registered!");
+          } else if (Mobileresponse.data.mobileExists) { 
+            NotificationManager.error("This mobile is already registered!");
+          } else {
             const formData = new FormData();
             formData.append('name', values.name);
             formData.append('mobile', values.mobile);
             formData.append('email', values.email);
             formData.append('password', values.password);
             formData.append('image', values.image);
-
-            const response = await axios.post("http://localhost:8081/register", formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+      
+            await axios.post("http://localhost:8081/register", formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
             });
-            // console.log(response.data);
+      
             NotificationManager.success("Form submitted successfully!");
             setTimeout(() => {
-                action.resetForm();
-                navigate("/");
+              action.resetForm();
+              navigate("/");
             }, 3000);
-          } 
-            
+          }
         } catch (error) {
-            console.log("Error submitting form", error);
-            NotificationManager.error("Form submission was not successful!");
+          console.log("Error submitting form", error);
+          NotificationManager.error("Form submission was not successful!");
         }
-    };
+      };
 
     const formik = useFormik({
         initialValues: initialValues,

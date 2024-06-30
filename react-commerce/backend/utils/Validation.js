@@ -2,7 +2,7 @@ const Joi=require("joi");
 
 // for user registration
  const registerSchema = Joi.object({
-    name: Joi.string().trim().min(3).max(100).required().label('Name'), // Descriptive label for name
+    name: Joi.string().trim().min(3).max(100).pattern(new RegExp('^[a-zA-Z]')).required().label('Name'), // Descriptive label for name
     mobile: Joi.string().pattern(/^[0-9]{10}$/).required().label('Mobile Number'), // Correct pattern for 10-digit mobile numbers
     email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'org'] } }).required().label('Email'), // Email validation
     password: Joi.string().trim().min(8).max(25).required().label('Password').pattern(new RegExp('^[a-zA-Z0-9#?!@$%^&*\\-]{8,25}$')), 
@@ -26,7 +26,7 @@ const passwordForgotSchema = Joi.object({
 
 // for CMS PAGE
 const CmsPageSchema=Joi.object({
-  title:Joi.string().required().trim().label('Title'),
+  title:Joi.string().required().trim().pattern(new RegExp('^[a-zA-Z]')).label('Title'),
   url:Joi.string().required().trim().label('URL'),
   description:Joi.string().required().trim().label('Description'),
   meta_title:Joi.string().required().trim().label('Meta Title'),
@@ -36,9 +36,9 @@ const CmsPageSchema=Joi.object({
 
 // for category
 const CategorySchema=Joi.object({
-  category_name:Joi.string().required().trim().label('Category Name'),
+  category_name:Joi.string().required().trim().pattern(new RegExp('^[a-zA-Z]')).label('Category Name'),
   parent_id:Joi.number().required().label('Parent ID'),
-  category_discount:Joi.number().required().label('Category Discpount'),
+  category_discount:Joi.string().required().pattern(new RegExp('^[0-9]')).label('Category Discpount'),
   description:Joi.string().required().trim().label('Description'),
   url:Joi.string().required().trim().label('URL'),
   meta_title:Joi.string().required().trim().label('Meta Title'),
@@ -59,16 +59,16 @@ const CategorySchema=Joi.object({
 // for product
 const ProductSchema = Joi.object({
   category_id: Joi.string().trim().required().label('Category ID'),
-  product_name: Joi.string().trim().required().label('Product Name'),
+  product_name: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z]')).label('Product Name'),
   product_code: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Product Code'),
   family_color: Joi.string().trim().required().label('Family Color'),
-  product_color: Joi.string().trim().required().label('Product Code'),
+  product_color: Joi.string().trim().required().label('Product Color'),
   group_code: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Group Code'),
-  product_price: Joi.number().required().label('Product Price'),
+  product_price: Joi.string().required().pattern(/^(?!0(?:\.0+)?$)(?:\d+(?:\.\d{1,2})?)$/).label('Product Price'),
   product_weight: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Product Weight'),
-  product_discount: Joi.number().required().label('Product Discount'),
-  discount_type: Joi.string().trim().required().label('Discount Type'),
-  final_price: Joi.number().required().label('Final Price'),
+  product_discount: Joi.string().required().pattern(new RegExp('^[0-9]')).label('Product Discount'),
+  product_price: Joi.string().required().pattern(/^(?!0(?:\.0+)?$)(?:\d+(?:\.\d{1,2})?)$/).label('Product Price'), // 0,0.23,0.54 NOT ALLOWED AND ALLOWED 12.23,12.00,122
+  final_price: Joi.string().required().pattern(/^(?!0(?:\.0+)?$)(?:\d+(?:\.\d{1,2})?)$/).label('Final Price'),
   description: Joi.string().trim().required().label('Description'),
   washcare: Joi.string().trim().required().label('WashCare'),
   keywords: Joi.string().trim().required().label('Keywords'),
@@ -92,7 +92,7 @@ const ProductSchema = Joi.object({
     size: Joi.number().required(),
   }).unknown().required().label('Product Video'),
 
-  product_image: Joi.object({
+  product_image: Joi.array().items(Joi.object({
     fieldname: Joi.string().required(),
     originalname: Joi.string().required(),
     encoding: Joi.string().required(),
@@ -101,20 +101,20 @@ const ProductSchema = Joi.object({
     filename: Joi.string().required(),
     path: Joi.string().required(),
     size: Joi.number().required(),
-  }).unknown().required().label('Product Image'),
+  })).min(1).max(20).required().label('Product Images'),
 
   attributes: Joi.array().items(Joi.object({
     size: Joi.string().trim().required().label('Size'),
     sku: Joi.string().trim().required().label('SKU'),
-    price: Joi.number().required().label('Price'),
-    stock: Joi.number().required().label('Stock'),
+    price: Joi.string().required().pattern(/^(?!0(?:\.0+)?$)(?:\d+(?:\.\d{1,2})?)$/).label('Price'),
+    stock: Joi.string().required().pattern(new RegExp('^[0-9]')).label('Stock'),
   })).required().label('Attributes'),
 });
 
 // for brand
 const BrandSchema = Joi.object({
-  brand_name: Joi.string().trim().required().label('Brand Name'),
-  brand_discount: Joi.number().required().label('Brand Discount'),
+  brand_name: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z]')).label('Brand Name'),
+  brand_discount: Joi.string().required().pattern(new RegExp('^[0-9]')).label('Brand Discount'),
   description: Joi.string().trim().required().label('Description'),
   url: Joi.string().trim().required().label('URL'),
   meta_title: Joi.string().trim().required().label('Meta Title'),
@@ -145,9 +145,9 @@ const BrandSchema = Joi.object({
 
 // for banner
 const BannerSchema=Joi.object({
-  type:Joi.string().trim().required().label('Type'),
+  type:Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z]')).label('Type'),
   link:Joi.string().trim().required().label('Link'),
-  alt:Joi.string().trim().required().label('Alt'),
+  alt:Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z]')).label('Alt'),
   BannerImage: Joi.object({
         fieldname: Joi.string().required(),
         originalname: Joi.string().required(),

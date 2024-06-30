@@ -34,6 +34,7 @@ const AddEditRegisterUser = (args) => {
     try {
       const response = await axios.get(`http://localhost:8081/singledata/${id}`);
       setmodaldata(response.data.data);
+      // console.log(modaldata)
       setModal(!modal);
     } catch (error) {
       console.error("error fetching data", error);
@@ -247,7 +248,7 @@ const handledelete = async (id) => {
                   <table id="example1" className="table table-bordered table-striped">
                     <thead>
                       <tr>
-                        <th className='bg-dark text-light'>ID</th>
+                        <th className='bg-dark text-light'>SL NO</th>
                         <th className='bg-dark text-light'>NAME</th>
                         <th className='bg-dark text-light'>MOBILE</th>
                         <th className='bg-dark text-light'>EMAIL</th>
@@ -303,18 +304,55 @@ const handledelete = async (id) => {
 
       {/* for show singledata modal*/}
       <Modal isOpen={modal} toggle={toggle} {...args}>
-        <ModalHeader toggle={toggle}>Hi <span className='bg-warning '>{modaldata.name}</span>This is Your Personal Information</ModalHeader>
+        <ModalHeader toggle={toggle} className="bg-primary text-white">
+          Hi <span className='bg-warning'>{modaldata.name}</span> 
+        </ModalHeader>
+        <div className="text-center">
+          <img src={`http://localhost:8081/profile/${modaldata.image}`} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
+        </div>
         <ModalBody>
-          <p style={{ fontWeight: "bolder" }}> ID: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span></p>
-          <hr />
-          <p style={{ fontWeight: "bolder" }}> Name: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span></p>
-          <hr />
-          <p style={{ fontWeight: "bolder" }}> Email: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span></p>
-          <hr />
-          <p style={{ fontWeight: "bolder" }}> Role: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span></p>
-
+          <div className="container">
+            <div className="row">
+              <div className="col-md-12">
+                <h5 className="text-primary">Personal Information</h5>
+                <hr />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>ID:</p>
+              </div>
+              <div className="col-md-4">
+                <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span></p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>Name:</p>
+              </div>
+              <div className="col-md-4">
+                <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span></p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>Email:</p>
+              </div>
+              <div className="col-md-4">
+                <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span></p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>Role:</p>
+              </div>
+              <div className="col-md-4">
+                <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span></p>
+              </div>
+            </div>
+          </div>
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="bg-light">
           <Button color="primary" onClick={toggle}>
             Ok
           </Button>{' '}
@@ -323,8 +361,6 @@ const handledelete = async (id) => {
           </Button>
         </ModalFooter>
       </Modal>
-
-
       {/* for update modal*/}
       <Modal isOpen={modal2} toggle={toggle2} {...args}>
         <ModalHeader toggle={toggle2}>Hi This is Your Personal Information</ModalHeader>

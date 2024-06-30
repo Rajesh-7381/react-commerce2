@@ -35,64 +35,8 @@ const AddEditProducts = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [productImagesPreview, setProductImagesPreview] = useState([]);
   const [allproductsAttributes,setallproductsAttributes]=useState([]);
+  const [PImages, setPImages] = useState([]);
   const [dynamicfields, setDynamicFields] = useState([{ size: "", sku: "", price: "", stock: "" },]);
-
-  // useEffect(() => {
-  //     let maxField = 10; // Input fields increment limitation
-  //     let x = 1; // Initial field counter is 1
-
-  //     const fieldHTML = `
-  //     <div className="col-md-12">
-  //         <div className="card-body">
-  //             <div className="field_wrapper">
-  //                 <div>
-  //                     <input type="text" name="size[]" id='size' placeholder='Size' style={{width:"120px"}} value="" />
-  //                     <input type="text" name="sku[]" id='sku' placeholder='Sku' style={{width:"120px"}} value="" />
-  //                     <input type="text" name="price[]" id='price' placeholder='Price' style={{width:"120px"}} value="" />
-  //                     <input type="text" name="stock[]" id='stock' placeholder='Stock' style={{width:"120px"}} value="" />
-  //                     <a href="javascript:void(0);" class="remove_button" style="color:red;text-decoration: none;">Remove</a>
-  //                 </div>
-  //              </div>
-  //         </div>
-  //       </div>
-  //       <br>
-  //     `;
-
-  //     // Ensure the click event is only attached once
-  //     $('.add_button').off('click').on('click', function () {
-  //       if (x < maxField) {
-  //         x++; // Increase field counter
-  //         $('.field_wrapper').append(fieldHTML); // Add field html
-  //       } else {
-  //         // alert('A maximum of ' + maxField + ' fields are allowed to be added.');
-
-  //         try {
-  //             const confirmed =  Swal.fire({
-  //                 title: 'Are you sure?',
-  //                 text: 'This action cannot be undone.',
-  //                 icon: 'warning',
-  //                 showCancelButton: true,
-  //                 confirmButtonColor: '#3085d6',
-  //                 cancelButtonColor: '#d33',
-  //                 confirmButtonText: `A maximum of  ${ maxField }  fields are allowed to be added.`,
-  //             });
-
-  //             if (confirmed.isConfirmed) {
-
-  //             }
-  //         } catch (error) {
-  //             console.error(error);
-  //         }
-  //       }
-  //     });
-
-  //     // Once remove button is clicked
-  //     $('.field_wrapper').off('click', '.remove_button').on('click', '.remove_button', function (e) {
-  //       e.preventDefault();
-  //       $(this).parent('div').remove(); // Remove field html
-  //       x--; // Decrease field counter
-  //     });
-  //   }, []); // Empty dependency array ensures this runs only once after the initial render
 
   const selectFiles = (event) => {
     setSelectedFiles([...event.target.files]);
@@ -130,7 +74,6 @@ const AddEditProducts = () => {
       console.error(error);
     }
   };
-  const [PImages, setPImages] = useState([]);
   const productimage = (e) => {
     const imagefile = e.target.files;
     setPImages(imagefile);
