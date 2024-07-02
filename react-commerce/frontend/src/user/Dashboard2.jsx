@@ -1,12 +1,35 @@
-import React, { useEffect } from 'react'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 const Dashboard2 = () => {
   const navigate=useNavigate();
-  useEffect(()=>{
-    document.title='Dashboard';
-    
-  },[])
+  const [categories, setcategories] = useState([]);
+  useEffect(() => {
+    document.title="Dashboard2"
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('http://localhost:8081/getAllCategorys');
+        setcategories(response.data);
+      } catch (error) {
+        console.error('Error fetching the categories:', error);
+      }
+    };
+  
+    fetchCategories();
+  }, []);
+  useEffect(() => {
+    // console.log(categories);
+  }, [categories]);
+  
+//  lookup object for category id to name mapping
+const categoryLookup = categories.reduce((acc, category) => {
+  acc[category.id] = category.category_name;
+  return acc;
+}, {});
+
+// Filter out categories without a parent
+const categoriesWithParent = categories.filter(category => category.parent_id); // if it met category contain id  and their parent_id they return new array
   return (
     <div>
     <div>
@@ -783,127 +806,24 @@ const Dashboard2 = () => {
                   <li>
                     <a href="shop-side-version-2.html">NEW ARRIVALS</a>
                   </li>
-                  <li className="has-dropdown">
-                    <a>CLOTHING<i className="fas fa-angle-down u-s-m-l-6" /></a>
-                    {/*====== Dropdown ======*/}
-                    <span className="js-menu-toggle" />
-                    <ul style={{width: 170}}>
-                      <li className="has-dropdown has-dropdown--ul-left-100">
-                        <a href="listing.html">Men<i className="fas fa-angle-down i-state-right u-s-m-l-6" /></a>
-                        {/*====== Dropdown ======*/}
+                  {categoriesWithParent.map((category) => (
+                    categoryLookup[category.parent_id] && (
+                      <li className="has-dropdown" key={category.id}>
+                        <Link>{categoryLookup[category.parent_id]}<i className="fas fa-angle-down u-s-m-l-6" /></Link>
                         <span className="js-menu-toggle" />
-                        <ul style={{width: 118}}>
-                          <li>
-                            <a href="listing.html">T-shirts</a>
-                          </li>
-                          <li>
-                            <a href="listing.html">Shirts</a>
-                          </li>
-                          <li>
-                            <a href="listing.html">Jeans</a>
-                          </li>
-                          <li>
-                            <a href="listing.html">Shorts</a>
+                        <ul style={{ width: 170 }}>
+                          <li className="has-dropdown has-dropdown--ul-left-100">
+                            <Link to={category.url}>{category.category_name}<i className="fas fa-angle-down i-state-right u-s-m-l-6" /></Link>
+                            <span className="js-menu-toggle" />
+                            <ul style={{ width: 118 }}>
+                            <li><a href="listing.html">T-shirts</a></li>
+                              
+                            </ul>
                           </li>
                         </ul>
-                        {/*====== End - Dropdown ======*/}
                       </li>
-                      <li className="has-dropdown has-dropdown--ul-left-100">
-                        <a href="listing.html">Women<i className="fas fa-angle-down i-state-right u-s-m-l-6" /></a>
-                        {/*====== Dropdown ======*/}
-                        <span className="js-menu-toggle" />
-                        <ul style={{width: 200}}>
-                          <li>
-                            <a href="listing.html">Tops</a>
-                          </li>
-                          <li>
-                            <a href="listing.html">Dresses</a>
-                          </li>
-                          <li>
-                            <a href="listing.html">Shorts</a>
-                          </li>
-                        </ul>
-                        {/*====== End - Dropdown ======*/}
-                      </li>
-                      <li className="has-dropdown has-dropdown--ul-left-100">
-                        <a href="listing.html">Kids<i className="fas fa-angle-down i-state-right u-s-m-l-6" /></a>
-                        {/*====== Dropdown ======*/}
-                        <span className="js-menu-toggle" />
-                        <ul style={{width: 118}}>
-                          <li>
-                            <a href="listing.html">T-shirts</a>
-                          </li>
-                          <li>
-                            <a href="listing.html">Shirts</a>
-                          </li>
-                          <li>
-                            <a href="listing.html">Shorts</a>
-                          </li>
-                        </ul>
-                        {/*====== End - Dropdown ======*/}
-                      </li>
-                      <li>
-                        <a href="listing.html">Dummy</a>
-                      </li>
-                    </ul>
-                    {/*====== End - Dropdown ======*/}
-                  </li>
-                  <li className="has-dropdown">
-                    <a>ELECTRONICS<i className="fas fa-angle-down u-s-m-l-6" /></a>
-                    {/*====== Dropdown ======*/}
-                    <span className="js-menu-toggle" />
-                    <ul style={{width: 170}}>
-                      <li className="has-dropdown has-dropdown--ul-left-100">
-                        <a href="listing.html">Mobiles<i className="fas fa-angle-down i-state-right u-s-m-l-6" /></a>
-                        {/*====== Dropdown ======*/}
-                        <span className="js-menu-toggle" />
-                        <ul style={{width: 118}}>
-                          <li>
-                            <a href="listing.html">Smartphones</a>
-                          </li>
-                          <li>
-                            <a href="listing.html">Accessories</a>
-                          </li>
-                        </ul>
-                        {/*====== End - Dropdown ======*/}
-                      </li>
-                      <li className="has-dropdown has-dropdown--ul-left-100">
-                        <a href="listing.html">Laptops<i className="fas fa-angle-down i-state-right u-s-m-l-6" /></a>
-                        {/*====== Dropdown ======*/}
-                        <span className="js-menu-toggle" />
-                        <ul style={{width: 200}}>
-                          <li>
-                            <a href="listing.html">Laptops</a>
-                          </li>
-                          <li>
-                            <a href="listing.html">Tablets</a>
-                          </li>
-                          <li>
-                            <a href="listing.html">Accessories</a>
-                          </li>
-                        </ul>
-                        {/*====== End - Dropdown ======*/}
-                      </li>
-                    </ul>
-                    {/*====== End - Dropdown ======*/}
-                  </li>
-                  <li className="has-dropdown">
-                    <a>APPLIANCES<i className="fas fa-angle-down u-s-m-l-6" /></a>
-                    {/*====== Dropdown ======*/}
-                    <span className="js-menu-toggle" />
-                    <ul style={{width: 200}}>
-                      <li>
-                        <a href="listing.html">Air Conditioners</a>
-                      </li>
-                      <li>
-                        <a href="listing.html">Refrigerators</a>
-                      </li>
-                    </ul>
-                    {/*====== End - Dropdown ======*/}
-                  </li>
-                  <li>
-                    <a href="listing.html">FEATURED PRODUCTS</a>
-                  </li>
+                    )
+                  ))}
                 </ul>
                 {/*====== End - List ======*/}
               </div>

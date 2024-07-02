@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
+import Footer from '../Component/Footer';
+import Header from '../Component/Header';
 
 const Products = () => {
     const navigate=useNavigate();
@@ -87,7 +89,59 @@ const Products = () => {
     }
   return (
     <div>
-        <section className="content">
+    <div>
+    <div className="wrapper">
+    {/* Preloader */}
+        <div className="preloader flex-column justify-content-center align-items-center">
+            <img
+            className="animation__shake"
+            src="dist/img/AdminLTELogo.png"
+            alt="AdminLTELogo"
+            height={60}
+            width={60}
+            />
+        </div>
+    {/* Navbar */}
+        <Header></Header>
+        <div className="content-wrapper">
+            {/* Content Header (Page header) */}
+            <div className="content-header">
+            <div className="container-fluid">
+                <div className="row mb-2">
+                <div className="col-sm-12">
+                    <h1 className="m-0 float-start">Products Table</h1>
+                    <Link  className="breadcrumb-item float-right" to={"/admindashboard1"}>
+                        Home
+                    </Link>
+                    <br />
+                    
+                </div>
+                
+                {/* /.col */}
+                <div className="col-sm-6">
+                    <ol className="breadcrumb float-sm-right">
+                    
+                    
+                    </ol>
+                </div>
+                {/* /.col */}
+                </div>
+                {/* /.row */}
+            </div>
+            {/* /.container-fluid */}
+            </div>
+            {/* /.content-header */}
+            {/* Main content */}
+            <section className="content">
+            <div className="container-fluid">
+                <div className="row">
+                <div className="col-lg-3 col-6"></div>
+                </div>
+            </div>
+            </section>
+            {/* /.content */}
+
+            <section className="content">
         <div className="container-fluid">
             <div className="row">
                 <div className="col-12">
@@ -100,20 +154,7 @@ const Products = () => {
                         </div>
 
                         <div className="card-body">
-                            <section className="content-header">
-                                <div className="container-fluid">
-                                    <div className="row mb-2">
-                                        <div className="col-sm-6"></div>
-                                        <div className="col-sm-6">
-                                            <ol className="breadcrumb float-sm-right">
-                                                <li className="breadcrumb-item "><Link to={"/admindashboard1"}>Home</Link></li>
-                                                <li className="breadcrumb-item"><Link to={""}>Back</Link></li>
-                                            </ol>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
+                            
                             <form className='d-flex align-items-center justify-content-end'>
                                 <div className="input-group">
                                     <input className="form-control mr-2" type="search" placeholder="Search using name, url, title etc..." aria-label="Search" onKeyUp={searchfunction}  />
@@ -135,8 +176,6 @@ const Products = () => {
                                             <th className='bg-dark text-light'>PRODUCT CODE </th>
                                             <th className='bg-dark text-light'>GROUP CODE</th>
                                             <th className='bg-dark text-light'>PRODUCT PRICE</th>
-                                            <th className='bg-dark text-light'>PRODUCT WEIGHT</th>
-                                            <th className='bg-dark text-light'>PRODUCT DISCOUNT </th>
                                             <th className='bg-dark text-light'>STATUS</th>
                                             <th className='bg-dark text-light'>ACTIONS</th>
                                         </tr>
@@ -152,8 +191,6 @@ const Products = () => {
                                                         <td>{item.product_code}</td>
                                                         <td>{item.group_code}</td>
                                                         <td>{item.product_price}</td>
-                                                        <td>{item.product_weight}</td>
-                                                        <td>{item.product_discount}</td>
                                                         <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
                                                         <td>
                                                             <NotificationContainer />
@@ -190,7 +227,19 @@ const Products = () => {
                 </div>
             </div>
         </div>
-        </section>
+            </section>
+        </div>
+
+    {/* /.content-wrapper */}
+        <Footer></Footer>
+    {/* Control Sidebar */}
+        <aside className="control-sidebar control-sidebar-dark">
+            {/* Control sidebar content goes here */}
+        </aside>
+    {/* /.control-sidebar */}
+    </div>
+    {/* ./wrapper */}
+    </div>
     </div>
   )
 }

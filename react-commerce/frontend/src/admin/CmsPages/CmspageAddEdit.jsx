@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { NotificationManager } from 'react-notifications';
+import Footer from '../Component/Footer';
+import Header from '../Component/Header';
 
 const CmspageAddEdit = () => {
     const location = useLocation();
@@ -57,95 +59,147 @@ const CmspageAddEdit = () => {
 
     return (
         <div>
+            <div>
             <div className="wrapper">
-                <div className="content-wrapper">
-                    <section className="content-header">
+            {/* Preloader */}
+            <div className="preloader flex-column justify-content-center align-items-center">
+                <img
+                className="animation__shake"
+                src="dist/img/AdminLTELogo.png"
+                alt="AdminLTELogo"
+                height={60}
+                width={60}
+                />
+            </div>
+            {/* Navbar */}
+            <Header></Header>
+            <div className="content-wrapper">
+                {/* Content Header (Page header) */}
+                <div className="content-header">
+                <div className="container-fluid">
+                    <div className="row mb-2">
+                    <div className="col-sm-12">
+                        <h1 className="m-0 float-start">Edit/Update CMS</h1>
+                        <section className="content-header">
                         <div className="container-fluid">
                             <div className="row mb-2">
-                                <div className="col-sm-6"></div>
-                                <div className="col-sm-6">
-                                    <ol className="breadcrumb float-sm-right">
-                                        <li className="breadcrumb-item"><Link to={"/admindashboard1"}>Home</Link></li>
-                                        <li className="breadcrumb-item"><Link to={"/cmspages"}>Back</Link></li>
-                                    </ol>
-                                </div>
+                            <div className="col-sm-6"></div>
+                            <div className="col-sm-6">
+                                <ol className="breadcrumb float-sm-right">
+                                <li className="breadcrumb-item ">
+                                    <Link to={"/admindashboard1"}>Home</Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link to={"/categories"}>Back</Link>
+                                </li>
+                                </ol>
+                            </div>
                             </div>
                         </div>
-                    </section>
-                    <section className="content">
-                        <div className="container-fluid">
-                            <div className="row">
-                                <div className="card card-primary">
-                                    <div className="card-header">
-                                        <h3 className="card-title" style={{ width: "100%", fontWeight: "bold" }}>
-                                            {id ? 'Update Form' : 'Add Form'}
-                                        </h3>
-                                    </div>
-                                    <form onSubmit={handleSubmit(onsubmit)}>
-                                        <div className="row">
-                                            <div className="col-md-6">
-                                                <div className="card-body">
-                                                    <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputcmspageTitle">Title<span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputcmspageTitle" name='title' {...register("title", { "required": true })} defaultValue={cmspagedata.title} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6">
-                                                <div className="card-body">
-                                                    <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputcmspageDescription">Description<span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputcmspageDescription" name='description'  {...register("description", { "required": true })} defaultValue={cmspagedata.description} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-md-6">
-                                                <div className="card-body">
-                                                    <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputcmspageURL">URL <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputcmspageURL" name='url' {...register("url", { "required": true })} defaultValue={cmspagedata.url} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6">
-                                                <div className="card-body">
-                                                    <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputcmspagemeta_title">Meta Title <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputcmspagemeta_title" name='meta_title'  {...register("meta_title", { "required": true })} defaultValue={cmspagedata.meta_title} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="row">
-                                            <div className="col-md-6">
-                                                <div className="card-body">
-                                                    <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputcmspagemeta_description">Meta Description <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputcmspageexampleInputcmspagemeta_description" name='meta_description'  {...register("meta_description", { "required": true })} defaultValue={cmspagedata.meta_description} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6">
-                                                <div className="card-body">
-                                                    <div className="form-group text-start">
-                                                        <label htmlFor="exampleInputcmspagemeta_keywords">Meta Keyword <span className='text-danger'>*</span></label>
-                                                        <input type="text" className="form-control" id="exampleInputcmspagemeta_keywords" name='meta_keywords'  {...register("meta_keywords", { "required": true })} defaultValue={cmspagedata.meta_keywords} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className='text-start'>
-                                            <button type="submit" className='btn btn-primary'>{id ? 'Update' : 'Submit'}</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                        </section>
+                        <br />
+                    </div>
+
+                    {/* /.col */}
+                    <div className="col-sm-6">
+                        <ol className="breadcrumb float-sm-right"></ol>
+                    </div>
+                    {/* /.col */}
+                    </div>
+                    {/* /.row */}
                 </div>
+                {/* /.container-fluid */}
+                </div>
+                {/* /.content-header */}
+                {/* Main content */}
+                <section className="content">
+                <div className="container-fluid">
+                    <div className="row">
+                    <div className="col-lg-3 col-6"></div>
+                    </div>
+                </div>
+                </section>
+                {/* /.content */}
+
+                <section className="content">
+                            <div className="container-fluid">
+                                <div className="row">
+                                    <div className="card card-primary">
+                                        <div className="card-header">
+                                            <h3 className="card-title" style={{ width: "100%", fontWeight: "bold" }}>
+                                                {id ? 'Update Form' : 'Add Form'}
+                                            </h3>
+                                        </div>
+                                        <form onSubmit={handleSubmit(onsubmit)}>
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <div className="card-body">
+                                                        <div className="form-group text-start">
+                                                            <label htmlFor="exampleInputcmspageTitle">Title<span className='text-danger'>*</span></label>
+                                                            <input type="text" className="form-control" id="exampleInputcmspageTitle" name='title' {...register("title", { "required": true })} defaultValue={cmspagedata.title} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="card-body">
+                                                        <div className="form-group text-start">
+                                                            <label htmlFor="exampleInputcmspageDescription">Description<span className='text-danger'>*</span></label>
+                                                            <input type="text" className="form-control" id="exampleInputcmspageDescription" name='description'  {...register("description", { "required": true })} defaultValue={cmspagedata.description} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <div className="card-body">
+                                                        <div className="form-group text-start">
+                                                            <label htmlFor="exampleInputcmspageURL">URL <span className='text-danger'>*</span></label>
+                                                            <input type="text" className="form-control" id="exampleInputcmspageURL" name='url' {...register("url", { "required": true })} defaultValue={cmspagedata.url} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="card-body">
+                                                        <div className="form-group text-start">
+                                                            <label htmlFor="exampleInputcmspagemeta_title">Meta Title <span className='text-danger'>*</span></label>
+                                                            <input type="text" className="form-control" id="exampleInputcmspagemeta_title" name='meta_title'  {...register("meta_title", { "required": true })} defaultValue={cmspagedata.meta_title} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <div className="card-body">
+                                                        <div className="form-group text-start">
+                                                            <label htmlFor="exampleInputcmspagemeta_description">Meta Description <span className='text-danger'>*</span></label>
+                                                            <input type="text" className="form-control" id="exampleInputcmspageexampleInputcmspagemeta_description" name='meta_description'  {...register("meta_description", { "required": true })} defaultValue={cmspagedata.meta_description} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="card-body">
+                                                        <div className="form-group text-start">
+                                                            <label htmlFor="exampleInputcmspagemeta_keywords">Meta Keyword <span className='text-danger'>*</span></label>
+                                                            <input type="text" className="form-control" id="exampleInputcmspagemeta_keywords" name='meta_keywords'  {...register("meta_keywords", { "required": true })} defaultValue={cmspagedata.meta_keywords} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className='text-start'>
+                                                <button type="submit" className='btn btn-primary'>{id ? 'Update' : 'Submit'}</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+            </div>
+
+            {/* /.content-wrapper */}
+            <Footer></Footer>
+            </div>
+            {/* ./wrapper */}
             </div>
         </div>
     )

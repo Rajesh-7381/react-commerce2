@@ -7,6 +7,8 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { DeleteEntity } from './CRUDENTITY/DeleteEntity';
+import Footer from './Component/Footer';
+import Header from './Component/Header';
 
 
 const Subadmin = (args) => {
@@ -136,16 +138,64 @@ const Subadmin = (args) => {
 
     return (
         <div>
+        <div>
+        <div className="wrapper">
+          {/* Preloader */}
+          <div className="preloader flex-column justify-content-center align-items-center">
+            <img
+              className="animation__shake"
+              src="dist/img/AdminLTELogo.png"
+              alt="AdminLTELogo"
+              height={60}
+              width={60}
+            />
+          </div>
+          {/* Navbar */}
+         <Header></Header>
+          <div className="content-wrapper">
+            {/* Content Header (Page header) */}
+            <div className="content-header">
+              <div className="container-fluid">
+                <div className="row mb-2">
+                  <div className="col-sm-12">
+                    <h1 className="m-0 float-start">Subadmin Table</h1>
+                    <Link  className="breadcrumb-item float-right" to={"/admindashboard1"}>
+                        Home
+                    </Link>
+                    <br />
+                    
+                  </div>
+                  
+                  {/* /.col */}
+                  <div className="col-sm-6">
+                    <ol className="breadcrumb float-sm-right">
+                      
+                     
+                    </ol>
+                  </div>
+                  {/* /.col */}
+                </div>
+                {/* /.row */}
+              </div>
+              {/* /.container-fluid */}
+            </div>
+            {/* /.content-header */}
+            {/* Main content */}
+            <section className="content">
+              <div className="container-fluid">
+                <div className="row">
+                  <div className="col-lg-3 col-6"></div>
+                </div>
+              </div>
+            </section>
+            {/* /.content */}
+    
             <section className="content">
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-12">
                             <div className="card">
-                                <div className="card-header">
-                                    <h1 className="card-title" style={{ margin: "auto", width: "100%", fontWeight: "bold" }}>
-                                        <span className='badge badge-pill badge-warning'>Subadmin/</span> <span className='badge badge-pill badge-info'>Registered User Data</span>
-                                    </h1>
-                                </div>
+                               
                                 <div className="card-body ">
                                     <form className='d-flex align-items-center justify-content-end'>
                                         <div className="input-group col-9">
@@ -216,9 +266,6 @@ const Subadmin = (args) => {
                 </div>
             </section>
             {/* for show singledata modal*/}
-      
-
-
             <Modal isOpen={modal} toggle={toggle} {...args}>
             <ModalHeader toggle={toggle} className="bg-primary text-white">
               Hi <span className='bg-warning'>{modaldata.name}</span> 
@@ -277,6 +324,18 @@ const Subadmin = (args) => {
               </Button>
             </ModalFooter>
             </Modal>
+          </div>
+    
+          {/* /.content-wrapper */}
+          <Footer></Footer>
+          {/* Control Sidebar */}
+          <aside className="control-sidebar control-sidebar-dark">
+            {/* Control sidebar content goes here */}
+          </aside>
+          {/* /.control-sidebar */}
+        </div>
+        {/* ./wrapper */}
+        </div>
         </div>
     );
 }

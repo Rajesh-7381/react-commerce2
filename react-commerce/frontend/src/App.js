@@ -22,6 +22,10 @@ import AddEditBrands from './admin/Brands/AddEditBrands';
 import Banners from './admin/Banners/Banners';
 import AddEditBanners from './admin/Banners/AddEditBanners';
 import Contact from './user/Contact';
+import MyAccount from './user/Account/MyAccount';
+import WishList from './user/Account/WishList';
+import Order from './user/Account/Order';
+import MyCart from './user/Account/MyCart';
 
 function App() {
   return (
@@ -53,6 +57,10 @@ function App() {
 
           <Route path='/userdashboard2' element={< Dashboard2/>}></Route>
           <Route path='/contactus' element={< Contact/>}></Route>
+          <Route path='/myAccount' element={< MyAccount/>}></Route>
+          <Route path='/wishlist' element={< WishList/>}></Route>
+          <Route path='/Orders' element={< Order/>}></Route>
+          <Route path='/myCart' element={< MyCart/>}></Route>
           
         </Routes>
       </BrowserRouter>

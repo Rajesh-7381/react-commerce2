@@ -173,7 +173,7 @@ const Banners = () => {
       {/* /.control-sidebar */}
     </div>
     {/* ./wrapper */}
-  </div>
+    </div>
     </div>
   )
 }

@@ -66,16 +66,18 @@ const Footer = () => {
                   <div className="outer-footer__list-wrap">
                     <ul>
                       <li>
-                        <a href="account.html">My Account</a>
+                        
+                        <Link to={"/myAccount"}>My Account</Link>
                       </li>
                       <li>
-                        <a href="orders.html">My Orders</a>
+                        
+                        <Link to={"/Orders"}>My Orders</Link>
                       </li>
                       <li>
-                        <a href="cart.html">My Cart</a>
+                        <Link to={"/myCart"}>My Cart</Link>
                       </li>
                       <li>
-                        <a href="wishlist.html">My Wishlist</a>
+                        <Link to={"/wishlist"}>My Wishlist</Link>
                       </li>
                     </ul>
                   </div>
@@ -89,7 +91,7 @@ const Footer = () => {
                     </span>
                     <ul>
                       <li>
-                        <a href="about.html">About us</a>
+                        <Link to={"/aboutus"}>About us</Link>
                       </li>
                       <li>
                         <Link to={"/contactus"}>Contact Us</Link>

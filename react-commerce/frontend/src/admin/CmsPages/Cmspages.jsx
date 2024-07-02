@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
+import Footer from '../Component/Footer';
+import Header from '../Component/Header';
 
 
 const Cmspages = () => {
@@ -59,20 +61,28 @@ const Cmspages = () => {
 
   return (
     <div>
-        <section className="content">
-        <div className="container-fluid">
-            <div className="row">
-                <div className="col-12">
-                    <div className="card">
-                        <div className="card-header ">
-                            <h1 className="card-title " style={{ margin: "auto", width: "100%", fontWeight: "bold" }}>
-                                <span className='badge badge-pill badge-warning'>CMS/</span>
-                                <span className='badge badge-pill badge-info'>CMSPagees Data</span>
-                            </h1>
-                        </div>
-
-                        <div className="card-body">
-                            <section className="content-header">
+    <div>
+    <div className="wrapper">
+      {/* Preloader */}
+      <div className="preloader flex-column justify-content-center align-items-center">
+        <img
+          className="animation__shake"
+          src="dist/img/AdminLTELogo.png"
+          alt="AdminLTELogo"
+          height={60}
+          width={60}
+        />
+      </div>
+      {/* Navbar */}
+     <Header></Header>
+      <div className="content-wrapper">
+        {/* Content Header (Page header) */}
+        <div className="content-header">
+          <div className="container-fluid">
+            <div className="row mb-2">
+              <div className="col-sm-12">
+                <h1 className="m-0 float-start">CMS Page Table</h1>
+                <section className="content-header">
                                 <div className="container-fluid">
                                     <div className="row mb-2">
                                         <div className="col-sm-6"></div>
@@ -85,7 +95,42 @@ const Cmspages = () => {
                                     </div>
                                 </div>
                             </section>
+                <br />
+                
+              </div>
+             
+              {/* /.col */}
+              <div className="col-sm-6">
+                <ol className="breadcrumb float-sm-right">
+                  
+                 
+                </ol>
+              </div>
+              {/* /.col */}
+            </div>
+            {/* /.row */}
+          </div>
+          {/* /.container-fluid */}
+        </div>
+        {/* /.content-header */}
+        {/* Main content */}
+        <section className="content">
+          <div className="container-fluid">
+            <div className="row">
+              <div className="col-lg-3 col-6"></div>
+            </div>
+          </div>
+        </section>
+        {/* /.content */}
 
+        <section className="content">
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-12">
+                    <div className="card">
+                        
+                        <div className="card-body">
+                            
                             <form className='d-flex align-items-center justify-content-end'>
                                 <div className="input-group">
                                     <input className="form-control mr-2" type="search" placeholder="Search using name, url, title etc..." aria-label="Search" onKeyUp={searchfunction} />
@@ -102,11 +147,7 @@ const Cmspages = () => {
                                         <tr>
                                             <th className='bg-dark text-light'>SL NO.</th>
                                             <th className='bg-dark text-light'>TITLE</th>
-                                            <th className='bg-dark text-light'>DESCRIPTION</th>
                                             <th className='bg-dark text-light'>URL</th>
-                                            <th className='bg-dark text-light'>META TITLE</th>
-                                            <th className='bg-dark text-light'>META DESCRIPTION</th>
-                                            <th className='bg-dark text-light'>META KEYWORD </th>
                                             <th className='bg-dark text-light'>STATUS</th>
                                             <th className='bg-dark text-light'>ACTIONS</th>
                                         </tr>
@@ -117,11 +158,7 @@ const Cmspages = () => {
                                                 <tr  key={item.id}>
                                                     <td > {index+1}</td>
                                                     <td > {item.title}</td>
-                                                    <td > {item.description}</td>
                                                     <td > <Link to={item.url} target='_blank'>{item.url}</Link></td>
-                                                    <td > {item.meta_title}</td>
-                                                    <td > {item.meta_description}</td>
-                                                    <td > {item.meta_keywords}</td>
                                                     <td > <span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
                                                     <td >
                                                         <button className='btn btn-sm btn-success mr-1' title='edit' onClick={()=>handladdeditcmspage(item.id)}><i className='fas fa-pencil-alt'></i></button>
@@ -140,6 +177,18 @@ const Cmspages = () => {
             </div>
         </div>
         </section>
+      </div>
+
+      {/* /.content-wrapper */}
+      <Footer></Footer>
+      {/* Control Sidebar */}
+      <aside className="control-sidebar control-sidebar-dark">
+        {/* Control sidebar content goes here */}
+      </aside>
+      {/* /.control-sidebar */}
+    </div>
+    {/* ./wrapper */}
+    </div>
     </div>
   )
 }

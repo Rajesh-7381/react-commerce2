@@ -158,48 +158,6 @@ app.post("/register", upload.single("image"), async (req, res) => {
 
 //========================================END====================================================
 
-//===============================================delete status change============================
-// app.post("/register", upload.single("image"), async (req, res) => {
-//     const { name, mobile, email, password } = req.body;
-//     try {
-//         const salt = await bcrypt.genSalt(10);
-//         const hashedPassword = await bcrypt.hash(password, salt);
-
-//         db.query(
-//             "INSERT INTO AdminUser (name, mobile, email, password, image) VALUES (?, ?, ?, ?, ?)",
-//             [name, mobile, email, hashedPassword, req.file.filename],
-//             (err, data) => {
-//                 if (err) {
-//                     console.error("Error submitting form", err);
-//                     return res.status(500).json({ message: "Internal server error" });
-//                 } else {
-//                     // Send welcome email
-//                     const mailOptions = {
-//                         from: process.env.EMAIL,
-//                         to: email,
-//                         subject: 'Welcome to Our Service!',
-//                         text: `Hello ${name},\n\nThank you for registering at our service! We are excited to have you.\n\nBest regards,\nYour Company`,
-//                     };
-
-//                     transpoter.sendMail(mailOptions, (error, info) => {
-//                         if (error) {
-//                             console.error('Error sending email:', error);
-//                             return res.status(500).json({ message: 'User created but failed to send email' });
-//                         }
-//                         console.log('Email sent:', info.response);
-//                         res.status(200).json({ message: 'Registration successful and email sent!' });
-//                     });
-//                 }
-//             }
-//         );
-//     } catch (error) {
-//         console.error("Error during registration:", error);
-//         res.status(500).json({ message: "Internal server error" });
-//     }
-// });
-
-//========================================END====================================================
-
 //===============================================ADMIN OR SUBADMIN USER LOGIN============================
 app.post("/login", (req, res, next) => {
   const { email, password, check } = req.body;
