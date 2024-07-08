@@ -1,8 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "./Component/Header";
 import Footer from "./Component/Footer";
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import axios from "axios";
+import { NotificationContainer, NotificationManager } from "react-notifications";
+
 const Contact = () => {
+
+  const initialValues={
+    name:"",
+    email:"",
+    subject:"",
+    message:""
+  };
+  const validationSchema=Yup.object({
+    name: Yup.string().max(100).min(3).matches(/^[a-zA-Z]+$/,"Please remove digits and special characters!").required("Please enter your name!"), //+ means(greedy quantifier) matches one or more of these letters and $ means  end of the string
+    subject: Yup.string().max(300).min(3).matches(/^[a-zA-Z0-9\s.,!?]+$/, "Please enter a valid subject!").required("Please enter subject"),
+    message: Yup.string().max(500).min(3).matches(/^[a-zA-Z0-9\s.,!?]+$/, "Please enter a valid Message!").required("Please enter message"), //+ means(greedy quantifier) matches one or more of these letters and $ means  end of the string
+    email: Yup.string().max(100).min(2).email("Invalid Email Format!").required("Please enter your email!"),
+
+  })
+
+  const onSubmitForm=async (values,action)=>{
+    try {
+      const formData=new FormData();
+      formData.append("name",values.name);
+      formData.append("email",values.email);
+      formData.append("subject",values.subject);
+      formData.append("message",values.message);
+      await axios.post("http://localhost:8081/ContactUS",values);
+      NotificationManager.success("Form submitted successfully!");
+      action.resetForm();
+    } catch (error) {
+      
+    }
+  }
+  const formik=useFormik({
+    initialValues:initialValues,
+    validationSchema:validationSchema,
+    onSubmit:onSubmitForm
+  });
   return (
     <div>
       <div>
@@ -95,66 +134,74 @@ const Contact = () => {
                       <h2 className="float-left">Get In Touch</h2>
                       <br />
                     </div>
-                    <form
-                      className="contact-f"
-                      method="post"
-                      action="index.html"
-                    >
-                      <div className="row">
-                        <div className="col-lg-6 col-md-6 u-h-100">
-                          <div className="u-s-m-b-30">
-                            <label htmlFor="c-name" />
-                            <input
-                              className="input-text input-text--border-radius input-text--primary-style"
-                              type="text"
-                              id="c-name"
-                              placeholder="Name (Required)"
-                              required
-                            />
-                          </div>
-                          <div className="u-s-m-b-30">
-                            <label htmlFor="c-email" />
-                            <input
-                              className="input-text input-text--border-radius input-text--primary-style"
-                              type="text"
-                              id="c-email"
-                              placeholder="Email (Required)"
-                              required
-                            />
-                          </div>
-                          <div className="u-s-m-b-30">
-                            <label htmlFor="c-subject" />
-                            <input
-                              className="input-text input-text--border-radius input-text--primary-style"
-                              type="text"
-                              id="c-subject"
-                              placeholder="Subject (Required)"
-                              required
-                            />
-                          </div>
+                    <form className="contact-f" onSubmit={formik.handleSubmit}>
+                    <div className="row">
+                      <div className="col-lg-6 col-md-6 u-h-100">
+                        <div className="u-s-m-b-30">
+                          <label htmlFor="c-name" />
+                          <input
+                            className="input-text input-text--border-radius input-text--primary-style"
+                            type="text"
+                            id="c-name"
+                            name="name"
+                            onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.name}  
+                            placeholder="Name (Required)"
+                            
+                          />
+                          {formik.touched.name && formik.errors.name ? <div className="text-danger">{formik.errors.name}</div> : null}
                         </div>
-                        <div className="col-lg-6 col-md-6 u-h-100">
-                          <div className="u-s-m-b-30">
-                            <label htmlFor="c-message" />
-                            <textarea
-                              className="text-area text-area--border-radius text-area--primary-style"
-                              id="c-message"
-                              placeholder="Compose a Message (Required)"
-                              required
-                              defaultValue={""}
-                            />
-                          </div>
+                        <div className="u-s-m-b-30">
+                          <label htmlFor="c-email" />
+                          <input
+                            className="input-text input-text--border-radius input-text--primary-style"
+                            type="text"
+                            id="c-email"
+                            name="email"
+                            onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.email} 
+                            placeholder="Email (Required)"
+                            
+                          />
+                          {formik.touched.email && formik.errors.email ? <div className="text-danger">{formik.errors.email}</div> : null}
                         </div>
-                        <div className="col-lg-12">
-                          <button
-                            className="btn btn--e-brand-b-2 float-left btn-outline-success"
-                            type="submit"
-                          >
-                            Send Message
-                          </button>
+                        <div className="u-s-m-b-30">
+                          <label htmlFor="c-subject" />
+                          <input
+                            className="input-text input-text--border-radius input-text--primary-style"
+                            type="text"
+                            id="c-subject"
+                            name="subject"
+                            onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.subject} 
+                            placeholder="Subject (Required)"
+                            
+                          />
+                          {formik.touched.subject && formik.errors.subject ? <div className="text-danger">{formik.errors.subject}</div> : null}
                         </div>
                       </div>
-                    </form>
+                      <div className="col-lg-6 col-md-6 u-h-100">
+                        <div className="u-s-m-b-30">
+                          <label htmlFor="c-message" />
+                          <textarea
+                            className="text-area text-area--border-radius text-area--primary-style"
+                            id="c-message"
+                            name="message"
+                            onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.message} 
+                            placeholder="Compose a Message (Required)"
+                            
+                          />
+                          {formik.touched.message && formik.errors.message ? <div className="text-danger">{formik.errors.message}</div> : null}
+                        </div>
+                      </div>
+                      <div className="col-lg-12">
+                      <NotificationContainer />
+                        <button
+                          className="btn btn--e-brand-b-2 float-left btn-outline-success"
+                          type="submit"
+                        >
+                          Send Message
+                        </button>
+                      </div>
+                    </div>
+                  </form>
                   </div>
                 </div>
               </div>

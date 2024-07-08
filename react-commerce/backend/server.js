@@ -1900,6 +1900,18 @@ app.put("/handlebannerstatus/:id", async (req, res) => {
   }
 });
 
+app.post("/ContactUS", (req, res) => {
+  const { name, email, subject, message } = req.body;
+  // console.log(req.body)
+  const query = "INSERT INTO ContactUS (name, email, subject, message) VALUES (?, ?, ?, ?)";
+  db.query(query, [name, email, subject, message], (err, data) => {
+    if (err) {
+      return res.json({ message: "not inserted" });
+    }
+    return res.status(200).json({ message: "inserted" });
+  });
+});
+
 //========================================END====================================================
 app.listen(process.env.SERVERPORT, () => {
   console.log(`server listening at port ${process.env.SERVERPORT}`);
