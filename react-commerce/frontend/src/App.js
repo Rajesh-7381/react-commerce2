@@ -26,6 +26,7 @@ import MyAccount from './user/Account/MyAccount';
 import WishList from './user/Account/WishList';
 import Order from './user/Account/Order';
 import MyCart from './user/Account/MyCart';
+import ProductDetails from './user/Account/ProductDetails';
 
 function App() {
   return (
@@ -61,6 +62,7 @@ function App() {
           <Route path='/wishlist' element={< WishList/>}></Route>
           <Route path='/Orders' element={< Order/>}></Route>
           <Route path='/myCart' element={< MyCart/>}></Route>
+          <Route path='/productDetails' element={< ProductDetails/>}></Route>
           
         </Routes>
       </BrowserRouter>

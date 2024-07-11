@@ -38,9 +38,9 @@ const categoriesWithParent = categories.filter(category => category.parent_id); 
           {/*====== Primary Nav ======*/}
           <div className="primary-nav">
             {/*====== Main Logo ======*/}
-            <a className="main-logo" href="index.html">
+            <Link className="main-logo" to={"/userdashboard2"}>
               
-              <img src="./frontend/images/logo/logo-1.png" alt="" /></a>
+              <img src="./frontend/images/logo/logo-1.png" alt="" /></Link>
             {/*====== End - Main Logo ======*/}
             {/*====== Search Form ======*/}
             <form className="main-form">

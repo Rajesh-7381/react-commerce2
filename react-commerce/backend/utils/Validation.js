@@ -59,6 +59,7 @@ const CategorySchema=Joi.object({
 // for product
 const ProductSchema = Joi.object({
   category_id: Joi.string().trim().required().label('Category ID'),
+  brand_id: Joi.string().trim().required().label('Brand ID'),
   product_name: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z]')).label('Product Name'),
   product_code: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Product Code'),
   family_color: Joi.string().trim().required().label('Family Color'),
@@ -67,7 +68,7 @@ const ProductSchema = Joi.object({
   product_price: Joi.string().required().pattern(/^(?!0(?:\.0+)?$)(?:\d+(?:\.\d{1,2})?)$/).label('Product Price'),
   product_weight: Joi.string().trim().required().pattern(new RegExp('^[a-zA-Z0-9]')).label('Product Weight'),
   product_discount: Joi.string().required().pattern(new RegExp('^[0-9]')).label('Product Discount'),
-  product_price: Joi.string().required().pattern(/^(?!0(?:\.0+)?$)(?:\d+(?:\.\d{1,2})?)$/).label('Product Price'), // 0,0.23,0.54 NOT ALLOWED AND ALLOWED 12.23,12.00,122
+  discount_type: Joi.string().required().label(' Discount Type'),
   final_price: Joi.string().required().pattern(/^(?!0(?:\.0+)?$)(?:\d+(?:\.\d{1,2})?)$/).label('Final Price'),
   description: Joi.string().trim().required().label('Description'),
   washcare: Joi.string().trim().required().label('WashCare'),

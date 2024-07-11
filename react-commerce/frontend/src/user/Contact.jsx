@@ -16,7 +16,7 @@ const Contact = () => {
     message:""
   };
   const validationSchema=Yup.object({
-    name: Yup.string().max(100).min(3).matches(/^[a-zA-Z]+$/,"Please remove digits and special characters!").required("Please enter your name!"), //+ means(greedy quantifier) matches one or more of these letters and $ means  end of the string
+    name: Yup.string().max(100).min(3).matches(/^[a-zA-Z\s.,!?]+$/,"Please remove digits and special characters!").required("Please enter your name!"), //+ means(greedy quantifier) matches one or more of these letters and $ means  end of the string
     subject: Yup.string().max(300).min(3).matches(/^[a-zA-Z0-9\s.,!?]+$/, "Please enter a valid subject!").required("Please enter subject"),
     message: Yup.string().max(500).min(3).matches(/^[a-zA-Z0-9\s.,!?]+$/, "Please enter a valid Message!").required("Please enter message"), //+ means(greedy quantifier) matches one or more of these letters and $ means  end of the string
     email: Yup.string().max(100).min(2).email("Invalid Email Format!").required("Please enter your email!"),

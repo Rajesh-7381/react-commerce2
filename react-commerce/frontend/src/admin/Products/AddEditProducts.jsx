@@ -25,6 +25,7 @@ const AddEditProducts = () => {
   const [data, setData] = useState({});
   const [productattributedata, setproductattributedata] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [brands, setbrands] = useState([]);
 
   const [productPrice, setProductPrice] = useState(0);
   const [productDiscount, setProductDiscount] = useState(0);
@@ -63,6 +64,7 @@ const AddEditProducts = () => {
     // Fetch categories from the backend when the component mounts
     fetchCategories();
     productcolor();
+    fetchBrands();
   }, []);
 
   const productcolor = async () => {
@@ -80,6 +82,15 @@ const AddEditProducts = () => {
       console.error(error);
     }
   };
+
+  const fetchBrands=async()=>{
+    try {
+      const response=await axios.get("http://localhost:8081/getAllBrands");
+      setbrands(response.data);
+    } catch (error) {
+        console.error(error)
+    }
+  }
   const productimage = (e) => {
     const imagefile = e.target.files;
     setPImages(imagefile);
@@ -101,6 +112,7 @@ const AddEditProducts = () => {
       setproductattributedata(productattributes);
       setValue("category_id", productdata.category_id); // Add category_id to FormData
       setValue("product_name", productdata.product_name);
+      setValue("brand_id", productdata.brand_id);
       setValue("product_code", productdata.product_code);
       setValue("family_color", productdata.family_color);
       setValue("product_color", productdata.product_color);
@@ -139,6 +151,7 @@ const AddEditProducts = () => {
       const form = new FormData();
       form.append("category_id", formData.category_id); // Add category_id to FormData
       form.append("product_name", formData.product_name);
+      form.append("brand_id", formData.brand_id);
       form.append("product_code", formData.product_code);
       form.append("family_color", formData.family_color);
       form.append("product_color", formData.product_color);
@@ -413,6 +426,35 @@ const AddEditProducts = () => {
                             </div>
                           </div>
                         </div>
+                        <div className="col-md-12">
+  <div className="card-body">
+    <div className="form-group text-start">
+      <label htmlFor="brand_id">Select Brand</label>
+      <select
+        name="brand_id"
+        id="brand_id"
+        className="form-control"
+        {...register("brand_id", { required: true })}
+        value={data.id} // Assuming `data` has the correct brand_id
+        onChange={(e) => setValue('brand_id', e.target.value)} // Use appropriate state update method if needed
+      >
+        <option value="">Select</option>
+        {brands.map((brand) => (
+          <option key={brand.id} value={brand.id}>
+            {brand.brand_name}
+          </option>
+        ))}
+      </select>
+      {errors.id && (
+        <span className="text-danger">
+          Category is required
+        </span>
+      )}
+    </div>
+  </div>
+</div>
+
+
                       </div>
                       <div className="row">
                         <div className="col-md-6">

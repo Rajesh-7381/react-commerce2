@@ -158,6 +158,7 @@ const Dashboard2 = () => {
                 </div>
                 <div className="filter__grid-wrapper u-s-m-t-30">
                   <div className="row">
+                   
                     <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item newarrivals">
                       <div className="product-o product-o--hover-on product-o--radius">
                         <div className="product-o__wrap">
@@ -175,57 +176,7 @@ const Dashboard2 = () => {
                           <span className="product-o__discount">₹1000.00.00</span></span>
                       </div>
                     </div>
-                    <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item newarrivals">
-                      <div className="product-o product-o--hover-on product-o--radius">
-                        <div className="product-o__wrap">
-                          <a className="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
-                            <img className="aspect__img" src="./frontend/images/product/sitemakers-tshirt.png" alt="" /></a>
-                        </div>
-                        <span className="product-o__category">
-                          <a href="shop-side-version-2.html">Brand Name</a></span>
-                        <span className="product-o__name">
-                          <a href="product-detail.html">Product Name</a></span>
-                        <div className="product-o__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" /><i className="far fa-star" /><i className="far fa-star" />
-                          <span className="product-o__review">(25)</span>
-                        </div>
-                        <span className="product-o__price">₹900.00
-                          <span className="product-o__discount">₹1000.00.00</span></span>
-                      </div>
-                    </div>
-                    <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item newarrivals">
-                      <div className="product-o product-o--hover-on product-o--radius">
-                        <div className="product-o__wrap">
-                          <a className="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
-                            <img className="aspect__img" src="./frontend/images/product/sitemakers-tshirt.png" alt="" /></a>
-                        </div>
-                        <span className="product-o__category">
-                          <a href="shop-side-version-2.html">Brand Name</a></span>
-                        <span className="product-o__name">
-                          <a href="product-detail.html">Product Name</a></span>
-                        <div className="product-o__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" />
-                          <span className="product-o__review">(25)</span>
-                        </div>
-                        <span className="product-o__price">₹900.00
-                          <span className="product-o__discount">₹1000.00.00</span></span>
-                      </div>
-                    </div>
-                    <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item newarrivals">
-                      <div className="product-o product-o--hover-on product-o--radius">
-                        <div className="product-o__wrap">
-                          <a className="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
-                            <img className="aspect__img" src="./frontend/images/product/sitemakers-tshirt.png" alt="" /></a>
-                        </div>
-                        <span className="product-o__category">
-                          <a href="shop-side-version-2.html">Brand Name</a></span>
-                        <span className="product-o__name">
-                          <a href="product-detail.html">Product Name</a></span>
-                        <div className="product-o__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" />
-                          <span className="product-o__review">(25)</span>
-                        </div>
-                        <span className="product-o__price">₹900.00
-                          <span className="product-o__discount">₹1000.00.00</span></span>
-                      </div>
-                    </div>
+                    
                     <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item bestsellers">
                       <div className="product-o product-o--hover-on product-o--radius">
                         <div className="product-o__wrap">
