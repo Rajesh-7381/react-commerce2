@@ -1904,6 +1904,9 @@ app.put("/handlebannerstatus/:id", async (req, res) => {
   }
 });
 
+//========================================END====================================================
+
+//===============================================Banner status change============================
 app.post('/ContactUS', (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
@@ -1923,6 +1926,31 @@ app.post('/ContactUS', (req, res) => {
   }
 });
 
+
+app.get("/AllProductDetailsShown",(req,res)=>{
+  // const query="select p.*,pi.image from products as p join products_image as pi on p.id=pi.product_id where p.status=1";
+  const query="select b.brand_name,p.*,pi.image from products as p join products_image as pi on p.id=pi.product_id join brands as b on p.brand_id=b.id";
+  db.query(query,(err,data)=>{
+    if(err){
+      console.log(err);
+    }
+    return res.json(data)
+  })
+});
+
+
+// show single listing data
+app.get("/listing/:categoryurl",(req,res)=>{
+  const categoryURL=req.params.categoryurl;
+  console.log(categoryURL)
+  const query="select * from categories where url=?";
+  db.query(query,[categoryURL],(err,data)=>{
+    if(err){
+      console.log(err);
+    }
+    return res.json(data);
+  })
+})
 //========================================END====================================================
 app.listen(process.env.SERVERPORT, () => {
   console.log(`server listening at port ${process.env.SERVERPORT}`);

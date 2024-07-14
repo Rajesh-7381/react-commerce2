@@ -6,6 +6,18 @@ import Footer from './Component/Footer';
 
 const Dashboard2 = () => {
   const navigate=useNavigate();
+  const [products,setproducts]=useState([]);
+
+  useEffect(()=>{
+    fetchProducts();
+    
+  },[]);
+
+  const fetchProducts=async()=>{
+    const response=await axios.get("http://localhost:8081/AllProductDetailsShown");
+    setproducts(response.data);
+  }
+  
   
   return (
     <div>
@@ -159,23 +171,27 @@ const Dashboard2 = () => {
                 <div className="filter__grid-wrapper u-s-m-t-30">
                   <div className="row">
                    
-                    <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item newarrivals">
-                      <div className="product-o product-o--hover-on product-o--radius">
-                        <div className="product-o__wrap">
-                          <a className="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
-                            <img className="aspect__img" src="./frontend/images/product/sitemakers-tshirt.png" alt="" /></a>
+                    {
+                      products.map((product)=>(
+                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item newarrivals">
+                        <div className="product-o product-o--hover-on product-o--radius">
+                          <div className="product-o__wrap">
+                            <Link className="aspect aspect--bg-grey aspect--square u-d-block" to={``}>
+                              <img className="aspect__img" src={`http://localhost:8081/productsimage/`+product.image} alt="" /></Link>
+                          </div>
+                          <span className="product-o__category">
+                            <a href="shop-side-version-2.html">{product.brand_name ? product.brand_name :'Brand Name'}</a></span>
+                          <span className="product-o__name">
+                            <a href="product-detail.html">{product.product_name}</a></span>
+                          <div className="product-o__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" />
+                            <span className="product-o__review">(25)</span>
+                          </div>
+                          <span className="product-o__price">₹{product.final_price}.00
+                            <span className="product-o__discount">₹{product.product_discount}.00</span></span>
                         </div>
-                        <span className="product-o__category">
-                          <a href="shop-side-version-2.html">Brand Name</a></span>
-                        <span className="product-o__name">
-                          <a href="product-detail.html">Product Name</a></span>
-                        <div className="product-o__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" />
-                          <span className="product-o__review">(25)</span>
-                        </div>
-                        <span className="product-o__price">₹900.00
-                          <span className="product-o__discount">₹1000.00.00</span></span>
                       </div>
-                    </div>
+                      ))
+                    }
                     
                     <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item bestsellers">
                       <div className="product-o product-o--hover-on product-o--radius">

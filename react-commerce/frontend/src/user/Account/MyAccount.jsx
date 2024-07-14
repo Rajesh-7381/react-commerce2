@@ -209,7 +209,7 @@ const MyAccount = () => {
     </div>
     {/*====== End - Main App ======*/}
     {/*====== Google Analytics: change UA-XXXXX-Y to be your site's ID ======*/}
-  </div>
+    </div>
     </div>
   )
 }
