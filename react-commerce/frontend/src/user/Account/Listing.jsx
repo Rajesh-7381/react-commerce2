@@ -5,22 +5,21 @@ import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 
 const Listing = () => {
-  const [listing,setlisting]=useState([]);
-  const { categoryurl }=useParams();
-  // alert(categoryurl)
+  const { id }=useParams();
+  const [listingproduct,setlistingproduct]=useState([]);
 
   useEffect(()=>{
-    fetchData();
-  },[categoryurl]);
-
-  const fetchData=async()=>{
-    const response=await axios.get(`http://localhost:8081/listing/${categoryurl}`);
-    console.log(response.data)
-    const data=await response.json();
-    // console.log(data)
-    // alert(listing) 
-
-  }
+    const fetchListingProduct=async()=>{
+      try {
+        const response=await axios.get(`http://localhost:8081/listingproduct/${id}`);
+        setlistingproduct(response.data)
+        console.log(listingproduct)
+      } catch (error) {
+          console.error("Error fetching the product details:", error);
+      }
+    }
+    fetchListingProduct();
+  },[id])
   return (
     <div>
    
@@ -447,31 +446,35 @@ const Listing = () => {
                 <div className="shop-p__collection">
                   <div className="row is-grid-active">
                     <div className="col-lg-4 col-md-6 col-sm-6">
-                      <div className="product-m">
-                        <div className="product-m__thumb">
-                          <a className="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
-                            <img className="aspect__img" src="images/product/sitemakers-tshirt.png" alt /></a>
-                          <div className="product-m__quick-look">
-                            <a className="fas fa-search" data-modal="modal" data-modal-id="#quick-look" data-tooltip="tooltip" data-placement="top" title="Quick Look" /></div>
-                          <div className="product-m__add-cart">
-                            <a className="btn--e-brand" data-modal="modal" data-modal-id="#add-to-cart">View Details</a></div>
-                        </div>
-                        <div className="product-m__content">
-                          <div className="product-m__category">
-                            <a href="shop-side-version-2.html">Brand Name</a></div>
-                          <div className="product-m__name">
-                            <a href="product-detail.html">Product Name</a></div>
-                          <div className="product-m__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" /><i className="far fa-star" /><i className="far fa-star" />
-                            <span className="product-m__review">(25)</span></div>
-                          <div className="product-m__price">₹900.00</div>
-                          <div className="product-m__hover">
-                            <div className="product-m__preview-description">
-                              <span>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</span></div>
-                            <div className="product-m__wishlist">
-                              <a className="far fa-heart" href="#" data-tooltip="tooltip" data-placement="top" title="Add to Wishlist" /></div>
+                      {
+                        listingproduct.map((list)=>(
+                          <div className="product-m">
+                          <div className="product-m__thumb">
+                            <a className="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
+                              <img className="aspect__img" src="images/product/sitemakers-tshirt.png" alt /></a>
+                            <div className="product-m__quick-look">
+                              <a className="fas fa-search" data-modal="modal" data-modal-id="#quick-look" data-tooltip="tooltip" data-placement="top" title="Quick Look" /></div>
+                            <div className="product-m__add-cart">
+                              <a className="btn--e-brand" data-modal="modal" data-modal-id="#add-to-cart">View Details</a></div>
+                          </div>
+                          <div className="product-m__content">
+                            <div className="product-m__category">
+                              <a href="shop-side-version-2.html">{list.product_name}</a></div>
+                            <div className="product-m__name">
+                              <a href="product-detail.html">Product Name</a></div>
+                            <div className="product-m__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" /><i className="far fa-star" /><i className="far fa-star" />
+                              <span className="product-m__review">(25)</span></div>
+                            <div className="product-m__price">₹900.00</div>
+                            <div className="product-m__hover">
+                              <div className="product-m__preview-description">
+                                <span>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</span></div>
+                              <div className="product-m__wishlist">
+                                <a className="far fa-heart" href="#" data-tooltip="tooltip" data-placement="top" title="Add to Wishlist" /></div>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                        ))
+                      }
                     </div>
                     
                   </div>

@@ -176,7 +176,7 @@ const Dashboard2 = () => {
                         <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item newarrivals">
                         <div className="product-o product-o--hover-on product-o--radius">
                           <div className="product-o__wrap">
-                            <Link className="aspect aspect--bg-grey aspect--square u-d-block" to={``}>
+                            <Link className="aspect aspect--bg-grey aspect--square u-d-block" to={`/listingproduct/${product.id}`}>
                               <img className="aspect__img" src={`http://localhost:8081/productsimage/`+product.image} alt="" /></Link>
                           </div>
                           <span className="product-o__category">

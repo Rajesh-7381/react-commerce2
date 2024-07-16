@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 // const mysql2=require("mysql2");
-
+const {  Sendmail } =require("./utils/email")
 // db
 const { db } = require("./config/dbconfig");
 const errhandler = require("./Middleware/ErrorHandler");
@@ -148,6 +148,8 @@ app.post("/register", upload.single("image"), async (req, res) => {
         }
       );
     });
+    
+    await Sendmail(email, "Welcome to E-commerce", `Hi ${name}, thank you for registering.`);
 
     res.json({ message: "✅ User created successfully!" });
   } catch (err) {
@@ -155,6 +157,7 @@ app.post("/register", upload.single("image"), async (req, res) => {
     res.status(500).json({ message: "🚫 Internal server error" });
   }
 });
+
 
 //========================================END====================================================
 
@@ -1940,11 +1943,11 @@ app.get("/AllProductDetailsShown",(req,res)=>{
 
 
 // show single listing data
-app.get("/listing/:categoryurl",(req,res)=>{
-  const categoryURL=req.params.categoryurl;
-  console.log(categoryURL)
-  const query="select * from categories where url=?";
-  db.query(query,[categoryURL],(err,data)=>{
+app.get("/listingproduct/:id",(req,res)=>{
+  const id=req.params.id;
+  // console.log(id)
+  const query="select * from products where id=?";
+  db.query(query,[id],(err,data)=>{
     if(err){
       console.log(err);
     }
