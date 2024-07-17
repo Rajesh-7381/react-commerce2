@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@auth0/auth0-react": "^2.2.4",
     "@blacklab/react-image-magnify": "^4.1.1",
+    "@fortawesome/fontawesome-free": "^6.6.0",
     "@hookform/resolvers": "^3.6.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -18,6 +20,8 @@
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
     "react": "^18.3.1",
     "react-apexcharts": "^1.4.1",
     "react-chartjs-2": "^5.2.0",

@@ -1,3 +1,4 @@
+// import { useAuth0 } from "@auth0/auth0-react";
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
@@ -7,8 +8,11 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import zxcvbn from 'zxcvbn';
 import ReCAPTCHA from 'react-google-recaptcha';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const Register = () => {
+    // const { user ,loginWithRedirect}=useAuth0();
+    // console.log(user)
     const navigate = useNavigate();
     const [passwordVisibility, setPasswordVisibility] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
@@ -199,9 +203,9 @@ const Register = () => {
                                                 />
                                                 <NotificationContainer />
                                                 <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary w-75"  disabled={!cap}  type="submit">CREATE</button>
-                                            </div>
+                                            </div>                                                                                                                       
                                             <Link className="gl-link"  to={'/'}>Already have an Account? Login Now</Link>
-                                        </form>
+                                        </form> 
                                     </div>
                                 </div>
                             </div>

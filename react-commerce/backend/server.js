@@ -2,6 +2,11 @@ const express = require("express");
 const cors = require("cors");
 // const mysql2=require("mysql2");
 const {  Sendmail } =require("./utils/email")
+const passport = require('passport');
+const session=require("express-session")
+const GoogleOauthStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
+
 // db
 const { db } = require("./config/dbconfig");
 const errhandler = require("./Middleware/ErrorHandler");
@@ -33,7 +38,6 @@ const jwt = require("jsonwebtoken"); //note.txt
 const sharp = require("sharp"); //The sharp library is a popular JavaScript library for image processing in Node.js. It provides a simple and efficient API for resizing, cropping, and transforming images in a variety of formats, including JPEG, PNG, WebP, and TIFF.
 const morgan = require("morgan"); //note.txt
 const transpoter = require("./Email/nodemailerConfig");
-
 // const checkauth=require("./Auth/RouteCheckAuth");
 // for file sysytem
 const fs = require("fs");
@@ -42,7 +46,152 @@ const checkAuth = require("./Auth/RouteCheckAuth");
 // here multerConfig is roled to define file path also image where stored
 const upload = require("./utils/multerConfig");
 const { promises } = require("dns");
+const { profile } = require("console");
 const app = express(); //create express.js(framework) instance
+
+app.use(session({
+  secret: process.env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours session
+}));
+
+
+app.use(passport.session());
+
+passport.use(new GoogleOauthStrategy({
+  clientID:process.env.GOOGLE_CLIENT_ID,
+  clientSecret:process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "http://localhost:8081/auth/google/callback", // Ensure this matches your Google Cloud Console
+  scope: ["profile", "email"]
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    const email = profile.emails[0].value;
+    const userQuery = "SELECT * FROM AdminUser WHERE email = ?";
+    const insertQuery = `INSERT INTO AdminUser (name, email, image, mobile, password) VALUES (?, ?, ?, ?, ?)`;
+
+    db.query(userQuery, [email], (err, results) => {
+      if (err) {
+        console.error('Error querying database: ', err);
+        return done(err, null);
+      }
+
+      if (results.length > 0) {
+        // User already exists
+        return done(null, results[0]);
+      } else {
+        // User does not exist, create new user
+        const user = {
+          name: profile.displayName,
+          email: email,
+          image: profile.photos[0] ? profile.photos[0].value : null,
+          mobile: null, 
+          password: null 
+        };
+
+        db.query(insertQuery, [user.name, user.email, user.image, user.mobile, user.password], (err, results) => {
+          if (err) {
+            console.error('Error inserting into database: ', err);
+            return done(err, null);
+          }
+
+          // Add the newly created user ID to the `user` object
+          user.id = results.insertId;
+          return done(null, user);
+        });
+      }
+    });
+  } catch (error) {
+    console.error('Error in passport strategy: ', error);
+    return done(error, null);
+  }
+}
+));
+
+passport.serializeUser((user, done) => {
+done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+const query = "SELECT * FROM AdminUser WHERE id = ?";
+db.query(query, [id], (err, results) => {
+  if (err) {
+    return done(err, null);
+  }
+  return done(null, results[0]);
+});
+});
+
+
+
+
+
+
+// for facebook
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_APP_ID,
+  clientSecret: process.env.FACEBOOK_APP_SECRET,
+  callbackURL: "http://localhost:8081/auth/facebook/callback", 
+  profileFields: ['id', 'displayName', 'emails', 'photos'] 
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    const email = profile.emails[0].value;
+    const userQuery = "SELECT * FROM AdminUser WHERE email = ?";
+    const insertQuery = `INSERT INTO AdminUser (name, email, image, mobile, password) VALUES (?, ?, ?, ?, ?)`;
+
+    db.query(userQuery, [email], (err, results) => {
+      if (err) {
+        console.error('Error querying database: ', err);
+        return done(err, null);
+      }
+
+      if (results.length > 0) {
+        // User already exists
+        return done(null, results[0]);
+      } else {
+        // User does not exist, create new user
+        db.query(insertQuery, [profile.displayName, email, profile.photos[0].value, null, null], (err, results) => {
+          if (err) {
+            console.error('Error inserting into database: ', err);
+            return done(err, null);
+          }
+          
+          // Return the newly created user object
+          const newUser = {
+            id: results.insertId,
+            name: profile.displayName,
+            email: email,
+            image: profile.photos[0].value,
+            mobile: null, // Default value since mobile is not provided by Facebook
+            password: null // Default value for password
+          };
+
+          return done(null, newUser);
+        });
+      }
+    });
+  } catch (error) {
+    console.error('Error in passport strategy: ', error);
+    return done(error, null);
+  }
+}
+));
+
+passport.serializeUser((user, done) => {
+done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+const query = "SELECT * FROM AdminUser WHERE id = ?";
+db.query(query, [id], (err, results) => {
+  if (err) {
+    return done(err, null);
+  }
+  return done(null, results[0]);
+});
+});
 
 // middleware
 app.use(cors()); //enables Cross-Origin Resource Sharing (CORS) to allow requests from different origins.
@@ -91,72 +240,89 @@ app.use(
 
 app.use(errhandler);
 
+app.use(passport.initialize());
+app.get('/auth/google', passport.authenticate('google', {
+  scope: ['profile', 'email']
+}));
+
+app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
+  res.redirect('http://localhost:3000/userdashboard2'); // Redirect to homepage or another page after successful login
+});
+
+
+
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+
+// Handle the callback after Facebook has authenticated the user
+app.get('/auth/facebook/callback',passport.authenticate('facebook'),(req,res)=>{
+  res.redirect('http://localhost:3000/userdashboard2');
+});
 //=============================================== register user data============================
 
-app.post("/register", upload.single("image"), async (req, res) => {
-  const combinedData = {
-    ...req.body,
-    image: req.file,
-  };
-  const { error } = registerSchema.validate(combinedData);
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: "🚫 Invalid request body", error: error.details });
-  }
-
-  const { name, mobile, email, password } = req.body;
-  const UserExistQuery =
-    "SELECT COUNT(*) AS count FROM AdminUser WHERE email = ? OR mobile = ?";
-
-  try {
-    // Check if the user already exists
-    const userExistsResult = await new Promise((resolve, reject) => {
-      db.query(UserExistQuery, [email, mobile], (err, results) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(results[0].count);
-      });
-    });
-
-    if (userExistsResult > 0) {
+  app.post("/register", upload.single("image"), async (req, res) => {
+    const combinedData = {
+      ...req.body,
+      image: req.file,
+    };
+    const { error } = registerSchema.validate(combinedData);
+    if (error) {
       return res
         .status(400)
-        .json({ message: "🚫 Email or mobile number already exists" });
+        .json({ message: "🚫 Invalid request body", error: error.details });
     }
 
-    // Proceed with user registration
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const { name, mobile, email, password } = req.body;
+    const UserExistQuery =
+      "SELECT COUNT(*) AS count FROM AdminUser WHERE email = ? OR mobile = ?";
 
-    await new Promise((resolve, reject) => {
-      db.query(
-        "INSERT INTO AdminUser (name, mobile, email, password, image) VALUES (?, ?, ?, ?, ?)",
-        [
-          name,
-          mobile,
-          email,
-          hashedPassword,
-          req.file ? req.file.filename : null,
-        ],
-        (err, results) => {
+    try {
+      // Check if the user already exists
+      const userExistsResult = await new Promise((resolve, reject) => {
+        db.query(UserExistQuery, [email, mobile], (err, results) => {
           if (err) {
             return reject(err);
           }
-          resolve(results);
-        }
-      );
-    });
-    
-    await Sendmail(email, "Welcome to E-commerce", `Hi ${name}, thank you for registering.`);
+          resolve(results[0].count);
+        });
+      });
 
-    res.json({ message: "✅ User created successfully!" });
-  } catch (err) {
-    console.error("🚫 Error submitting form", err);
-    res.status(500).json({ message: "🚫 Internal server error" });
-  }
-});
+      if (userExistsResult > 0) {
+        return res
+          .status(400)
+          .json({ message: "🚫 Email or mobile number already exists" });
+      }
+
+      // Proceed with user registration
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      await new Promise((resolve, reject) => {
+        db.query(
+          "INSERT INTO AdminUser (name, mobile, email, password, image) VALUES (?, ?, ?, ?, ?)",
+          [
+            name,
+            mobile,
+            email,
+            hashedPassword,
+            req.file ? req.file.filename : null,
+          ],
+          (err, results) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve(results);
+          }
+        );
+      });
+      
+      await Sendmail(email, "Welcome to E-commerce", `Hi ${name}, thank you for registering.`);
+
+      res.json({ message: "✅ User created successfully!" });
+    } catch (err) {
+      console.error("🚫 Error submitting form", err);
+      res.status(500).json({ message: "🚫 Internal server error" });
+    }
+  });
 
 
 //========================================END====================================================
