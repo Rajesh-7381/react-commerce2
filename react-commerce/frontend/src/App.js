@@ -56,6 +56,7 @@ function App() {
           <Route path='/addeditbrands' element={< AddEditBrands/>}></Route>
           <Route path='/banners' element={< Banners/>}></Route>
           <Route path='/addeditbanners' element={< AddEditBanners/>}></Route>
+          
                   
 
           <Route path='/userdashboard2' element={< Dashboard2/>}></Route>
@@ -65,7 +66,7 @@ function App() {
           <Route path='/Orders' element={< Order/>}></Route>
           <Route path='/myCart' element={< MyCart/>}></Route>
           <Route path='/productDetails' element={< ProductDetails/>}></Route>
-          <Route path='/listingproduct/:id' element={< Listing/>}></Route>
+          <Route path='/listproduct' element={< Listing/>}></Route>
           
         </Routes>
       </BrowserRouter>

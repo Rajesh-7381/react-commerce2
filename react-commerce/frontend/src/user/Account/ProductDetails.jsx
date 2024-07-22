@@ -1,9 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../Component/Header'
 import Footer from '../Component/Footer'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import axios from 'axios'
 
 const ProductDetails = () => {
+  const {id}=useParams();
+  const [listproduct, setlistProduct] = useState([]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, []);
+
+  const fetchProduct = async () => {
+    const response = await axios.get(`http://localhost:8081/productDetails/49`);
+    // const response = await axios.get(`http://localhost:8081/listingproduct/${id}`);
+    setlistProduct(response.data[0]);
+    console.log(listproduct)
+  };
   return (
     <div>
         <div>
@@ -35,11 +49,11 @@ const ProductDetails = () => {
               <li className="has-separator">
                 <a href="index.hml">Home</a></li>
               <li className="has-separator">
-                <a href="shop-side-version-2.html">Clothing</a></li>
+                <a href="shop-side-version-2.html">{listproduct.parent_id}</a></li>
               <li className="has-separator">
-                <a href="shop-side-version-2.html">Men</a></li>
+                <a href="shop-side-version-2.html">{listproduct.category_name}</a></li>
               <li className="is-marked">
-                <a href="shop-side-version-2.html">T-Shirts</a></li>
+                <a href="shop-side-version-2.html">{listproduct.product_name}</a></li>
             </ul>
           </div>
           {/*====== End - Product Breadcrumb ======*/}
@@ -47,21 +61,10 @@ const ProductDetails = () => {
           <div className="pd u-s-m-b-30">
             <div className="slider-fouc pd-wrap">
               <div id="pd-o-initiate">
-                <div className="pd-o-img-wrap" data-src="images/product/sitemakers-tshirt-large-1.png">
-                  <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-1.png" data-zoom-image="images/product/sitemakers-tshirt-large-1.png" alt />
+                <div className="pd-o-img-wrap" data-src={`http://localhost:8081/productsimage/`+listproduct.image}>
+                  <img className="u-img-fluid" src={`http://localhost:8081/productsimage/`+listproduct.image} data-zoom-image={`http://localhost:8081/productsimage/`+listproduct.image} alt="" />
                 </div>
-                <div className="pd-o-img-wrap" data-src="images/product/sitemakers-tshirt-large-2.png">
-                  <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-2.png" data-zoom-image="images/product/sitemakers-tshirt-large-2.png" alt />
-                </div>
-                <div className="pd-o-img-wrap" data-src="images/product/sitemakers-tshirt-large-3.png">
-                  <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-3.png" data-zoom-image="images/product/sitemakers-tshirt-large-3.png" alt />
-                </div>
-                <div className="pd-o-img-wrap" data-src="images/product/sitemakers-tshirt-large-4.png">
-                  <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-4.png" data-zoom-image="images/product/sitemakers-tshirt-large-4.png" alt />
-                </div>
-                <div className="pd-o-img-wrap" data-src="images/product/sitemakers-tshirt-large-5.png">
-                  <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-5.png" data-zoom-image="images/product/sitemakers-tshirt-large-5.png" alt />
-                </div>
+                
               </div>
               <span className="pd-text">Click for larger zoom</span>
             </div>
@@ -93,11 +96,11 @@ const ProductDetails = () => {
           {/*====== Product Right Side Details ======*/}
           <div className="pd-detail">
             <div>
-              <span className="pd-detail__name">Double Shade Black Grey Casual T-Shirt</span></div>
+              <span className="pd-detail__name">{listproduct.product_name}</span></div>
             <div>
               <div className="pd-detail__inline">
-                <span className="pd-detail__price">₹900.00</span>
-                <span className="pd-detail__discount">(10% OFF)</span><del className="pd-detail__del">₹1000.00</del></div>
+                <span className="pd-detail__price">₹{listproduct.final_price}.00</span>
+                <span className="pd-detail__discount">({listproduct.product_discount}% OFF)</span><del className="pd-detail__del">₹{listproduct.product_price}.00</del></div>
             </div>
             <div className="u-s-m-b-15">
               <div className="pd-detail__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" />
@@ -106,11 +109,11 @@ const ProductDetails = () => {
             </div>
             <div className="u-s-m-b-15">
               <div className="pd-detail__inline">
-                <span className="pd-detail__stock">200 in stock</span>
+                <span className="pd-detail__stock">{listproduct.stock} in stock</span>
                 <span className="pd-detail__left">Only 2 left</span></div>
             </div>
             <div className="u-s-m-b-15">
-              <span className="pd-detail__preview-desc">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</span></div>
+              <span className="pd-detail__preview-desc">{listproduct.description}.</span></div>
             <div className="u-s-m-b-15">
               <div className="pd-detail__inline">
                 <span className="pd-detail__click-wrap"><i className="far fa-heart u-s-m-r-6" />

@@ -371,7 +371,7 @@ const handledelete = async (id) => {
           Hi <span className='bg-warning'>{modaldata.name}</span> 
         </ModalHeader>
         <div className="text-center">
-          <img src={`http://localhost:8081/profile/${modaldata.image}`} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
+          <img src={`http://localhost:8081/profile/${modaldata.image}`} className='rounded-circle img-thumbnail mx-auto d-block' height={150}  width={150}  alt={modaldata.name}/>
         </div>
         <ModalBody>
           <div className="container">

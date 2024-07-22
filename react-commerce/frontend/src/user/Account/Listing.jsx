@@ -1,28 +1,41 @@
 import React, { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import Footer from '../Component/Footer'
 import Header from '../Component/Header'
-import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 
 const Listing = () => {
-  const { id }=useParams();
-  const [listingproduct,setlistingproduct]=useState([]);
+  // const {id}=useParams();
+  const [listproduct, setlistProduct] = useState([]);
+  const [productcount ,setproductcount]=useState(0);
 
-  useEffect(()=>{
-    const fetchListingProduct=async()=>{
+  useEffect(() => {
+    const fetchProductDetailsCount = async () => {
       try {
-        const response=await axios.get(`http://localhost:8081/listingproduct/${id}`);
-        setlistingproduct(response.data)
-        console.log(listingproduct)
+        const res = await axios.get("http://localhost:8081/productdetailscount");
+        if (res.data && typeof res.data.count === 'number') {
+          setproductcount(res.data.count);
+        } else {
+          console.log("No count data available");
+        }
       } catch (error) {
-          console.error("Error fetching the product details:", error);
+        console.error("Error fetching product details count:", error);
       }
-    }
-    fetchListingProduct();
-  },[id])
+    };
+
+    fetchProductDetailsCount();
+    fetchProduct(); // Ensure this function is defined elsewhere in your component
+  }, []);
+
+  const fetchProduct = async () => {
+    const response = await axios.get(`http://localhost:8081/listingproduct`);
+    // const response = await axios.get(`http://localhost:8081/listingproduct/${id}`);
+    setlistProduct(response.data);
+    console.log(listproduct)
+  };
+
   return (
     <div>
-   
     <div>
     <div className="preloader is-active">
       <div className="preloader__wrap">
@@ -420,7 +433,7 @@ const Listing = () => {
               <div className="shop-p">
                 <div className="shop-p__toolbar u-s-m-b-30">
                   <div className="shop-p__meta-wrap u-s-m-b-60">
-                    <span className="shop-p__meta-text-1 text-start">FOUND 12 RESULTS</span>
+                    <span className="shop-p__meta-text-1 text-start">FOUND {productcount} RESULTS</span>
                     <div className="shop-p__meta-text-2 text-start">
                       <a className="gl-tag btn--e-brand-shadow " href="#">T-Shirts</a>
                     </div>
@@ -428,7 +441,7 @@ const Listing = () => {
                   <div className="shop-p__tool-style">
                     <div className="tool-style__group u-s-m-b-8">
                       <span className="js-shop-grid-target is-active">Grid</span>
-                      <span className="js-shop-list-target">List</span></div>
+                      <span className="js-shop-list-target ">List</span></div>
                     <form>
                       <div className="tool-style__form-wrap">
                         <div className="u-s-m-b-8"><select className="select-box select-box--transparent-b-2">
@@ -445,36 +458,39 @@ const Listing = () => {
                 </div>
                 <div className="shop-p__collection">
                   <div className="row is-grid-active">
+                  
                     <div className="col-lg-4 col-md-6 col-sm-6">
-                      {
-                        listingproduct.map((list)=>(
-                          <div className="product-m">
-                          <div className="product-m__thumb">
-                            <a className="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
-                              <img className="aspect__img" src="images/product/sitemakers-tshirt.png" alt /></a>
-                            <div className="product-m__quick-look">
-                              <a className="fas fa-search" data-modal="modal" data-modal-id="#quick-look" data-tooltip="tooltip" data-placement="top" title="Quick Look" /></div>
-                            <div className="product-m__add-cart">
-                              <a className="btn--e-brand" data-modal="modal" data-modal-id="#add-to-cart">View Details</a></div>
-                          </div>
-                          <div className="product-m__content">
-                            <div className="product-m__category">
-                              <a href="shop-side-version-2.html">{list.product_name}</a></div>
-                            <div className="product-m__name">
-                              <a href="product-detail.html">Product Name</a></div>
-                            <div className="product-m__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" /><i className="far fa-star" /><i className="far fa-star" />
-                              <span className="product-m__review">(25)</span></div>
-                            <div className="product-m__price">₹900.00</div>
-                            <div className="product-m__hover">
-                              <div className="product-m__preview-description">
-                                <span>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</span></div>
-                              <div className="product-m__wishlist">
-                                <a className="far fa-heart" href="#" data-tooltip="tooltip" data-placement="top" title="Add to Wishlist" /></div>
+                      
+                          {
+                            listproduct.map((list)=>(
+                              <div className="product-m">
+                              <div className="product-m__thumb">
+                                <a className="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
+                                  <img className="aspect__img" src={``} alt="" /></a>
+                                <div className="product-m__quick-look">
+                                  <a className="fas fa-search" data-modal="modal" data-modal-id="#quick-look" data-tooltip="tooltip" data-placement="top" title="Quick Look" /></div>
+                                <div className="product-m__add-cart">
+                                  <Link to={"/productDetails"} className="btn--e-brand" data-modal="modal" data-modal-id="#add-to-cart">View Details</Link></div>
+                              </div>
+                              <div className="product-m__content">
+                                <div className="product-m__category">
+                                  <a href="shop-side-version-2.html">{list.brand_name}</a></div>
+                                <div className="product-m__name">
+                                  <Link to={"/productDetails"}>{list.brand_name}</Link></div>
+                                <div className="product-m__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" /><i className="far fa-star" /><i className="far fa-star" />
+                                  <span className="product-m__review">(25)</span></div>
+                                <div className="product-m__price">₹{list.final_price}.00</div>
+                                <div className="product-m__hover">
+                                  <div className="product-m__preview-description">
+                                    <span>{list.description}.</span></div>
+                                  <div className="product-m__wishlist">
+                                    <a className="far fa-heart" href="#" data-tooltip="tooltip" data-placement="top" title="Add to Wishlist" /></div>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                        ))
-                      }
+                            ))
+                          }
+                       
                     </div>
                     
                   </div>

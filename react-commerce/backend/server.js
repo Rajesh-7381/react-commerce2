@@ -6,7 +6,6 @@ const passport = require('passport');
 const session=require("express-session")
 const GoogleOauthStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
-
 // db
 const { db } = require("./config/dbconfig");
 const errhandler = require("./Middleware/ErrorHandler");
@@ -49,6 +48,7 @@ const { promises } = require("dns");
 const { profile } = require("console");
 const app = express(); //create express.js(framework) instance
 
+// setup session
 app.use(session({
   secret: process.env.JWT_SECRET,
   resave: false,
@@ -67,9 +67,10 @@ passport.use(new GoogleOauthStrategy({
 },
 async (accessToken, refreshToken, profile, done) => {
   try {
+    // console.log(profile)
     const email = profile.emails[0].value;
     const userQuery = "SELECT * FROM AdminUser WHERE email = ?";
-    const insertQuery = `INSERT INTO AdminUser (name, email, image, mobile, password) VALUES (?, ?, ?, ?, ?)`;
+    const insertQuery = `INSERT INTO AdminUser (googleId,name, email, image, mobile, password) VALUES (?, ?, ?, ?, ?, ?)`;
 
     db.query(userQuery, [email], (err, results) => {
       if (err) {
@@ -79,10 +80,11 @@ async (accessToken, refreshToken, profile, done) => {
 
       if (results.length > 0) {
         // User already exists
-        return done(null, results[0]);
+        return done(null, results[0]); //if user exist it show with user inforamtion
       } else {
         // User does not exist, create new user
         const user = {
+          GoogleId:profile.id,
           name: profile.displayName,
           email: email,
           image: profile.photos[0] ? profile.photos[0].value : null,
@@ -90,7 +92,7 @@ async (accessToken, refreshToken, profile, done) => {
           password: null 
         };
 
-        db.query(insertQuery, [user.name, user.email, user.image, user.mobile, user.password], (err, results) => {
+        db.query(insertQuery, [user.GoogleId,user.name, user.email, user.image, user.mobile, user.password], (err, results) => {
           if (err) {
             console.error('Error inserting into database: ', err);
             return done(err, null);
@@ -2109,18 +2111,47 @@ app.get("/AllProductDetailsShown",(req,res)=>{
 
 
 // show single listing data
-app.get("/listingproduct/:id",(req,res)=>{
+app.get("/listingproduct",(req,res)=>{
+  // const id=req.params.id;
+  // console.log(id)
+  const query="select * from products as p join products_image as pi on p.id=pi.product_id where  p.status=1";
+  db.query(query,(err,data)=>{
+    if(err){
+      console.log(err);
+    }
+    return res.json(data);
+  })
+});
+// show single listing data
+app.get("/productDetails/:id",(req,res)=>{
   const id=req.params.id;
   // console.log(id)
-  const query="select * from products where id=?";
+  const query="select p.*,pa.*,pi.*,c.* from products as p join product_attributes as pa on p.id=pa.product_id join products_image as pi on pi.product_id=p.id join categories as c on p.category_id=c.id where p.id=?";
   db.query(query,[id],(err,data)=>{
     if(err){
       console.log(err);
     }
     return res.json(data);
   })
-})
+});
+
+
 //========================================END====================================================
+
+app.get("/productdetailscount", (req, res) => {
+  const query = "SELECT COUNT(id) AS total FROM products WHERE status=1"; 
+  db.query(query, (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "🚫 Internal server error" });
+    } else {
+      const count = data[0].total; 
+      res.json({
+        count: count,
+      });
+    }
+  });
+});
+
 app.listen(process.env.SERVERPORT, () => {
   console.log(`server listening at port ${process.env.SERVERPORT}`);
 });

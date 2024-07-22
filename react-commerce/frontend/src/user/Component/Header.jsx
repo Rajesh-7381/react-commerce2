@@ -802,7 +802,7 @@ const categoriesWithParent = categories.filter(category => category.parent_id); 
                         <span className="js-menu-toggle" />
                         <ul style={{ width: 170 }}>
                           <li className="has-dropdown has-dropdown--ul-left-100">
-                            <Link to={`/listing/${category.url}`}>{category.category_name}<i className="fas fa-angle-down i-state-right u-s-m-l-6" /></Link>
+                            <Link >{category.category_name}<i className="fas fa-angle-down i-state-right u-s-m-l-6" /></Link>
                             <span className="js-menu-toggle" />
                             <ul style={{ width: 118 }}>
                             <li><a href="listing.html">T-shirts</a></li>
