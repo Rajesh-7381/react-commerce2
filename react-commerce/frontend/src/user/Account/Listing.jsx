@@ -5,16 +5,32 @@ import Header from '../Component/Header'
 import axios from 'axios'
 
 const Listing = () => {
-  // const {id}=useParams();
-  const [listproduct, setlistProduct] = useState([]);
-  const [productcount ,setproductcount]=useState(0);
+  const { id } = useParams();
+  const [listProduct, setListProduct] = useState([]);
+  const [productCount, setProductCount] = useState(0);
+  const [viewMode, setViewMode] = useState('grid');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ListedProductPerPage = 9;
+
+  const LastListedProduct = currentPage * ListedProductPerPage;
+  const FirstListedProduct = LastListedProduct - ListedProductPerPage;
+
+  const [sortedProducts, setSortedProducts] = useState([]);
+  const [currentProducts, setCurrentProducts] = useState([]);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(productCount / ListedProductPerPage); i++) {
+    pageNumbers.push(i);
+  }
 
   useEffect(() => {
     const fetchProductDetailsCount = async () => {
       try {
         const res = await axios.get("http://localhost:8081/productdetailscount");
         if (res.data && typeof res.data.count === 'number') {
-          setproductcount(res.data.count);
+          setProductCount(res.data.count);
         } else {
           console.log("No count data available");
         }
@@ -23,17 +39,64 @@ const Listing = () => {
       }
     };
 
+    const fetchProduct = async () => {
+      const response = await axios.get(`http://localhost:8081/listingproduct`);
+      setListProduct(response.data);
+    };
+
     fetchProductDetailsCount();
-    fetchProduct(); // Ensure this function is defined elsewhere in your component
+    fetchProduct();
   }, []);
 
-  const fetchProduct = async () => {
-    const response = await axios.get(`http://localhost:8081/listingproduct`);
-    // const response = await axios.get(`http://localhost:8081/listingproduct/${id}`);
-    setlistProduct(response.data);
-    console.log(listproduct)
+  useEffect(() => {
+    setSortedProducts(listProduct);
+  }, [listProduct]);
+
+  useEffect(() => {
+    setCurrentProducts(sortedProducts.slice(FirstListedProduct, LastListedProduct));
+  }, [sortedProducts, currentPage]);
+
+  const handleSort = (event) => {
+    const selectedValue = event.target.value;
+    let sortedProductsCopy = [...listProduct];
+
+    switch (selectedValue) {
+      case "newest":
+        sortedProductsCopy = [...listProduct];
+        break;
+      case "latest":
+        sortedProductsCopy = [...listProduct].sort((a, b) => b.id - a.id);
+        break;
+      case "bestSelling":
+        sortedProductsCopy = [...listProduct].sort((a, b) => b.sales - a.sales);
+        break;
+      case "bestRating":
+        sortedProductsCopy = [...listProduct].sort((a, b) => b.rating - a.rating);
+        break;
+      case "lowestPrice":
+        sortedProductsCopy = [...listProduct].sort((a, b) => a.final_price - b.final_price);
+        break;
+      case "highestPrice":
+        sortedProductsCopy = [...listProduct].sort((a, b) => b.final_price - a.final_price);
+        break;
+      default:
+        sortedProductsCopy = [...listProduct];
+    }
+
+    setSortedProducts(sortedProductsCopy);
+    setCurrentPage(1); // Reset to first page after sorting
   };
 
+  const getUniqueSizes = (products) => {
+    const sizes = products.map(product => product.size).filter(size => size);
+    return [...new Set(sizes)];
+  };
+
+  const uniqueSizes = getUniqueSizes(listProduct);
+
+
+  // collapsible category for expanding or closing
+ 
   return (
     <div>
     <div>
@@ -232,39 +295,24 @@ const Listing = () => {
                       </div>
                       <div className="shop-w__wrap collapse show" id="s-size">
                         <ul className="shop-w__list gl-scroll">
-                          <li>
-                            {/*====== Check Box ======*/}
-                            <div className="check-box">
-                              <input type="checkbox" id="small" />
-                              <div className="check-box__state check-box__state--primary">
-                                <label className="check-box__label" htmlFor="small">Small</label>
-                              </div>
-                            </div>
-                            {/*====== End - Check Box ======*/}
-                          </li>
-                          <li>
-                            {/*====== Check Box ======*/}
-                            <div className="check-box">
-                              <input type="checkbox" id="medium" />
-                              <div className="check-box__state check-box__state--primary">
-                                <label className="check-box__label" htmlFor="medium">Medium</label>
-                              </div>
-                            </div>
-                            {/*====== End - Check Box ======*/}
-                          </li>
-                          <li>
-                            {/*====== Check Box ======*/}
-                            <div className="check-box">
-                              <input type="checkbox" id="large" />
-                              <div className="check-box__state check-box__state--primary">
-                                <label className="check-box__label" htmlFor="large">Large</label>
-                              </div>
-                            </div>
-                            {/*====== End - Check Box ======*/}
-                          </li>
+                          {
+                            uniqueSizes.map((size, index) => (
+                              <li key={index}>
+                                {/*====== Check Box ======*/}
+                                <div className="check-box">
+                                  <input type="checkbox" id={`size-${index}`} />
+                                  <div className="check-box__state check-box__state--primary">
+                                    <label className="check-box__label" htmlFor={`size-${index}`}>{size.toUpperCase()}</label>
+                                  </div>
+                                </div>
+                                {/*====== End - Check Box ======*/}
+                              </li>
+                            ))
+                          }
                         </ul>
                       </div>
                     </div>
+                
                   </div>
                   <div className="u-s-m-b-30">
                     <div className="shop-w shop-w--style">
@@ -430,89 +478,94 @@ const Listing = () => {
               </div>
             </div>
             <div className="col-lg-9 col-md-12">
-              <div className="shop-p">
-                <div className="shop-p__toolbar u-s-m-b-30">
-                  <div className="shop-p__meta-wrap u-s-m-b-60">
-                    <span className="shop-p__meta-text-1 text-start">FOUND {productcount} RESULTS</span>
-                    <div className="shop-p__meta-text-2 text-start">
-                      <a className="gl-tag btn--e-brand-shadow " href="#">T-Shirts</a>
-                    </div>
+            <div className="shop-p">
+              <div className="shop-p__toolbar u-s-m-b-30">
+                <div className="shop-p__meta-wrap u-s-m-b-60">
+                  <span className="shop-p__meta-text-1 text-start">FOUND {productCount} RESULTS</span>
+                  <div className="shop-p__meta-text-2 text-start">
+                    <a className="gl-tag btn--e-brand-shadow" href="#">T-Shirts</a>
                   </div>
-                  <div className="shop-p__tool-style">
-                    <div className="tool-style__group u-s-m-b-8">
-                      <span className="js-shop-grid-target is-active">Grid</span>
-                      <span className="js-shop-list-target ">List</span></div>
-                    <form>
-                      <div className="tool-style__form-wrap">
-                        <div className="u-s-m-b-8"><select className="select-box select-box--transparent-b-2">
-                            <option selected>Sort By: Newest Items</option>
-                            <option>Sort By: Latest Items</option>
-                            <option>Sort By: Best Selling</option>
-                            <option>Sort By: Best Rating</option>
-                            <option>Sort By: Lowest Price</option>
-                            <option>Sort By: Highest Price</option>
-                          </select></div>
+                </div>
+                <div className="shop-p__tool-style">
+                  <div className="tool-style__group u-s-m-b-8">
+                    <span className={`js-shop-grid-target ${viewMode === 'grid' ? 'is-active' : ''}`} onClick={() => setViewMode('grid')}>Grid</span>
+                    <span className={`js-shop-list-target ${viewMode === 'list' ? 'is-active' : ''}`} onClick={() => setViewMode('list')}>List</span>
+                  </div>
+                  <form>
+                    <div className="tool-style__form-wrap">
+                      <div className="u-s-m-b-8">
+                        <select className="select-box select-box--transparent-b-2" onChange={handleSort}>
+                          <option value="newest">Sort By: Newest Items</option>
+                          <option value="latest">Sort By: Latest Items</option>
+                          <option value="bestSelling">Sort By: Best Selling</option>
+                          <option value="bestRating">Sort By: Best Rating</option>
+                          <option value="lowestPrice">Sort By: Lowest Price</option>
+                          <option value="highestPrice">Sort By: Highest Price</option>
+                        </select>
                       </div>
-                    </form>
-                  </div>
-                </div>
-                <div className="shop-p__collection">
-                  <div className="row is-grid-active">
-                  
-                    <div className="col-lg-4 col-md-6 col-sm-6">
-                      
-                          {
-                            listproduct.map((list)=>(
-                              <div className="product-m">
-                              <div className="product-m__thumb">
-                                <a className="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
-                                  <img className="aspect__img" src={``} alt="" /></a>
-                                <div className="product-m__quick-look">
-                                  <a className="fas fa-search" data-modal="modal" data-modal-id="#quick-look" data-tooltip="tooltip" data-placement="top" title="Quick Look" /></div>
-                                <div className="product-m__add-cart">
-                                  <Link to={"/productDetails"} className="btn--e-brand" data-modal="modal" data-modal-id="#add-to-cart">View Details</Link></div>
-                              </div>
-                              <div className="product-m__content">
-                                <div className="product-m__category">
-                                  <a href="shop-side-version-2.html">{list.brand_name}</a></div>
-                                <div className="product-m__name">
-                                  <Link to={"/productDetails"}>{list.brand_name}</Link></div>
-                                <div className="product-m__rating gl-rating-style"><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" /><i className="far fa-star" /><i className="far fa-star" />
-                                  <span className="product-m__review">(25)</span></div>
-                                <div className="product-m__price">₹{list.final_price}.00</div>
-                                <div className="product-m__hover">
-                                  <div className="product-m__preview-description">
-                                    <span>{list.description}.</span></div>
-                                  <div className="product-m__wishlist">
-                                    <a className="far fa-heart" href="#" data-tooltip="tooltip" data-placement="top" title="Add to Wishlist" /></div>
-                                </div>
-                              </div>
-                            </div>
-                            ))
-                          }
-                       
                     </div>
-                    
-                  </div>
-                </div>
-                <div className="u-s-p-y-60">
-                  {/*====== Pagination ======*/}
-                  <ul className="shop-p__pagination">
-                    <li className="is-active">
-                      <a href="shop-side-version-2.html">1</a></li>
-                    <li>
-                      <a href="shop-side-version-2.html">2</a></li>
-                    <li>
-                      <a href="shop-side-version-2.html">3</a></li>
-                    <li>
-                      <a href="shop-side-version-2.html">4</a></li>
-                    <li>
-                      <a className="fas fa-angle-right" href="shop-side-version-2.html" /></li>
-                  </ul>
-                  {/*====== End - Pagination ======*/}
+                  </form>
                 </div>
               </div>
+              <div className="shop-p__collection">
+                <div className={`row ${viewMode === 'grid' ? 'is-grid-active' : ''}`}>
+                {currentProducts.map((product) => (
+                  <div key={product.id} className="col-lg-4 col-md-6 col-sm-6">
+                    <div className="product-m">
+                      <div className="product-m__thumb">
+                        <Link className="aspect aspect--bg-grey aspect--square u-d-block" to={`/productDetails/${product.id}`}>
+                          <img className="aspect__img listing_productImage" src={product.image ? `http://localhost:8081/productsimage/${product.image}` : 'https://png.pngtree.com/png-vector/20221125/ourmid/pngtree-no-image-available-icon-flatvector-illustration-pic-design-profile-vector-png-image_40966566.jpg'} alt={product.product_name} />
+                        </Link>
+                        <div className="product-m__quick-look">
+                          <a className="fas fa-search" data-modal="modal" data-modal-id="#quick-look" data-tooltip="tooltip" data-placement="top" title="Quick Look" />
+                        </div>
+                        <div className="product-m__add-cart">
+                          <Link to={"/productDetails"} className="btn--e-brand" data-modal="modal" data-modal-id="#add-to-cart">View Details</Link>
+                        </div>
+                      </div>
+                      <div className="product-m__content">
+                        <div className="product-m__category">
+                          <a href="shop-side-version-2.html">{product.brand_name}{product.id}</a>
+                        </div>
+                        <div className="product-m__name">
+                          <Link to={`/productDetails/${product.id}`}>{product.product_name}</Link>
+                        </div>
+                        <div className="product-m__rating gl-rating-style">
+                          <i className="fas fa-star" />
+                          <i className="fas fa-star" />
+                          <i className="fas fa-star-half-alt" />
+                          <i className="far fa-star" />
+                          <i className="far fa-star" />
+                          <span className="product-m__review">(25)</span>
+                        </div>
+                        <div className="product-m__price">₹{product.final_price}.00</div>
+                        <div className="product-m__hover">
+                          <div className="product-m__preview-description">
+                            <span>{product.description}</span>
+                          </div>
+                          <div className="product-m__wishlist">
+                            <a className="far fa-heart" href="#" data-tooltip="tooltip" data-placement="top" title="Add to Wishlist" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                </div>
+              </div>
+              <div className="u-s-p-y-60">
+                {/*====== Pagination ======*/}
+                <ul className="shop-p__pagination">
+                  {pageNumbers.map(number => (
+                    <li key={number} className={number === currentPage ? 'is-active bg-warning' : ''}>
+                      <a onClick={() => paginate(number)} href='#!'>{number}</a>
+                    </li>
+                  ))}
+                </ul>
+                {/*====== End - Pagination ======*/}
+              </div>
             </div>
+          </div>
           </div>
         </div>
       </div>

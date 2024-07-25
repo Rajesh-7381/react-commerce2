@@ -3,10 +3,24 @@ import Header from '../Component/Header'
 import Footer from '../Component/Footer'
 import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
+import { useSelector, useDispatch } from 'react-redux';
+import { incrementQuantity,decrementQuantity } from './redux/features/productSlice'
 
 const ProductDetails = () => {
   const {id}=useParams();
+  // console.log(id)
   const [listproduct, setlistProduct] = useState([]);
+  const dispatch=useDispatch();
+  const quantity=useSelector(state=>state.product.quantity);
+
+  // increment or decrement product quantity
+  const handleIncrement=()=>{
+    dispatch(incrementQuantity());
+    
+  }
+  const handleDecrement=()=>{
+    dispatch(decrementQuantity());
+  }
 
   useEffect(() => {
     fetchProduct();
@@ -16,8 +30,9 @@ const ProductDetails = () => {
     const response = await axios.get(`http://localhost:8081/productDetails/49`);
     // const response = await axios.get(`http://localhost:8081/listingproduct/${id}`);
     setlistProduct(response.data[0]);
-    console.log(listproduct)
+    // console.log(listproduct)
   };
+
   return (
     <div>
         <div>
@@ -61,8 +76,11 @@ const ProductDetails = () => {
           <div className="pd u-s-m-b-30">
             <div className="slider-fouc pd-wrap">
               <div id="pd-o-initiate">
-                <div className="pd-o-img-wrap" data-src={`http://localhost:8081/productsimage/`+listproduct.image}>
+                {/* <div className="pd-o-img-wrap" data-src={`http://localhost:8081/productsimage/`+listproduct.image}>
                   <img className="u-img-fluid" src={`http://localhost:8081/productsimage/`+listproduct.image} data-zoom-image={`http://localhost:8081/productsimage/`+listproduct.image} alt="" />
+                </div> */}
+                <div className="pd-o-img-wrap" data-src={'https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg'}>
+                  <img className="u-img-fluid" src={'https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg'} data-zoom-image={'https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg'} alt="" />
                 </div>
                 
               </div>
@@ -72,7 +90,7 @@ const ProductDetails = () => {
               <div className="slider-fouc">
                 <div id="pd-o-thumbnail">
                   <div>
-                    <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-1.png" alt />
+                    <img className="u-img-fluid" src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg" alt="" />
                   </div>
                   <div>
                     <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-2.png" alt />
@@ -138,7 +156,7 @@ const ProductDetails = () => {
             <div className="u-s-m-b-15">
               <form className="pd-detail__form">
                 <div className="u-s-m-b-15">
-                  <span className="pd-detail__label u-s-m-b-8">Color:</span>
+                  <span className="pd-detail__label u-s-m-b-8 text-start">Color:</span>
                   <div className="pd-detail__color">
                     <div className="color__radio">
                       <input type="radio" id="jet" name="color" defaultChecked />
@@ -158,7 +176,7 @@ const ProductDetails = () => {
                   </div>
                 </div>
                 <div className="u-s-m-b-15">
-                  <span className="pd-detail__label u-s-m-b-8">Size:</span>
+                  <span className="pd-detail__label u-s-m-b-8 text-start">Size:</span>
                   <div className="pd-detail__size">
                     <div className="size__radio">
                       <input type="radio" id="xs" name="size" defaultChecked />
@@ -182,21 +200,39 @@ const ProductDetails = () => {
                 </div>
                 <div className="pd-detail-inline-2">
                   <div className="u-s-m-b-15">
-                    {/*====== Input Counter ======*/}
-                    <div className="input-counter">
-                      <span className="input-counter__minus fas fa-minus" />
-                      <input className="input-counter__text input-counter--text-primary-style" type="text" defaultValue={1} data-min={1} data-max={1000} />
-                      <span className="input-counter__plus fas fa-plus" /></div>
-                    {/*====== End - Input Counter ======*/}
+                    <div className="input-group">
+                      <div className="input-group-prepend">
+                        <button className="btn btn-outline-secondary" type="button" onClick={handleDecrement}>
+                          <i className="fas fa-minus"></i>
+                        </button>
+                      </div>
+                      <input
+                        className="form-control text-center"
+                        type="text"
+                        value={quantity}
+                        readOnly
+                        data-min={1}
+                        data-max={1000}
+                      />
+                      <div className="input-group-append">
+                        <button className="btn btn-outline-secondary" type="button" onClick={handleIncrement}>
+                          <i className="fas fa-plus"></i>
+                        </button>
+                      </div>
+                      
+                    </div>
                   </div>
                   <div className="u-s-m-b-15">
-                    <button className="btn btn--e-brand-b-2 btn btn-primary" type="submit">Add to Cart</button></div>
+                    <button className="btn btn--e-brand-b-2 btn btn-primary" type="submit">
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>
             <div className="u-s-m-b-15">
               <span className="pd-detail__label u-s-m-b-8">Product Policy:</span>
-              <ul className="pd-detail__policy-list">
+              <ul className="pd-detail__policy-list text-start">
                 <li><i className="fas fa-check-circle u-s-m-r-8" />
                   <span>Buyer Protection.</span></li>
                 <li><i className="fas fa-check-circle u-s-m-r-8" />
@@ -238,19 +274,20 @@ const ProductDetails = () => {
                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
                   </div>
                   <div className="u-s-m-b-30"><iframe src="https://www.youtube.com/embed/qKqSBm07KZk" allowFullScreen /></div>
-                  {/* <div class="u-s-m-b-30">
-                                    <ul>
-                                        <li><i class="fas fa-check u-s-m-r-8"></i>
+                  <div class="u-s-m-b-30">
+                    <ul>
+                         <li><i class="fas fa-check u-s-m-r-8 "></i>
 
-                                            <span>Buyer Protection.</span></li>
-                                        <li><i class="fas fa-check u-s-m-r-8"></i>
+                            <span>Buyer Protection.</span></li>
+                        <li><i class="fas fa-check u-s-m-r-8"></i>
 
-                                            <span>Full Refund if you don't receive your order.</span></li>
-                                        <li><i class="fas fa-check u-s-m-r-8"></i>
+                            <span>Full Refund if you don't receive your order.</span></li>
+                        <li><i class="fas fa-check u-s-m-r-8"></i>
 
-                                            <span>Returns accepted if product not as described.</span></li>
-                                    </ul>
-                                </div> */}
+                            <span>Returns accepted if product not as described.</span>
+                        </li>
+                    </ul>
+                </div> 
                   <div className="u-s-m-b-15">
                     <h4>PRODUCT INFORMATION</h4>
                   </div>
@@ -260,35 +297,35 @@ const ProductDetails = () => {
                         <tbody>
                           <tr>
                             <td>Product Code</td>
-                            <td>RC001</td>
+                            <td><b className='text-dark'>{listproduct.group_code ? listproduct.group_code :'RC001'}</b></td>
                           </tr>
                           <tr>
                             <td>Product Color</td>
-                            <td>Red</td>
+                            <td><b className='text-dark'>{listproduct.product_color ? listproduct.product_color :'RC001'}</b>Red</td>
                           </tr>
                           <tr>
                             <td>Fabric</td>
-                            <td>Cotton</td>
+                            <td><b className='text-dark'>{listproduct.fabric ? listproduct.fabric :'Cotton'}</b></td>
                           </tr>
                           <tr>
                             <td>Sleeve</td>
-                            <td>Long Sleeve</td>
+                            <td><b className='text-dark'>{listproduct.sleeve ? listproduct.sleeve :'Long Sleeve'}</b></td>
                           </tr>
                           <tr>
                             <td>Fit</td>
-                            <td>Regular</td>
+                            <td><b className='text-dark'>{listproduct.fit ? listproduct.fit :'Regular'}</b></td>
                           </tr>
                           <tr>
                             <td>Neck</td>
-                            <td>Round Neck</td>
+                            <td><b className='text-dark'>{listproduct.group_code ? listproduct.group_code :'RC001'}</b></td>
                           </tr>
                           <tr>
                             <td>Occasion</td>
-                            <td>Casual</td>
+                            <td><b className='text-dark'>{listproduct.occassion ? listproduct.occassion :'Casual'}</b></td>
                           </tr>
                           <tr>
                             <td>Shipping Weight (Grams)</td>
-                            <td>500</td>
+                            <td><b className='text-dark'>{listproduct.product_weight ? listproduct.product_weight.replace(/\D/g,'') :'0.00'}</b></td>
                           </tr>
                         </tbody>
                       </table>

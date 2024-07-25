@@ -2114,7 +2114,7 @@ app.get("/AllProductDetailsShown",(req,res)=>{
 app.get("/listingproduct",(req,res)=>{
   // const id=req.params.id;
   // console.log(id)
-  const query="select * from products as p join products_image as pi on p.id=pi.product_id where  p.status=1";
+  const query="select * from products as p join products_image as pi on p.id=pi.product_id  join product_attributes   where  p.status=1";
   db.query(query,(err,data)=>{
     if(err){
       console.log(err);
