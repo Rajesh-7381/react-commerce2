@@ -1,9 +1,12 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { addToCart } from '../Account/redux/features/cartSlice'
+import { useDispatch, useSelector } from 'react-redux';
 
 const Header = () => {
   const [categories, setcategories] = useState([]);
+  const dispatch=useDispatch();
   useEffect(() => {
     document.title="Dashboard2"
     const fetchCategories = async () => {
@@ -29,6 +32,13 @@ const categoryLookup = categories.reduce((acc, category) => {
 
 // Filter out categories without a parent
 const categoriesWithParent = categories.filter(category => category.parent_id); // if it met category contain id  and their parent_id they return new array
+
+const  { cart } =useSelector((state)=>state.allCart)
+  // console.log(cart)
+
+  const send=(e)=>{
+    dispatch(addToCart())
+  }
   return (
     <div>
     <header className="header--style-1">
@@ -822,7 +832,7 @@ const categoriesWithParent = categories.filter(category => category.parent_id); 
             {/*====== Dropdown Main plugin ======*/}
             <div className="menu-init" id="navigation3">
               <button className="btn btn--icon toggle-button toggle-button--secondary fas fa-shopping-bag toggle-button-shop" type="button" />
-              <span className="total-item-round">2</span>
+              <span className="total-item-round">{cart.length}</span>
               {/*====== Menu ======*/}
               <div className="ah-lg-mode">
                 <span className="ah-close">✕ Close</span>
@@ -836,7 +846,7 @@ const categoriesWithParent = categories.filter(category => category.parent_id); 
                   </li>
                   <li className="has-dropdown">
                     <a className="mini-cart-shop-link"><i className="fas fa-shopping-bag" />
-                      <span className="total-item-round">3</span></a>
+                      <span className="total-item-round">{cart.length}</span></a>
                     {/*====== Dropdown ======*/}
                     <span className="js-menu-toggle" />
                     <div className="mini-cart">
@@ -908,8 +918,8 @@ const categoriesWithParent = categories.filter(category => category.parent_id); 
                           <span className="subtotal-value">₹2700</span>
                         </div>
                         <div className="mini-action">
-                          <a className="mini-link btn--e-brand-b-2" href="checkout.html">PROCEED TO CHECKOUT</a>
-                          <a className="mini-link btn--e-transparent-secondary-b-2" href="cart.html">VIEW CART</a>
+                          <Link className="mini-link btn--e-brand-b-2" to={"/checkout"}>PROCEED TO CHECKOUT</Link>
+                          <Link className="mini-link btn--e-transparent-secondary-b-2" to={"/cart"}>VIEW CART</Link>
                         </div>
                       </div>
                       {/*====== End - Mini Product Statistics ======*/}

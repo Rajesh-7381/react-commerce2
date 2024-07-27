@@ -198,7 +198,7 @@ const Register = () => {
                                             <div  className="u-s-m-b-15">
                                                 <ReCAPTCHA
                                                     ref={recaptchaRef}
-                                                    sitekey="6Lf0AcopAAAAABiOyhyphLfETW8tsx8KW9Xxs5ah" //r........2@gm....com
+                                                    sitekey={process.env.GOOGLE_CAPTCHA_KEY} //r........2@gm....com
                                                     onChange={(val)=>setcap(val)}
                                                 />
                                                 <NotificationContainer />

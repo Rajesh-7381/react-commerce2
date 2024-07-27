@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux';
 import { incrementQuantity,decrementQuantity } from './redux/features/productSlice'
+import { addToCart } from './redux/features/cartSlice'
 
 const ProductDetails = () => {
   const {id}=useParams();
@@ -32,6 +33,13 @@ const ProductDetails = () => {
     setlistProduct(response.data[0]);
     // console.log(listproduct)
   };
+
+  
+  // console.log(cart)
+
+  const send=(e)=>{
+    dispatch(addToCart(e))
+  }
 
   return (
     <div>
@@ -154,7 +162,7 @@ const ProductDetails = () => {
               </ul>
             </div>
             <div className="u-s-m-b-15">
-              <form className="pd-detail__form">
+              <div className="pd-detail__form" >
                 <div className="u-s-m-b-15">
                   <span className="pd-detail__label u-s-m-b-8 text-start">Color:</span>
                   <div className="pd-detail__color">
@@ -223,12 +231,12 @@ const ProductDetails = () => {
                     </div>
                   </div>
                   <div className="u-s-m-b-15">
-                    <button className="btn btn--e-brand-b-2 btn btn-primary" type="submit">
+                    <button className="btn btn--e-brand-b-2 btn btn-primary" type="submit" onClick={()=>send(listproduct)}>
                       Add to Cart
                     </button>
                   </div>
                 </div>
-              </form>
+              </div>
             </div>
             <div className="u-s-m-b-15">
               <span className="pd-detail__label u-s-m-b-8">Product Policy:</span>

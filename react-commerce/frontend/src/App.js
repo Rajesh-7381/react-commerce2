@@ -29,6 +29,14 @@ import Order from './user/Account/Order';
 import MyCart from './user/Account/MyCart';
 import ProductDetails from './user/Account/ProductDetails';
 import Listing from './user/Account/Listing';
+import Checkout from './user/Account/Checkout';
+import Cart from './user/Account/Cart';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import Success from './user/Account/Success';
+import Cancel from './user/Account/Cancel';
+
+const stripePromise = loadStripe('pk_test_51Ph8kgFnMqw8LC18U63JgNUhD8F5wAKZfjQAyrnfgoKNwI5fbZtwBYZfXwkVE7VdsxMmKziLUOKi6AXbI7XJN9Oe00iO9DHFpM');
 
 function App() {
   return (
@@ -67,6 +75,14 @@ function App() {
           <Route path='/myCart' element={< MyCart/>}></Route>
           <Route path='/productDetails' element={< ProductDetails/>}></Route>
           <Route path='/listproduct' element={< Listing/>}></Route>
+          <Route path='/checkout' element={
+            <Elements stripe={stripePromise}>
+              <Checkout />
+            </Elements>
+          } />
+          <Route path='/cart' element={< Cart/>} ></Route>
+          <Route path='/success' element={< Success/>} ></Route>
+          <Route path='/cancel' element={< Cancel/>} ></Route>
           
         </Routes>
       </BrowserRouter>

@@ -10,6 +10,8 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const { db } = require("./config/dbconfig");
 const errhandler = require("./Middleware/ErrorHandler");
 const { DatabaseError } = require("./Error/AppError");
+
+const stripe=require('stripe')(process.env.STRIPE_SECRET_KEY)
 // for backend validation
 const {
   registerSchema,
@@ -46,6 +48,7 @@ const checkAuth = require("./Auth/RouteCheckAuth");
 const upload = require("./utils/multerConfig");
 const { promises } = require("dns");
 const { profile } = require("console");
+// const { default: Stripe } = require("stripe");
 const app = express(); //create express.js(framework) instance
 
 // setup session
@@ -259,6 +262,7 @@ app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }
 app.get('/auth/facebook/callback',passport.authenticate('facebook'),(req,res)=>{
   res.redirect('http://localhost:3000/userdashboard2');
 });
+
 //=============================================== register user data============================
 
   app.post("/register", upload.single("image"), async (req, res) => {
@@ -2151,6 +2155,37 @@ app.get("/productdetailscount", (req, res) => {
     }
   });
 });
+
+// for stripe
+app.post('/create-payment-intent', async (req, res) => {
+  try {
+    const { amount, id } = req.body;
+    // console.log(amount,id)
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [{
+        price_data: {
+          currency: 'usd', //inr
+          product_data: {
+            name: 'Sample Product',
+          },
+          unit_amount: amount * 100,
+        },
+        quantity: 1,
+      }],
+      mode: 'payment',
+      success_url: 'http://localhost:3000/success',
+      cancel_url: 'http://localhost:3000/cancel',
+    });
+
+    res.json({ url:session.url });
+  } catch (error) {
+    res.status(400).send({
+      error: error.message,
+    });
+  }
+});
+
 
 app.listen(process.env.SERVERPORT, () => {
   console.log(`server listening at port ${process.env.SERVERPORT}`);
