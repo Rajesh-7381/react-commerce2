@@ -15,7 +15,8 @@ const productSlice = createSlice({
     incrementQuantity(state) {
       
       if(state.quantity < 5){
-        state.quantity = Math.min(state.quantity + 1, 100); // here 100 means allowed 100 not above
+        
+        state.quantity = Math.min(state.quantity + 1, 5); // here 100 means allowed 100 not above
         
       }else{
         alert("no more quantity allowed")

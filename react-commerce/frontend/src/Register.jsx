@@ -9,6 +9,9 @@ import axios from 'axios';
 import zxcvbn from 'zxcvbn';
 import ReCAPTCHA from 'react-google-recaptcha';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { SpinnerCircular } from 'spinners-react';
+
+
 
 const Register = () => {
     // const { user ,loginWithRedirect}=useAuth0();
@@ -17,6 +20,7 @@ const Register = () => {
     const [passwordVisibility, setPasswordVisibility] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [cap,setcap]=useState(null);
+    const [loading,setloading]=useState(false)
     
     useEffect(()=>{
         document.title="Registration";
@@ -31,7 +35,7 @@ const Register = () => {
     };
 
     const validationSchema = Yup.object({
-        name: Yup.string().max(100).min(3).matches(/^[a-zA-Z]+$/,"Please remove digits and special characters!").required("Please enter your name!"), //+ means(greedy quantifier) matches one or more of these letters and $ means  end of the string
+        name: Yup.string().max(100).min(3).matches(/^[a-zA-Z ]+$/,"Please remove digits and special characters!").required("Please enter your name!"), //+ means(greedy quantifier) matches one or more of these letters and $ means  end of the string
         mobile: Yup.string().max(10).min(10).matches(/^[0-9]{10}$/,"Mobile number must be 10 digits!").required("Mobile number required!"),
         email: Yup.string().max(100).min(2).email("Invalid Email Format!").required("Please enter your email!"),
         password: Yup.string().max(25).min(8)
@@ -61,6 +65,7 @@ const Register = () => {
         }
       
         try {
+            setloading(true)
           const { email, mobile } = values; // Destructuring values
       
           const Emailresponse = await axios.get(`http://localhost:8081/checkemail/${email}`);
@@ -87,12 +92,15 @@ const Register = () => {
             NotificationManager.success("Form submitted successfully!");
             setTimeout(() => {
               action.resetForm();
+            //   here add loader logic
               navigate("/");
             }, 3000);
           }
         } catch (error) {
           console.log("Error submitting form", error);
           NotificationManager.error("Form submission was not successful!");
+        }finally{
+            setloading(false)
         }
       };
 
@@ -183,8 +191,8 @@ const Register = () => {
                                                     <div
                                                         className={`progress-bar ${passwordStrength === 0 ? 'bg-danger' : passwordStrength === 1 ? 'bg-warning' : passwordStrength === 2 ? 'bg-info' : passwordStrength === 3 ? 'bg-primary' : 'bg-success'}`}
                                                         role="progressbar"
-                                                        style={{ width: `${(passwordStrength + 1) * 25}%` }}
-                                                        aria-valuenow={(passwordStrength + 1) * 25}
+                                                        style={{ width: `${(passwordStrength ) * 25}%` }}
+                                                        aria-valuenow={(passwordStrength ) * 25}
                                                         aria-valuemin="0"
                                                         aria-valuemax="100">
                                                         {passwordStrength === 0 && "0%"}
@@ -198,11 +206,11 @@ const Register = () => {
                                             <div  className="u-s-m-b-15">
                                                 <ReCAPTCHA
                                                     ref={recaptchaRef}
-                                                    sitekey={process.env.GOOGLE_CAPTCHA_KEY} //r........2@gm....com
+                                                    sitekey="6Lf0AcopAAAAABiOyhyphLfETW8tsx8KW9Xxs5ah" //r........2@gm....com
                                                     onChange={(val)=>setcap(val)}
                                                 />
                                                 <NotificationContainer />
-                                                <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary w-75"  disabled={!cap}  type="submit">CREATE</button>
+                                                <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary w-75"  disabled={!cap || loading}  type="submit">{loading ? <span>CREATE <SpinnerCircular thickness={180} speed={169} size={39}  color="rgba(57, 162, 172, 1)" secondaryColor='rgba(172, 57, 59, 0.86)' /></span> : "CREATE"}</button>
                                             </div>                                                                                                                       
                                             <Link className="gl-link"  to={'/'}>Already have an Account? Login Now</Link>
                                         </form> 

@@ -39,6 +39,7 @@
     "reactstrap": "^9.2.2",
     "redux": "^5.0.1",
     "socket.io-client": "^4.7.5",
+    "spinners-react": "^1.0.7",
     "sweetalert2": "^11.10.8",
     "web-vitals": "^2.1.4",
     "yup": "^1.4.0",

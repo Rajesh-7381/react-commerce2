@@ -14,7 +14,7 @@ const CategoryAddEdit = () => {
     const id = location.state ? location.state.id : null;
     const navigate = useNavigate();
     const imageRef=useRef(null);
-    console.log(categories[0])
+    // console.log(categories[0])
     useEffect(() => {
         document.title = 'AddEditCategories';
         if (id) {

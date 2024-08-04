@@ -34,6 +34,7 @@ const ForgotPassword = () => {
               console.log(response.data.message);
               NotificationManager.success("Password Updated Successfully!")
               setTimeout(()=>{
+                // add loader logic
                 navigate("/");
               },3000);
             //   navigate("/");

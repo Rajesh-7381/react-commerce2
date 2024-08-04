@@ -344,7 +344,7 @@ const handledelete = async (id) => {
                   </table>
                   <br></br>
                   <nav className='float-right'>
-                    <ul className='pagination'>
+                    <ul className='pagination paginationRightTab'>
                       <li className='page-item'>
                         <button onClick={prePage} className='page-link'>Prev</button>
                       </li>
@@ -371,13 +371,13 @@ const handledelete = async (id) => {
           Hi <span className='bg-warning'>{modaldata.name}</span> 
         </ModalHeader>
         <div className="text-center">
-          <img src={`http://localhost:8081/profile/${modaldata.image}`} className='rounded-circle img-thumbnail mx-auto d-block' height={150}  width={150}  alt={modaldata.name}/>
+          <img src={modaldata.image} className='rounded-circle img-thumbnail mx-auto d-block' height={150}  width={150}  alt={modaldata.name}/>
         </div>
         <ModalBody>
           <div className="container">
             <div className="row">
               <div className="col-md-12">
-                <h5 className="text-primary">Personal Information</h5>
+                <h5 className="text-primary">Personal Information </h5>
                 <hr />
               </div>
             </div>

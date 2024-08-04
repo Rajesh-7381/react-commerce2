@@ -11,12 +11,12 @@ import STACKEDChart from './Chart/STACKEDChart';
 import PIEChart from './Chart/PIEChart';
 import Header from './Component/Header';
 import Footer from './Component/Footer';
-
+import { CSVLink } from 'react-csv';
 
 const Dashboard1 = () => {
- 
-  const chartref = useRef(null);
-  const chartinstance = useRef(null);
+  const tableRef = useRef(null);
+  const chartref = useRef(null); // this reference points to the <canvas> element in the DOM, which will be used as the rendering context for the chart.
+  const chartinstance = useRef(null); //This reference stores the Chart.js instance, allowing for proper cleanup and management of the chart.
   const [usercount, setUserCount] = useState(0);
   const [admincount, setAdminCount] = useState(0);
   const [subadmincount, setSubadminCount] = useState(0);
@@ -30,7 +30,8 @@ const Dashboard1 = () => {
   const [fromdate, setFromDate] = useState('');
   const [todate, setToDate] = useState('');
   const [selectedChart, setSelectedChart] = useState('pie');
-
+  const [userDetails,setuserDetails]=useState([]);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,12 +58,12 @@ const Dashboard1 = () => {
   }, []);
 
   useEffect(()=>{
-    if(chartinstance.current){
-      chartinstance.current.destroy();
+    if(chartinstance.current){ //check if chartinstance exists
+      chartinstance.current.destroy(); //if exist destroyed before creating new one 
     }
-    const mychartref=chartref.current.getContext('2d');
+    const mychartref=chartref.current.getContext('2d'); //2d drawing context
 
-    chartinstance.current=new Chart(mychartref,{
+    chartinstance.current=new Chart(mychartref,{ //This creates a new Chart.js instance with the specified type ("pie") and data.
       type:"pie",
       data:{
         labels: ['Admin', 'SubAdmin', 'User','Categories','Products','Brands'],
@@ -80,7 +81,7 @@ const Dashboard1 = () => {
               
             ],
             
-            hoverOffset: 4
+            hoverOffset: 4 //Defines the offset for slices on hover.
           }
         ]
       }
@@ -93,14 +94,20 @@ const Dashboard1 = () => {
   })
 
   const UserQuery = async (pdate) => {
+    // alert(pdate)
     try {
       const response = await axios.get(`http://localhost:8081/registerUserParticularDate/${pdate}`);
       // console.log(response.data);
       setregisteruserdata(response.data.count);
+      setuserDetails(response.data.data)
+      console.log(userDetails)
     } catch (error) {
       console.error(error);
     }
   }
+  // to convert array of data
+  const isArrayData=Array.isArray(userDetails)
+
   const UserQuery2 = async () => {
     try {
       const response = await axios.get(`http://localhost:8081/registerUserfromrDateTotodate/${fromdate}/${todate}`);
@@ -116,6 +123,15 @@ const Dashboard1 = () => {
     setSelectedChart(e.target.value);
   };
   
+  // download csv file
+  const headers=[
+    {label:'Name',key:'name'},
+    {label:'Email',key:'email'},
+    {label:'Mobile',key:'mobile'},
+  ]
+
+  // progress bar
+
   return (
     
     <div>
@@ -139,7 +155,7 @@ const Dashboard1 = () => {
           </div>{/* /.col */}
           <div className="col-sm-6">
             <ol className="breadcrumb float-sm-right">
-              <Link className="breadcrumb-item" to={"/admindashboard1"}>Home</Link>
+              <Link className="breadcrumb-item" to={"/admindashboard1"} style={{textDecoration:"none"}}>Home</Link>
               <li className="breadcrumb-item active ">Dashboard v1</li>
             </ol>
           </div>{/* /.col */}
@@ -299,6 +315,83 @@ const Dashboard1 = () => {
                         <label htmlFor="pdate">Search by date:</label>
                         <input type="date" className="form-control" id="pdate" value={pdate} onChange={(e) => setPdate(e.target.value)} />
                         <button className="btn btn-primary mt-2" onClick={() => UserQuery(pdate)}>Search</button>
+                        {
+                          registeruserdata2 && (
+                            <div>
+                              <a data-toggle="modal" href="#myModal" className="btn btn-dark mt-2 mx-2">View</a>
+                              <div className="modal" id="myModal">
+                                <div className="modal-dialog modal-dialog-centered modal-lg">
+                                  <div className="modal-content">
+                                    <div className="modal-header">
+                                      <h4 className="modal-title " >Register User Details on <u>{pdate}</u></h4>
+                                      <button type="button" className="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    </div>
+                                    <div className="modal-body">
+                                    <table className='table table-bordered table-striped' ref={tableRef}>
+                                    <tr>
+                                      <th className='bg-dark'>SL NO</th>
+                                      <th className='bg-dark'>Name</th>
+                                      <th className='bg-dark'>EMAIL</th>
+                                      <th className='bg-dark'>MOBILE</th>
+                                    </tr>
+                                    <tbody>
+                                      {isArrayData ? (
+                                        userDetails.map((user,index)=>(
+                                          <tr key={index}>
+                                            <td>{index+1}</td>
+                                            <td>{user.name}</td>
+                                            <td>{user.email}</td>
+                                            <td>{user.mobile}</td>
+                                          </tr>
+                                        ))
+                                      ):(
+                                        <tr>
+                                            <td>{userDetails.id}</td>
+                                            <td>{userDetails.name}</td>
+                                            <td>{userDetails.email}</td>
+                                            <td>{userDetails.mobile}</td>
+                                          </tr>
+                                      )}
+                                    </tbody>
+                                    </table>
+                                    <CSVLink data={userDetails} headers={headers} filename="Static_Users.csv" target='_blank' >
+                                      <button className='btn btn-success mx-2' ><i class="fa-solid fa-download"></i>   DownLoad</button>
+                                    </CSVLink>
+                                    <a data-toggle="modal" href="#myModal2" title='Are You want to modify User Data'  className="btn btn-primary">Click Me!</a>
+                                    <br />
+                                    <br />
+                                      {/* progress bar*/}
+                                      
+                                    </div>
+                                    <div className="modal-footer">
+                                      <a href="#" data-dismiss="modal" className="btn btn-dark">Close</a>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="modal" id="myModal2" data-backdrop="static">
+                                <div className="modal-dialog modal-dialog-centered">
+                                  <div className="modal-content">
+                                    <div className="modal-header">
+                                      <h4 className="modal-title">mee</h4>
+                                      <button type="button" className="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    </div>
+                                    <div className="modal-body">
+                                      <div className='form-group text-start'>
+                                          <label htmlFor="" className='form-label'>Email:</label>
+                                          <input type="text" className='form-control' autoFocus/>
+                                      </div>
+                                    </div>
+                                    <div className="modal-footer">
+                                      <a href="#" data-dismiss="modal" className="btn">Close</a>
+                                      <a href="#" className="btn btn-primary">Save changes</a>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        }
                         <p><span className="bg-warning">{registeruserdata2}</span> User(s) registered on <span className="bg-warning">{pdate}</span></p>
                       </div>
                       <hr />

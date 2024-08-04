@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import Header from '../Component/Header'
 import Footer from '../Component/Footer'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux';
 import { incrementQuantity,decrementQuantity } from './redux/features/productSlice'
 import { addToCart } from './redux/features/cartSlice'
 
 const ProductDetails = () => {
-  const {id}=useParams();
-  // console.log(id)
+  const location = useLocation();
+  const { id } = location.state || {};
+
+  useEffect(() => {
+    if (id) {
+      // Fetch product details using the id
+      // console.log('Received id:', id);
+    } else {
+      console.error('No ID provided');
+    }
+  }, [id]);
   const [listproduct, setlistProduct] = useState([]);
   const dispatch=useDispatch();
   const quantity=useSelector(state=>state.product.quantity);
@@ -238,7 +247,7 @@ const ProductDetails = () => {
                 </div>
               </div>
             </div>
-            <div className="u-s-m-b-15">
+            <div className="u-s-m-b-15 text-start">
               <span className="pd-detail__label u-s-m-b-8">Product Policy:</span>
               <ul className="pd-detail__policy-list text-start">
                 <li><i className="fas fa-check-circle u-s-m-r-8" />

@@ -427,32 +427,32 @@ const AddEditProducts = () => {
                           </div>
                         </div>
                         <div className="col-md-12">
-  <div className="card-body">
-    <div className="form-group text-start">
-      <label htmlFor="brand_id">Select Brand</label>
-      <select
-        name="brand_id"
-        id="brand_id"
-        className="form-control"
-        {...register("brand_id", { required: true })}
-        value={data.id} // Assuming `data` has the correct brand_id
-        onChange={(e) => setValue('brand_id', e.target.value)} // Use appropriate state update method if needed
-      >
-        <option value="">Select</option>
-        {brands.map((brand) => (
-          <option key={brand.id} value={brand.id}>
-            {brand.brand_name}
-          </option>
-        ))}
-      </select>
-      {errors.id && (
-        <span className="text-danger">
-          Category is required
-        </span>
-      )}
-    </div>
-  </div>
-</div>
+                          <div className="card-body">
+                            <div className="form-group text-start">
+                              <label htmlFor="brand_id">Select Brand</label>
+                              <select
+                                name="brand_id"
+                                id="brand_id"
+                                className="form-control"
+                                {...register("brand_id", { required: true })}
+                                value={data.id} // Assuming `data` has the correct brand_id
+                                onChange={(e) => setValue('brand_id', e.target.value)} // Use appropriate state update method if needed
+                              >
+                                <option value="">Select</option>
+                                {brands.map((brand) => (
+                                  <option key={brand.id} value={brand.id}>
+                                    {brand.brand_name}
+                                  </option>
+                                ))}
+                              </select>
+                              {errors.id && (
+                                <span className="text-danger">
+                                  Category is required
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
 
 
                       </div>
