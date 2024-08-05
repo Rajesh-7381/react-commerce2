@@ -1,10 +1,11 @@
 const express = require("express");
-const router=express.Router();
-const AuthController=require("../Controller/authController");
 // for image uploading
 const upload=require("../utils/multerConfig");
+const { registerUser } = require("../Controller/userController");
 
-router.post("/register",upload.single("image"),AuthController.register);
-router.post("/login",AuthController.login);
+const router=express.Router();
+
+router.post("",upload.single("image"),registerUser);
+router.post("",AuthController.login);
 
 module.exports=router;

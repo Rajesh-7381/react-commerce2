@@ -23,10 +23,13 @@ module.exports = (req, res, next) => {
         // Extract the role from the verified token
         const { role } = verified;
         // Check if the role is 'admin'
-        if (role === 'admin' ) {
+        if (role === 'admin' || role ==='subadmin' ) {
             // If the role is admin, proceed to the next middleware
             next();
-        } else {
+        }else if(role === 'user'){
+            return res.json({message:"Acess denied!"})
+            next();
+        }else {
             
             return res.status(403).json({ message: 'Access denied. You do not have permission to access this resource.' });
         }

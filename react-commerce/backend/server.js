@@ -10,7 +10,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const { db } = require("./config/dbconfig");
 const errhandler = require("./Middleware/ErrorHandler");
 const { DatabaseError } = require("./Error/AppError");
-
+const { cloudinary }=require("./helper/cloudinaryConfig")
 const stripe=require('stripe')(process.env.STRIPE_SECRET_KEY)
 // for backend validation
 const {
@@ -47,7 +47,8 @@ const checkAuth = require("./Auth/RouteCheckAuth");
 // here multerConfig is roled to define file path also image where stored
 const upload = require("./utils/multerConfig");
 const { promises } = require("dns");
-const { profile } = require("console");
+const { profile, count } = require("console");
+const { UUID } = require("./utils/UserIID");
 // const { default: Stripe } = require("stripe");
 const app = express(); //create express.js(framework) instance
 
@@ -62,71 +63,71 @@ app.use(session({
 
 app.use(passport.session());
 
-passport.use(new GoogleOauthStrategy({
-  clientID:process.env.GOOGLE_CLIENT_ID,
-  clientSecret:process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:8081/auth/google/callback", // Ensure this matches your Google Cloud Console
-  scope: ["profile", "email"]
-},
-async (accessToken, refreshToken, profile, done) => {
-  try {
-    // console.log(profile)
-    const email = profile.emails[0].value;
-    const userQuery = "SELECT * FROM AdminUser WHERE email = ?";
-    const insertQuery = `INSERT INTO AdminUser (googleId,name, email, image, mobile, password) VALUES (?, ?, ?, ?, ?, ?)`;
+  passport.use(new GoogleOauthStrategy({
+    clientID:process.env.GOOGLE_CLIENT_ID,
+    clientSecret:process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:8081/auth/google/callback", // Ensure this matches your Google Cloud Console
+    scope: ["profile", "email"]
+  },
+  async (accessToken, refreshToken, profile, done) => {
+    try {
+      // console.log(profile)
+      const email = profile.emails[0].value;
+      const userQuery = "SELECT * FROM AdminUser WHERE email = ?";
+      const insertQuery = `INSERT INTO AdminUser (googleId,name, email, image, mobile, password) VALUES (?, ?, ?, ?, ?, ?)`;
 
-    db.query(userQuery, [email], (err, results) => {
-      if (err) {
-        console.error('Error querying database: ', err);
-        return done(err, null);
-      }
+      db.query(userQuery, [email], (err, results) => {
+        if (err) {
+          console.error('Error querying database: ', err);
+          return done(err, null);
+        }
 
-      if (results.length > 0) {
-        // User already exists
-        return done(null, results[0]); //if user exist it show with user inforamtion
-      } else {
-        // User does not exist, create new user
-        const user = {
-          GoogleId:profile.id,
-          name: profile.displayName,
-          email: email,
-          image: profile.photos[0] ? profile.photos[0].value : null,
-          mobile: null, 
-          password: null 
-        };
+        if (results.length > 0) {
+          // User already exists
+          return done(null, results[0]); //if user exist it show with user inforamtion
+        } else {
+          // User does not exist, create new user
+          const user = {
+            GoogleId:profile.id,
+            name: profile.displayName,
+            email: email,
+            image: profile.photos[0] ? profile.photos[0].value : null,
+            mobile: null, 
+            password: null 
+          };
 
-        db.query(insertQuery, [user.GoogleId,user.name, user.email, user.image, user.mobile, user.password], (err, results) => {
-          if (err) {
-            console.error('Error inserting into database: ', err);
-            return done(err, null);
-          }
+          db.query(insertQuery, [user.GoogleId,user.name, user.email, user.image, user.mobile, user.password], (err, results) => {
+            if (err) {
+              console.error('Error inserting into database: ', err);
+              return done(err, null);
+            }
 
-          // Add the newly created user ID to the `user` object
-          user.id = results.insertId;
-          return done(null, user);
-        });
-      }
-    });
-  } catch (error) {
-    console.error('Error in passport strategy: ', error);
-    return done(error, null);
+            // Add the newly created user ID to the `user` object
+            user.id = results.insertId;
+            return done(null, user);
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error in passport strategy: ', error);
+      return done(error, null);
+    }
   }
-}
-));
+  ));
 
-passport.serializeUser((user, done) => {
-done(null, user.id);
-});
+  passport.serializeUser((user, done) => {
+  done(null, user.id);
+  });
 
-passport.deserializeUser((id, done) => {
-const query = "SELECT * FROM AdminUser WHERE id = ?";
-db.query(query, [id], (err, results) => {
-  if (err) {
-    return done(err, null);
-  }
-  return done(null, results[0]);
-});
-});
+  passport.deserializeUser((id, done) => {
+  const query = "SELECT * FROM AdminUser WHERE id = ?";
+  db.query(query, [id], (err, results) => {
+    if (err) {
+      return done(err, null);
+    }
+    return done(null, results[0]);
+  });
+  });
 
 
 
@@ -205,10 +206,14 @@ app.use(express.json()); // parses incoming requests with JSON payloads.
 // app.use(morgan("combined")); //logs HTTP requests in a concise format.
 
 // bodyParser.json() and bodyParser.urlencoded({ extended: true }): parse incoming request bodies in JSON and URL-encoded formats, respectively.
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());  //Parses incoming JSON-formatted request bodies and makes them accessible on the req.body property of the request object.
+app.use(bodyParser.urlencoded({ extended: true })); //Parses incoming URL-encoded request bodies and makes them accessible on the req.body property.
+// The extended: true option enables parsing of nested objects and arrays, allowing for more complex data structures.
 
 // Serve static files for profile images
+// express.static :: is built in middleware function in  express that serves static files. It takes a directory path as an argument and serves the files within that directory
+// path.join() is a method from Node.js's path module. It joins the provided path segments into a single path string.
+// __dirname is a Node.js global variable that represents the directory name of the current 
 app.use("/profile", express.static(path.join(__dirname, "uploads/profile")));
 
 // Serve static files for product video
@@ -263,6 +268,12 @@ app.get('/auth/facebook/callback',passport.authenticate('facebook'),(req,res)=>{
   res.redirect('http://localhost:3000/userdashboard2');
 });
 
+// for uuid
+// const id=uuidv4()
+// console.log(id)
+// const num=Math.floor(Math.random() * 1000000);
+// console.log(num)
+
 //=============================================== register user data============================
 
   app.post("/register", upload.single("image"), async (req, res) => {
@@ -278,6 +289,9 @@ app.get('/auth/facebook/callback',passport.authenticate('facebook'),(req,res)=>{
     }
 
     const { name, mobile, email, password } = req.body;
+    // generate unique uuid
+    const uuid=await UUID();
+    
     const UserExistQuery =
       "SELECT COUNT(*) AS count FROM AdminUser WHERE email = ? OR mobile = ?";
 
@@ -302,24 +316,28 @@ app.get('/auth/facebook/callback',passport.authenticate('facebook'),(req,res)=>{
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
-      await new Promise((resolve, reject) => {
-        db.query(
-          "INSERT INTO AdminUser (name, mobile, email, password, image) VALUES (?, ?, ?, ?, ?)",
-          [
-            name,
-            mobile,
-            email,
-            hashedPassword,
-            req.file ? req.file.filename : null,
-          ],
-          (err, results) => {
-            if (err) {
-              return reject(err);
+      if(req.file){
+        const uploadImagePath=await cloudinary.uploader.upload(req.file.path)
+        await new Promise((resolve, reject) => {
+          db.query(
+            "INSERT INTO AdminUser (name, mobile, email, password, image,UUID) VALUES (?, ?, ?, ?, ?,?)",
+            [
+              name,
+              mobile,
+              email,
+              hashedPassword,
+              req.file ? uploadImagePath.secure_url : null,
+              uuid,
+            ],
+            (err, results) => {
+              if (err) {
+                return reject(err);
+              }
+              resolve(results);
             }
-            resolve(results);
-          }
-        );
-      });
+          );
+        });
+      }
       
       await Sendmail(email, "Welcome to E-commerce", `Hi ${name}, thank you for registering.`);
 
@@ -637,24 +655,33 @@ app.get("/SearchAdminSubAdminUser/:searchTerm", (req, res) => {
 
 app.get("/registerUserParticularDate/:date", (req, res) => {
   const date = req.params.date;
+  // console.log(date)
   // const formattedDate = date.split('-').reverse().join('-');
   // console.log(formattedDate)
 
   // here issue is created_at stored date time format but i want to show date format thats why we use  'CAST' or 'DATE_FORMAT'
   // const query="SELECT COUNT(*) AS count FROM AdminUser WHERE role='user' AND CAST(created_at AS DATE) = ?";
   const query =
-    "SELECT COUNT(*) AS count FROM AdminUser WHERE role='user' AND DATE(created_at) = ?";
+    "SELECT * FROM AdminUser WHERE role='user' and date(created_at) = ?";
   db.query(query, [date], (err, data) => {
     // db.query(query, [formattedDate], (err, data) => {
     if (err) {
       console.error("🚫 " + err);
       res.status(500).json({ message: "🚫 Internal server error" });
     } else {
-      res.json(data[0]);
+      // console.log(data)
+      res.json({
+        count:data.length,
+        data:data
+      });
     }
   });
 });
 
+// particular date and show data
+app.get("/registerUserPartCularDateWithDeails/:date",(req,res)=>{
+  const date=req.params.date;
+})
 //========================================END====================================================
 
 //===============================================// from date to to date through user data show============================
@@ -1219,12 +1246,12 @@ app.post(
 
           // Process and save the images in different resolutions
           await Promise.all(
-            product_images.map(async (file) => {
+            product_images.map(async (file) => { //file: Represents the current file object, which includes properties like path (temporary location on the server) and filename.
               await Promise.all(
-                Object.entries(resolutions).map(
-                  async ([key, { width, height }]) => {
+                Object.entries(resolutions).map( //Object.entries(resolutions).map(...): Iterates over each resolution defined in the resolutions object. This gives access to both the key (like large) and the resolution values (width, height).
+                  async ([key, { width, height }]) => { //[key, { width, height }]: Destructures the current resolution object into key, width, and height.
                     const outputPath = path.join(
-                      __dirname,
+                      __dirname, //outputPath: The full path where the resized image will be saved. It combines the current directory (__dirname), the directory for the specific size (outputDirs[key]), and the original filename (file.filename).
                       outputDirs[key],
                       file.filename
                     );
@@ -1258,8 +1285,8 @@ app.post(
 
         // Handle product attributes
         let attributes = req.body.attributes;
-        if (typeof attributes === "string") {
-          attributes = JSON.parse(attributes);
+        if (typeof attributes === "string") { //typeof attributes === "string": This checks if the attributes data is a string. This could happen if the attributes were sent as a JSON string.
+          attributes = JSON.parse(attributes); //convert into objects or array
         }
 
         if (Array.isArray(attributes) && attributes.length > 0) {

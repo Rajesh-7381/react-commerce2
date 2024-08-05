@@ -2,74 +2,48 @@ const User = require("../Models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const transporter = require("../utils/email");
+const { registerSchema } = require("../utils/Validation");
+const { uploadImage } = require("../helper/cloudinaryConfig");
+const { sendMail } = require("../Email/nodemailerConfig");
 
-exports.register = async (req, res) => {
-  const { name, mobile, email, password } = req.body;
-  const image = req.file.filename;
 
-  try {
-    await User.register({ name, mobile, email, password, image });
+const Salt=process.env.GEN_SALT;
 
-    const mailOptions = {
-      from: process.env.EMAIL,
-      to: email,
-      subject: "Welcome to Our Service!",
-      text: `Hello ${name},\n\nThank you for registering at our service! We are excited to have you.\n\nBest regards,\nYour Company`,
-    };
+const registerUser=async(req,res)=>{
+  const CombinedData={
+    ...req.body,
+    image:req.file
+  };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-        return res.status(500).json({ message: "Internal Server Error" });
-      }
-      console.log("Email sent:", info.response);
-      res.status(200).json({ message: "Registration successful and email sent!" });
-    });
-  } catch (err) {
-    console.error("Error submitting form", err);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-exports.login = async (req, res) => {
-  const { email, password, check } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ status: 0, message: "Email and password are required" });
+  const { error }=registerSchema.validate(CombinedData);
+  if(error){
+    return res.status(400).json({ message: "🚫 Invalid request body", error: error.details })
   }
 
+  const {name,email,mobile,password}=req.body;
   try {
-    const user = await User.findByEmail(email);
+    const userExist=await User.getUserEmailOrMobile(email,mobile);
+    if(userExist > 0){
+      return res.status(400).json({ message: "🚫 Email or mobile number already exists" });
+    }
+    const salt=await bcrypt.genSalt(Salt);
+    const hashedPassword=await bcrypt.hash(password,salt);
+    let imageUrl=null;
 
-    if (!user) {
-      return res.status(401).json({ status: 0, message: "Invalid email or password" });
+    if(req.file){
+      const UpLoadImagePath=await uploadImage(req.file.path);
+      imageUrl=UpLoadImagePath.secure_url;
     }
 
-    const match = await bcrypt.compare(password, user.password);
+    await User.createUser(name, mobile, email, hashedPassword, imageUrl);
+    await sendMail(email, "Welcome to E-commerce", `Hi ${name}, thank you for registering.`)
 
-    if (!match) {
-      return res.status(401).json({ status: 0, message: "Invalid email or password" });
-    }
 
-    const token = jwt.sign(
-      { email: user.email, role: user.role, id: user.id },
-      process.env.JWT_SECRET,
-      { expiresIn: check ? "7d" : "24h" }
-    );
+    res.json({ message: "✅ User created successfully!" });
+  } catch (error) {
 
-    // console.log("Generated Token:", token);
-    // console.log("Secret Key:", process.env.JWT_SECRET);
-
-    res.status(200).json({
-      status: 1,
-      message: "Login successful",
-      email: user.email,
-      role: user.role,
-      id: user.id,
-      token: token,
-    });
-  } catch (err) {
-    console.error("Login unsuccessful:", err);
-    res.status(500).json({ status: 0, message: "Internal server error" });
+      console.error("🚫 Error submitting form", err);
+      res.status(500).json({ message: "🚫 Internal server error" });
   }
-};
+}
+module.exports={ registerUser };
