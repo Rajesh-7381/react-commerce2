@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Footer from '../Component/Footer'
 import Header from '../Component/Header'
@@ -8,6 +8,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPaymentMethod } from './redux/features/paymentSlice';
 import stripe from './Payment/Stripe';
 import {loadStripe} from '@stripe/stripe-js'; 
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import axios from 'axios';
+import { NotificationManager } from 'react-notifications';
 
 const Checkout = () => {
     const stripe = useStripe();
@@ -20,6 +24,62 @@ const Checkout = () => {
   const [dis,setdis]=useState(null)
   
 
+  useEffect(()=>{
+    document.title="Checkout"
+  })
+  const initialValues={
+    name:"",
+    address:"",
+    city:"",
+    state:"",
+    country:"",
+    pincode:"",
+    mobile:"",
+    secondaryMobile:"",
+  }
+  const validationSchema=Yup.object({
+    name:Yup.string().required("Name Required"),
+    address:Yup.mixed().required("Please Enter Your Address"),
+    city:Yup.string().required("Please enter your city"),
+    state:Yup.string().required("Enter Your State Name"),
+    country:Yup.string().required("Choose Your Country Name"),
+    mobile:Yup.number().required("enter your mobile number"),
+    secondaryMobile:Yup.number().min(10).max(10).notRequired()
+  })
+
+  const onSubmitForm=async(values,action)=>{
+    // alert(1)
+    console.log(values)
+    const user_id=localStorage.getItem('id')
+    // console.log(user_id)
+    try {
+        const formdata=new FormData();
+        formdata.append("name",values.name)
+        formdata.append("address",values.address)
+        formdata.append("city",values.city)
+        formdata.append("state",values.state)
+        formdata.append("country",values.country)
+        formdata.append("mobile",values.mobile)
+        formdata.append("secondaryMobile",values.secondaryMobile)
+        formdata.append("user_id",user_id)
+
+        const response=await axios.post("http://localhost:8081/DeliveryAddress",formdata)
+        console.log(response.data)
+        setTimeout(() => {
+            
+            NotificationManager.success("Your Address Saved Successfully!")
+            // action.resetForm()
+        }, 3000);
+    } catch (error) {
+        
+    }
+  }
+//   console.log(onSubmitForm)
+  const formik=useFormik({
+    initialValues:initialValues,
+    validationSchema:validationSchema,
+    onSubmit:onSubmitForm
+  });
 //   const MakePayment = async () => {
 //     const stripe = await loadStripe("pk_test_51O4a72SHw6r4P7p3lRcPeLEdr5MlKBBt9O4hJGgIz5uHbedh6yzVa2YTv7dNcRazWeZIe9WmdYgjz3KjinL8ZvnC00IR7KUVcj");
   
@@ -224,7 +284,7 @@ const handlePaymentChange=(event)=>{
                             </div>
                         </div>
                         <h1 className="checkout-f__h1">ADD NEW DELIVERY ADDRESS</h1>
-                        <form className="checkout-f__delivery">
+                        <form className="checkout-f__delivery" onSubmit={formik.handleSubmit}>
                             <div className="u-s-m-b-30">
                             <div className="u-s-m-b-15">
                                 {/*====== Check Box ======*/}
@@ -240,50 +300,75 @@ const handlePaymentChange=(event)=>{
                             {/*====== NAME ======*/}
                             <div className="u-s-m-b-15 text-start">
                                 <label className="gl-label" htmlFor="shipping-name">NAME *</label>
-                                <input className="input-text input-text--primary-style" type="text" id="shipping-name" />
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-name" name='name' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.name} autoComplete='username'/>
+                                {formik.touched.name && formik.errors.name ?(
+                                    <div className='text-danger'>{formik.errors.name}</div>
+                                ):null}
                             </div>
                             {/*====== End - NAME ======*/}
                             {/*====== ADDRESS ======*/}
                             <div className="u-s-m-b-15 text-start">
                                 <label className="gl-label" htmlFor="shipping-address">ADDRESS *</label>
-                                <input className="input-text input-text--primary-style" type="text" id="shipping-address" />
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-address" name='address' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.address} />
+                                {formik.touched.address && formik.errors.address ?(
+                                    <div className='text-danger'>{formik.errors.address}</div>
+                                ):null}
                             </div>
                             {/*====== End - ADDRESS ======*/}
                             {/*====== CITY ======*/}
                             <div className="u-s-m-b-15 text-start">
                                 <label className="gl-label" htmlFor="shipping-city">CITY *</label>
-                                <input className="input-text input-text--primary-style" type="text" id="shipping-city" />
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-city" name='city' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.city} />
+                                {formik.touched.city && formik.errors.city ?(
+                                    <div className='text-danger'>{formik.errors.city}</div>
+                                ):null}
                             </div>
                             {/*====== End - CITY ======*/}
                             {/*====== STATE ======*/}
                             <div className="u-s-m-b-15 text-start">
                                 <label className="gl-label" htmlFor="shipping-state">STATE *</label>
-                                <input className="input-text input-text--primary-style" type="text" id="shipping-state" />
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-state" name='state' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.state}/>
+                                {formik.touched.state && formik.errors.state ?(
+                                    <div className='text-danger'>{formik.errors.state}</div>
+                                ):null}
                             </div>
                             {/*====== End - STATE ======*/}
                             {/*====== Country ======*/}
                             <div className="u-s-m-b-15 text-start">
                                 {/*====== Select Box ======*/}
-                                <label className="gl-label" htmlFor="billing-country">COUNTRY *</label><select className="select-box select-box--primary-style" id="billing-country">
-                                <option selected value>Choose Country</option>
-                                <option value="India">India</option>
-                                <option value="United Arab Emirate">United Arab Emirate</option>
-                                <option value="United Kingdom">United Kingdom</option>
-                                <option value="United States">United States</option>
+                                <label className="gl-label" htmlFor="billing-country">COUNTRY *</label><select className="select-box select-box--primary-style" id="billing-country" name='country' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.country}>
+                                <option  value>Choose Country</option>
+                                <option value="India" selected={formik.values.country === "India"}>India</option>
+                                <option value="United Arab Emirate" selected={formik.values.country === "United Arab Emirate"}>United Arab Emirate</option>
+                                <option value="United Kingdom" selected={formik.values.country === "United Kingdom"}>United Kingdom</option>
+                                <option value="United States" selected={formik.values.country === "United States"}>United States</option>
                                 </select>
                                 {/*====== End - Select Box ======*/}
+                                {formik.touched.country && formik.errors.country ?(
+                                    <div className='text-danger'>{formik.errors.country}</div>
+                                ):null}
                             </div>
                             {/*====== End - Country ======*/}
                             {/*====== PINCODE ======*/}
                             <div className="u-s-m-b-15 text-start">
                                 <label className="gl-label" htmlFor="shipping-pincode">PINCODE *</label>
-                                <input className="input-text input-text--primary-style" type="text" id="shipping-pincode" />
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-pincode" name='pincode' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.pincode} />
+                                {formik.touched.pincode && formik.errors.pincode ?(
+                                    <div className='text-danger'>{formik.errors.pincode}</div>
+                                ):null}
                             </div>
                             {/*====== End - PINCODE ======*/}
                             {/*====== MOBILE ======*/}
                             <div className="u-s-m-b-15 text-start">
                                 <label className="gl-label" htmlFor="shipping-mobile">MOBILE *</label>
-                                <input className="input-text input-text--primary-style" type="text" id="shipping-mobile" />
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-mobile" name='mobile' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.mobile} />
+                                {formik.touched.mobile && formik.errors.mobile ?(
+                                    <div className='text-danger'>{formik.errors.mobile}</div>
+                                ):null}
+                            </div>
+                            <div className="u-s-m-b-15 text-start">
+                                <label className="gl-label" htmlFor="shipping-mobile2">MOBILE(Optional)</label>
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-mobile2" name='secondaryMobile' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.secondaryMobile} />
                             </div>
                             {/*====== End - MOBILE ======*/}
                             <div className="u-s-m-b-10 text-start">

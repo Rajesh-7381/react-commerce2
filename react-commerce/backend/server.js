@@ -21,6 +21,7 @@ const {
   ProductSchema,
   BrandSchema,
   BannerSchema,
+  DeliVeryAddressSchema,
 } = require("./utils/Validation");
 // for multiple database
 // const {db,db2}=require("./config/dbconfig");
@@ -50,6 +51,10 @@ const { promises } = require("dns");
 const { profile, count } = require("console");
 const { UUID } = require("./utils/UserIID");
 // const { default: Stripe } = require("stripe");
+const router=express.Router();
+const userRoutes=require("./Routes/userRoutes")
+const cmsRoutes=require("./Routes/cmsRoutes")
+const { v4: uuidv4 } = require("uuid");
 const app = express(); //create express.js(framework) instance
 
 // setup session
@@ -271,143 +276,28 @@ app.get('/auth/facebook/callback',passport.authenticate('facebook'),(req,res)=>{
 // for uuid
 // const id=uuidv4()
 // console.log(id)
-// const num=Math.floor(Math.random() * 1000000);
-// console.log(num)
+
+function makeid(length) {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result.toUpperCase();       
+}
+
+var randomoutput=makeid(15);
+const num=Math.floor(Math.random() * 1000000);
+console.log(randomoutput +num)
 
 //=============================================== register user data============================
-
-  app.post("/register", upload.single("image"), async (req, res) => {
-    const combinedData = {
-      ...req.body,
-      image: req.file,
-    };
-    const { error } = registerSchema.validate(combinedData);
-    if (error) {
-      return res
-        .status(400)
-        .json({ message: "🚫 Invalid request body", error: error.details });
-    }
-
-    const { name, mobile, email, password } = req.body;
-    // generate unique uuid
-    const uuid=await UUID();
-    
-    const UserExistQuery =
-      "SELECT COUNT(*) AS count FROM AdminUser WHERE email = ? OR mobile = ?";
-
-    try {
-      // Check if the user already exists
-      const userExistsResult = await new Promise((resolve, reject) => {
-        db.query(UserExistQuery, [email, mobile], (err, results) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(results[0].count);
-        });
-      });
-
-      if (userExistsResult > 0) {
-        return res
-          .status(400)
-          .json({ message: "🚫 Email or mobile number already exists" });
-      }
-
-      // Proceed with user registration
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-
-      if(req.file){
-        const uploadImagePath=await cloudinary.uploader.upload(req.file.path)
-        await new Promise((resolve, reject) => {
-          db.query(
-            "INSERT INTO AdminUser (name, mobile, email, password, image,UUID) VALUES (?, ?, ?, ?, ?,?)",
-            [
-              name,
-              mobile,
-              email,
-              hashedPassword,
-              req.file ? uploadImagePath.secure_url : null,
-              uuid,
-            ],
-            (err, results) => {
-              if (err) {
-                return reject(err);
-              }
-              resolve(results);
-            }
-          );
-        });
-      }
-      
-      await Sendmail(email, "Welcome to E-commerce", `Hi ${name}, thank you for registering.`);
-
-      res.json({ message: "✅ User created successfully!" });
-    } catch (err) {
-      console.error("🚫 Error submitting form", err);
-      res.status(500).json({ message: "🚫 Internal server error" });
-    }
-  });
-
-
-//========================================END====================================================
+app.use("/api",userRoutes)//register
 
 //===============================================ADMIN OR SUBADMIN USER LOGIN============================
-app.post("/login", (req, res, next) => {
-  const { email, password, check } = req.body;
-  // console.log(req.body)
-  if (!email || !password) {
-    return res
-      .status(400)
-      .json({ status: 0, message: "Email and password are required" });
-  }
-
-  const query = "SELECT * FROM AdminUser WHERE email = ?";
-  db.query(query, [email], async (err, data) => {
-    if (err) {
-      console.error("Login unsuccessful:", err);
-      return res
-        .status(500)
-        .json({ status: 0, message: "🚫 Internal server error" });
-    }
-
-    if (data.length === 0) {
-      return res
-        .status(401)
-        .json({ status: 0, message: "Invalid email or password" });
-    }
-
-    const user = data[0];
-    const match = await bcrypt.compare(password, user.password);
-
-    if (!match) {
-      return res
-        .status(401)
-        .json({ status: 0, message: "Invalid email or password" });
-    }
-
-    const token = jwt.sign(
-      { email: user.email, role: user.role, id: user.id },
-      // 'dummy text',
-      process.env.JWT_SECRET,
-      // { expiresIn: check ? '7d' : process.env.JWT_EXPIRATION }
-      { expiresIn: "24h" }
-    );
-
-    // console.log('Generated Token:', token); // Log the generated token for debugging
-    // console.log('Secret Key:', process.env.JWT_SECRET); // Log the JWT secret key for debugging
-
-    res.status(200).json({
-      status: 1,
-      message: "Login successful",
-      email: user.email,
-      role: user.role,
-      id: user.id,
-      token: token,
-    });
-  });
-});
-
-//========================================END====================================================
+app.use("/api",userRoutes)//login
 
 //===============================================// forgot password before check email already exist in database or not and registering time to check this email is already exists or not============================
 
@@ -441,6 +331,28 @@ app.get("/checkmobile/:mobile", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+//========================================END====================================================
+
+//===============================================UUID exist check============================
+
+app.get("/UniqueID/:unique_id",async(req,res)=>{
+  try {
+    const unique_id=req.params.unique_id;
+    // console.log(unique_id)
+    const query="select * from AdminUser where UUID=?";
+    const result=await db.promise().query(query,[unique_id]);
+    // console.log(result)
+    const UniqueIdExists=result[0].length > 0;
+    // console.log(UniqueIdExists)
+    res.json({ UniqueIdExists })
+  } catch (error) {
+      console.log("Error Checking Unique Id",error)
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+})
+
+// app.use("/",userRoutes)
 
 //========================================END====================================================
 
@@ -722,15 +634,7 @@ app.get("/getAllSubAdminData", (req, res) => {
 
 //===============================================// GET ALL cms page data============================
 
-app.get("/getAllCmss", (req, res) => {
-  const query = "select * from cmspages where deleted_at is null";
-  db.query(query, (err, data) => {
-    if (err) {
-      console.error("🚫 " + err);
-    }
-    return res.json(data);
-  });
-});
+app.use("/",cmsRoutes)
 
 //========================================END====================================================
 
@@ -2213,6 +2117,32 @@ app.post('/create-payment-intent', async (req, res) => {
   }
 });
 
+// DeliveryAddress
+app.post("/DeliveryAddress",(req,res)=>{
+  const combinedData = {
+    ...req.body,
+    
+  };
+  const { error } = DeliVeryAddressSchema.validate(combinedData);
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: "🚫 Invalid request body", error: error.details });
+  }
+  console.log(error)
+  const { name,address,city,state,country,pincode ,mobile,secondaryMobile }=req.body;
+  console.log(req.body)
+  const uuid=uuidv4();
+  const query="insert into DELIVERY_ADDRESS (name,UUID,address,city,state,country,pincode ,mobile,secondaryMobile) values(?,?,?,?,?,?,?,?,?)";
+  db.query(query,[name,uuid,address,city,state,country,pincode,mobile,secondaryMobile],(err,data)=>{
+    if(err){
+      console.log(err)
+    
+    }
+    return res.json({data})
+    return res.status(200).json({ message: "✅ Delivery Address Added successfully!" });
+  })
+})
 
 app.listen(process.env.SERVERPORT, () => {
   console.log(`server listening at port ${process.env.SERVERPORT}`);

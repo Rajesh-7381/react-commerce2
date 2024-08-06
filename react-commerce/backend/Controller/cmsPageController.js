@@ -1,4 +1,4 @@
-const db=require("../config/dbconfig");
+const { db } =require("../config/dbconfig");
 const CmsPage = require("../Models/CmsPage");
 
 exports.getAllPages=async(req,res)=>{
@@ -6,7 +6,7 @@ exports.getAllPages=async(req,res)=>{
         const data=await CmsPage.getAll();
         res.json(data);
     } catch (error) {
-        console.error(err);
+        console.error(error);
         res.status(500).json({ message: "Internal server error" });
     };
 };

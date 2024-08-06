@@ -29,9 +29,9 @@ const Login = () => {
     }),
     onSubmit: async (values, action) => {
       try {
-        const response = await axios.post("http://localhost:8081/login", values);
+        const response = await axios.post("http://localhost:8081/api/login", values);
         const data = response.data;
-        console.log(data)
+        // console.log(data)
         
         // if(formik.check){
           // localStorage.setItem('token',response.data.token); // after 1day  token will be expired and redirect to login page

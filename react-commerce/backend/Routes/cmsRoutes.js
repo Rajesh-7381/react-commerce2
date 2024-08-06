@@ -3,7 +3,7 @@ const router = express.Router();
 const upload=require("../utils/multerConfig");
 const cmsController=require("../Controller/cmsPageController");
 
-router.get("/cmspagedata",cmsController.getAllPages);
+router.get("/getAllCmss",cmsController.getAllPages);
 router.put("/handlecmspagestatus/:id",cmsController.updatePageStatus);
 router.delete("/cmspagedelete/:id", cmsController.deletePage);
 router.put("/cmsupdatepage/:id", upload.none(), cmsController.updatePage);

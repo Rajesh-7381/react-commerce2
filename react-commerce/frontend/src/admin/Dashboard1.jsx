@@ -2,7 +2,8 @@ import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
 import Chart from 'chart.js/auto';
-
+import {useFormik} from 'formik'
+import * as Yup from 'yup'
 import AreaChart from './Chart/AreaChart';
 import BARChart from './Chart/BARChart';
 import DOUNGHTChart from './Chart/DOUNGHTChart';
@@ -12,6 +13,7 @@ import PIEChart from './Chart/PIEChart';
 import Header from './Component/Header';
 import Footer from './Component/Footer';
 import { CSVLink } from 'react-csv';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
 
 const Dashboard1 = () => {
   const tableRef = useRef(null);
@@ -130,7 +132,35 @@ const Dashboard1 = () => {
     {label:'Mobile',key:'mobile'},
   ]
 
-  // progress bar
+  // exist or not
+  const initialValues={
+    unique_id:""
+  }
+  const validationSchema=Yup.object({
+    unique_id:Yup.string().required("Please Enter Unique Id")
+  })
+  const onSubmitForm=async(values)=>{
+   
+    try {
+      const { unique_id }=values;
+      console.log(unique_id)
+      const UniqueIdResponse=await axios.get(`http://localhost:8081/UniqueID/${unique_id}`)
+      // console.log(UniqueIdResponse)
+      if(UniqueIdResponse.data.UniqueIdExists){
+        NotificationManager.success("yes")
+      }else{
+        NotificationManager.error("Provided Unique ID Not Exists!")
+      }
+    } catch (error) {
+      
+    }
+  }
+
+  const formik=useFormik({
+    initialValues:initialValues,
+    validationSchema:validationSchema,
+    onSubmit:onSubmitForm
+  })
 
   return (
     
@@ -330,18 +360,20 @@ const Dashboard1 = () => {
                                     <table className='table table-bordered table-striped' ref={tableRef}>
                                     <tr>
                                       <th className='bg-dark'>SL NO</th>
+                                      <th className='bg-dark'>UNIQUE ID</th>
                                       <th className='bg-dark'>Name</th>
                                       <th className='bg-dark'>EMAIL</th>
-                                      <th className='bg-dark'>MOBILE</th>
+                                      
                                     </tr>
                                     <tbody>
                                       {isArrayData ? (
                                         userDetails.map((user,index)=>(
                                           <tr key={index}>
                                             <td>{index+1}</td>
+                                            <td>{user.UUID}</td>
                                             <td>{user.name}</td>
                                             <td>{user.email}</td>
-                                            <td>{user.mobile}</td>
+                                            
                                           </tr>
                                         ))
                                       ):(
@@ -373,22 +405,29 @@ const Dashboard1 = () => {
                                 <div className="modal-dialog modal-dialog-centered">
                                   <div className="modal-content">
                                     <div className="modal-header">
-                                      <h4 className="modal-title">mee</h4>
+                                      <h4 className="modal-title">Exist or Not</h4>
                                       <button type="button" className="close" data-dismiss="modal" aria-hidden="true">×</button>
                                     </div>
-                                    <div className="modal-body">
+                                    <form onSubmit={formik.handleSubmit}>
+                                      <div className="modal-body">
                                       <div className='form-group text-start'>
-                                          <label htmlFor="" className='form-label'>Email:</label>
-                                          <input type="text" className='form-control' autoFocus/>
+                                          <label htmlFor="unique_id" className='form-label'>UNIQUE ID:</label>
+                                          <input type="text" className='form-control' name='unique_id' id='unique_id' value={formik.values.name} onBlur={formik.handleBlur} onChange={formik.handleChange} placeholder='9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d' style={{background:"transparent", border:"none", borderBottom:"1px solid #000000", outline:"none", boxShadow:"none"}} autoFocus/>
+                                          {formik.touched.name && formik.errors.name ? (
+                                            <div className='text-danger'>{formik.errors.unique_id}</div>
+                                          ):null}
                                       </div>
                                     </div>
                                     <div className="modal-footer">
-                                      <a href="#" data-dismiss="modal" className="btn">Close</a>
-                                      <a href="#" className="btn btn-primary">Save changes</a>
+                                    <NotificationContainer />
+                                      <button href="#" data-dismiss="modal" className="btn btn-danger">Close</button>
+                                      <button type='submit' data-toggle="modal" href="#myModal3" className="btn btn-primary">CHECK</button>
                                     </div>
+                                    </form>
                                   </div>
                                 </div>
                               </div>
+                              
                             </div>
                           )
                         }
