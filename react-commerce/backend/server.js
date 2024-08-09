@@ -591,10 +591,6 @@ app.get("/registerUserParticularDate/:date", (req, res) => {
   });
 });
 
-// particular date and show data
-app.get("/registerUserPartCularDateWithDeails/:date",(req,res)=>{
-  const date=req.params.date;
-})
 //========================================END====================================================
 
 //===============================================// from date to to date through user data show============================
