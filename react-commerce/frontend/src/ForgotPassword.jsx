@@ -9,11 +9,13 @@ import zxcvbn from 'zxcvbn';
 const ForgotPassword = () => {
     const navigate=useNavigate();
     const [passwordStrength, setPasswordStrength] = useState(0);
+    // console.log(passwordStrength)
     const initialValues = {
         email: '',
         password: ''
     };
-
+    console.log(initialValues.email)
+    console.log(initialValues.password)
     const validationSchema = Yup.object({
         email: Yup.string().email('Invalid email format').required('Email is required'),
         password: Yup.string().max(25).min(8)
@@ -21,16 +23,19 @@ const ForgotPassword = () => {
     });
 
     const onSubmitForm = async (values) => {
+        alert(values)
         if (passwordStrength !== 4) {
             NotificationManager.error("Password strength is not strong enough!");
             return;
           }
         const { email, password } = values; // Destructuring values
+        console.log(values)
         try {
-          const response = await axios.get(`http://localhost:8081/checkemail/${email}`);
-          if (response.data.exists) {
+          const response = await axios.get(`http://localhost:8081/api/checkemail/${email}`);
+          console.log(response.data)
+          if (response.data.emailExists) {
             try {
-              const response = await axios.post(`http://localhost:8081/passwordforgot/${email}`, { password });
+              const response = await axios.post(`http://localhost:8081/api/passwordforgot/${email}`, { password });
               console.log(response.data.message);
               NotificationManager.success("Password Updated Successfully!")
               setTimeout(()=>{
@@ -51,6 +56,7 @@ const ForgotPassword = () => {
         } catch (error) {
           console.error(error);
         }
+        
       }
       
 
@@ -61,6 +67,7 @@ const ForgotPassword = () => {
     });
     const calculatePasswordStrength=(password)=>{
         const result=zxcvbn(password);
+        console.log(result.score)
         setPasswordStrength(result.score);
     }
 

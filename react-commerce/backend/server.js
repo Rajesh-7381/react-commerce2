@@ -12,9 +12,10 @@ const errhandler = require("./Middleware/ErrorHandler");
 const { DatabaseError } = require("./Error/AppError");
 const { cloudinary }=require("./helper/cloudinaryConfig")
 const stripe=require('stripe')(process.env.STRIPE_SECRET_KEY)
+const swaggerUi = require('swagger-ui-express');
+const { swaggerSpec }= require('./Swagger/swaggerConfig');
 // for backend validation
 const {
-  registerSchema,
   passwordForgotSchema,
   CmsPageSchema,
   CategorySchema,
@@ -54,6 +55,8 @@ const { UUID } = require("./utils/UserIID");
 const router=express.Router();
 const userRoutes=require("./Routes/userRoutes")
 const cmsRoutes=require("./Routes/cmsRoutes")
+const categoryRoutes=require("./Routes/categoryRoutes")
+const productRoutes=require("./Routes/productRoutes")
 const { v4: uuidv4 } = require("uuid");
 const app = express(); //create express.js(framework) instance
 
@@ -62,7 +65,7 @@ app.use(session({
   secret: process.env.JWT_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours session
+  cookie: { secure: false, maxAge: 20000 } // 24 hours session
 }));
 
 
@@ -71,7 +74,7 @@ app.use(passport.session());
   passport.use(new GoogleOauthStrategy({
     clientID:process.env.GOOGLE_CLIENT_ID,
     clientSecret:process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:8081/auth/google/callback", // Ensure this matches your Google Cloud Console
+    callbackURL: process.env.GOOGLE_CALLBACK, // Ensure this matches your Google Cloud Console
     scope: ["profile", "email"]
   },
   async (accessToken, refreshToken, profile, done) => {
@@ -293,17 +296,17 @@ var randomoutput=makeid(15);
 const num=Math.floor(Math.random() * 1000000);
 console.log(randomoutput +num)
 
-//=============================================== register user data============================
-app.use("/api",userRoutes)//register
+//=============================================== register ,login============================
+app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
+app.use("/api",userRoutes)//re gister and login and check email and check mobile
 
-//===============================================ADMIN OR SUBADMIN USER LOGIN============================
-app.use("/api",userRoutes)//login
-
+//========================================END====================================================
 //===============================================// forgot password before check email already exist in database or not and registering time to check this email is already exists or not============================
 
 app.get("/checkemail/:email", async (req, res) => {
   try {
     const email = req.params.email;
+    console.log(email)
     const query = "SELECT * FROM AdminUser WHERE email=?";
     const result = await db.promise().query(query, [email]);
 
@@ -368,6 +371,7 @@ app.post("/passwordforgot/:email", async (req, res) => {
   }
   const email = req.params.email;
   const newPassword = req.body.password;
+  console.log(email +" "+newPassword)
   try {
     const salt = await bcrypt.genSalt(saltRounds);
     const hashedNewPassword = await bcrypt.hash(newPassword, salt);
@@ -386,9 +390,6 @@ app.post("/passwordforgot/:email", async (req, res) => {
     return res.status(500).json({ error: "🚫 Internal server error" });
   }
 });
-
-//========================================END====================================================
-
 //===============================================// count user============================
 
 app.get("/countuser", (req, res) => {
@@ -635,6 +636,9 @@ app.get("/getAllSubAdminData", (req, res) => {
 //===============================================// GET ALL cms page data============================
 
 app.use("/",cmsRoutes)
+app.use("/api",cmsRoutes)
+app.use("/api",categoryRoutes)
+app.use("/api",productRoutes)
 
 //========================================END====================================================
 
@@ -2140,10 +2144,12 @@ app.post("/DeliveryAddress",(req,res)=>{
     
     }
     return res.json({data})
-    return res.status(200).json({ message: "✅ Delivery Address Added successfully!" });
+    
   })
+  return res.status(200).json({ message: "✅ Delivery Address Added successfully!" });
 })
 
 app.listen(process.env.SERVERPORT, () => {
   console.log(`server listening at port ${process.env.SERVERPORT}`);
+  console.log(`Swagger UI is available at http://localhost:${process.env.SERVERPORT}/api-docs`);
 });

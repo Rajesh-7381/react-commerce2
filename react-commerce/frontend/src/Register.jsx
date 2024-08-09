@@ -68,8 +68,8 @@ const Register = () => {
             setloading(true)
           const { email, mobile } = values; // Destructuring values
       
-          const Emailresponse = await axios.get(`http://localhost:8081/checkemail/${email}`);
-          const Mobileresponse = await axios.get(`http://localhost:8081/checkmobile/${mobile}`);
+          const Emailresponse = await axios.get(`http://localhost:8081/api/checkemail/${email}`);
+          const Mobileresponse = await axios.get(`http://localhost:8081/api/checkmobile/${mobile}`);
       
           if (Emailresponse.data.emailExists) { 
             NotificationManager.error("This email is already registered!");

@@ -146,3 +146,58 @@ exports.deleteImage = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+exports.handleproductImagesstatus=async(req,res)=>{
+  const id = req.params.id;
+  try {
+    await Product.imageStatus(id);
+    res.status(200).json({ message: "image status successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+exports.editproductattributes=async(req,res)=>{
+  const id = req.params.id;
+  try {
+    await Product.ProductAttributeById(id);
+    res.status(200).json({ message: "updated successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+exports.ProductAttributesStatusChange=async(req,res)=>{
+  const id = req.params.id;
+  const { status } = req.body; // Extract status from the request body
+  try {
+    await Product.ProductAttributeByIdStatusChange(id,status);
+    res.status(200).json({ message: "status updated successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+exports.deleteattribute=async(req,res)=>{
+  const id = req.params.id;
+  
+  try {
+    await Product.DeleteAttributeById(id);
+    res.status(200).json({ message: "attribute deleted successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+exports.allproductsAttributes=async(req,res)=>{  
+  try {
+    await Product.getAllProductsAttribute();
+    res.status(200).json({ message: "attribute get successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}

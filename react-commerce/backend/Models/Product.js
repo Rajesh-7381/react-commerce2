@@ -1,4 +1,4 @@
-const db = require("../config/dbconfig");
+const { db }= require("../config/dbconfig");
 
 const Product = {
   getAll: () => {
@@ -183,6 +183,66 @@ const Product = {
     const query = "UPDATE products_image SET deleted_at=CURRENT_TIMESTAMP WHERE id=?";
     return new Promise((resolve, reject) => {
       db.query(query, id, (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(result);
+      });
+    });
+  },
+
+  imageStatus: (id)=>{
+    const query = "update products_image set status=? where id=?";
+    return new Promise((resolve, reject) => {
+      db.query(query, id, (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(result);
+      });
+    });
+  },
+
+  ProductAttributeById: (id)=>{
+    const query = "select * from product_attributes where product_id=?";
+    return new Promise((resolve, reject) => {
+      db.query(query, id, (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(result);
+      });
+    });
+  },
+  ProductAttributeByIdStatusChange: (id,status)=>{    
+    const newStatus = status === "Active" ? 1 : 0; // Convert status to integer
+    const query = "UPDATE product_attributes SET status = ? WHERE product_id = ?";
+    return new Promise((resolve, reject) => {
+      db.query(query, id, (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(result);
+      });
+    });
+  },
+  DeleteAttributeById: (id)=>{    
+    
+    const query = "UPDATE product_attributes SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
+    return new Promise((resolve, reject) => {
+      db.query(query, id, (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(result);
+      });
+    });
+  },
+  getAllProductsAttribute: ()=>{    
+    
+    const query = "SELECT * FROM product_attributes WHERE deleted_at IS NULL";
+    return new Promise((resolve, reject) => {
+      db.query(query, (err, result) => {
         if (err) {
           return reject(err);
         }
