@@ -1,78 +1,141 @@
-const { db }=require("../config/dbconfig");
+const { db } = require("../config/dbconfig");
+const { v4: uuidv4 } = require('uuid');
+const UUID=uuidv4()
 
 const Brand = {
-  getAll: () => {
-    return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM Brands WHERE deleted_at IS NULL";
-      db.query(query, (err, data) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(data);
-      });
-    });
+  // Fetch all non-deleted brands
+  getAll: async () => {
+    const query = "SELECT * FROM Brands WHERE deleted_at IS NULL";
+    try {
+      const [rows] = await db.promise().query(query);
+      return rows;
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+      throw error;
+    }
   },
 
-  updateStatus: (id, status) => {
-    return new Promise((resolve, reject) => {
-      const query = "UPDATE Brands SET status=? WHERE id=?";
-      db.query(query, [status, id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Update the status of a brand by ID
+  updateStatus: async (id, status) => {
+    const query = "UPDATE Brands SET status = ? WHERE id = ? AND deleted_at IS NULL";
+    try {
+      const [result] = await db.promise().query(query, [status, id]);
+      return result;
+    } catch (error) {
+      console.error(`Error updating status for brand with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  delete: (id) => {
-    return new Promise((resolve, reject) => {
-      const query = "UPDATE Brands SET deleted_at=CURRENT_TIMESTAMP WHERE id=?";
-      db.query(query, [id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Soft delete a brand by ID
+  delete: async (id) => {
+    const query = "UPDATE Brands SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL";
+    try {
+      const [result] = await db.promise().query(query, [id]);
+      return result;
+    } catch (error) {
+      console.error(`Error deleting brand with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  update: (id, page) => {
-    const { title, url, description, meta_title, meta_keywords, meta_description } = page;
-    return new Promise((resolve, reject) => {
-      const query = "UPDATE Brands SET title=?, url=?, description=?, meta_title=?, meta_keywords=?, meta_description=? WHERE id=?";
-      db.query(query, [title, url, description, meta_title, meta_keywords, meta_description, id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Update brand details by ID
+  update: async (id, page) => {
+    const {
+      brand_name,
+      brand_image,
+      brand_logo,
+      brand_discount,
+      description,
+      url,
+      meta_title,
+      meta_description,
+      meta_keywords
+    } = page;
+
+    const query = `
+      UPDATE Brands 
+      SET 
+        brand_name = ?, 
+        brand_image = ?, 
+        brand_logo = ?, 
+        brand_discount = ?, 
+        description = ?, 
+        url = ?, 
+        meta_title = ?, 
+        meta_description = ?, 
+        meta_keywords = ? 
+      WHERE id = ? AND deleted_at IS NULL`;
+
+    try {
+      const [result] = await db.promise().query(query, [
+        brand_name,
+        brand_image,
+        brand_logo,
+        brand_discount,
+        description,
+        url,
+        meta_title,
+        meta_description,
+        meta_keywords,
+        id
+      ]);
+      return result;
+    } catch (error) {
+      console.error(`Error updating brand with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  add: (page) => {
-    const { title, url, description, meta_title, meta_keywords, meta_description } = page;
-    return new Promise((resolve, reject) => {
-      const query = "INSERT INTO Brands (title, url, description, meta_title, meta_keywords, meta_description) VALUES (?, ?, ?, ?, ?, ?)";
-      db.query(query, [title, url, description, meta_title, meta_keywords, meta_description], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Add a new brand
+  add: async (page) => {
+    const { brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_descriptions,meta_keywords } = page;
+    const query = `INSERT INTO Brands (UUID,brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_descriptions,meta_keywords) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    try {
+      const [result] = await db.promise().query(query, [UUID,brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_descriptions, meta_keywords]);
+      // console.log(result)
+      return result;
+    } catch (error) {
+      console.error("Error adding new brand:", error);
+      throw error;
+    }
   },
 
-  getById: (id) => {
-    return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM Brands WHERE id=?";
-      db.query(query, [id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Get brand details by ID
+  getById: async (id) => {
+    const query = "SELECT * FROM Brands WHERE id = ? AND deleted_at IS NULL";
+    try {
+      const [rows] = await db.promise().query(query, [id]);
+      return rows[0];
+    } catch (error) {
+      console.error(`Error fetching brand with ID ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // Get the total count of non-deleted brands
+  allBrandCount: async () => {
+    const query = "SELECT COUNT(*) as total FROM Brands WHERE deleted_at IS NULL";
+    try {
+      const [rows] = await db.promise().query(query);
+      return rows[0].total;
+    } catch (error) {
+      console.error("Error counting brands:", error);
+      throw error;
+    }
+  },
+
+  // Search for brands by a search term
+  searchTerm: async (searchTerm) => {
+    const searchLowerCase = searchTerm.toLowerCase();
+    const query = "SELECT * FROM Brands WHERE LOWER(brand_name) LIKE ? AND deleted_at IS NULL";
+    try {
+      const [results] = await db.promise().query(query, [`%${searchLowerCase}%`]);
+      return results;
+    } catch (error) {
+      console.error("Error searching for brands:", error);
+      throw error;
+    }
   }
 };
 

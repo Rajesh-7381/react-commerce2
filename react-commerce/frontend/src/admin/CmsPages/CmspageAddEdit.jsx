@@ -22,7 +22,7 @@ const CmspageAddEdit = () => {
 
     const handleupdatecmspage = async (id) => {
         try {
-            const response = await axios.get(`http://localhost:8081/cmspageeditdata/${id}`);
+            const response = await axios.get(`http://localhost:8081/api/cmspageeditdata/${id}`);
             const cmsdata = response.data.data;
 
             setcmspagedata(cmsdata);
@@ -40,13 +40,13 @@ const CmspageAddEdit = () => {
     const onsubmit = async (formData) => {
         try {
             if (id) {
-                const response = await axios.put(`http://localhost:8081/cmsupdatepage/${id}`, formData);
+                const response = await axios.put(`http://localhost:8081/api/cmsupdatepage/${id}`, formData);
                 if (response.status === 200) {
                     NotificationManager.success("Form updated successfully!");
                 }
                 navigate("/cmspages");
             } else {
-                const response = await axios.post("http://localhost:8081/cmsaddpage", formData);
+                const response = await axios.post("http://localhost:8081/api/cmsaddpage", formData);
                 if (response.status === 200) {
                     NotificationManager.success("Form submitted successfully!");
                 }

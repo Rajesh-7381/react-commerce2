@@ -1,6 +1,7 @@
 const express=require("express");
 const router=express.Router();
 const upload=require("../utils/multerConfig");
+const brandController=require("../Controller/brandController")
 
 /**
  * @swagger
@@ -207,13 +208,12 @@ const upload=require("../utils/multerConfig");
  *       '500':
  *         description: 🚫 Internal server error
  */
-
 /**
  * @swagger
  * /api/AddBrand:
  *   post:
  *     summary: Add a new Brand
- *     description: Add a new Brand
+ *     description: Add a new Brand with an image, logo, and associated details.
  *     requestBody:
  *       required: true
  *       content:
@@ -223,34 +223,36 @@ const upload=require("../utils/multerConfig");
  *             properties:
  *               brand_name:
  *                 type: string
- *                 description: Brand name
+ *                 description: The name of the brand.
  *               brand_image:
  *                 type: string
  *                 format: binary
- *                 description: Brand image
+ *                 description: The image of the brand.
  *               brand_logo:
  *                 type: string
  *                 format: binary
- *                 description: Brand logo
+ *                 description: The logo of the brand.
  *               brand_discount:
- *                 type: float
- *                 description: Brand discount
+ *                 type: number
+ *                 format: float
+ *                 maxLength: 10
+ *                 description: The discount associated with the brand.
+ *                 example: 10.50
  *               description:
  *                 type: string
- *                 description: Brand description
+ *                 description: A description of the brand.
  *               url:
  *                 type: string
- *                 description: Brand url
+ *                 description: The URL associated with the brand.
  *               meta_title:
  *                 type: string
- *                 description: Brand meta_title
+ *                 description: The meta title for SEO purposes.
  *               meta_descriptions:
  *                 type: string
- *                 description: Brand meta_descriptions
+ *                 description: The meta descriptions for SEO purposes.
  *               meta_keywords:
  *                 type: string
- *                 description: Brand meta_keywords
- *               
+ *                 description: The meta keywords for SEO purposes.
  *     responses:
  *       '201':
  *         description: ✅ Brand added successfully
@@ -259,6 +261,7 @@ const upload=require("../utils/multerConfig");
  *       '500':
  *         description: 🚫 Internal server error
  */
+
 
 /**
  * @swagger
@@ -386,11 +389,12 @@ const upload=require("../utils/multerConfig");
  *                   example: "🚫 Internal server error."
  */
 
-router.get("/getAllBrands")
-router.get("/GetSingleBrandDetails/:id")
-router.put("/UpdateBrand/:id")
-router.post("/AddBrand")
-router.get("/AllBrandCount")
-router.delete("/branddelete/:id")
-router.put("/handlebrandstatus/:id")
-router.get("/SearchBrands/:searchTerm")
+router.get("/getAllBrands",brandController.getAllBrands)
+router.get("/GetSingleBrandDetails/:id",brandController.getBrandById)
+router.put("/UpdateBrand/:id",brandController.updateBrand)
+router.post("/AddBrand",upload.fields([{ name: "brand_image", maxCount: 1 },{ name: "brand_logo", maxCount: 1 },]),brandController.addBrand)
+router.get("/AllBrandCount",brandController.brandCount)
+router.delete("/branddelete/:id",brandController.deleteBrand)
+router.put("/handlebrandstatus/:id",brandController.updateBrandStatus)
+router.get("/SearchBrands/:searchTerm",brandController.Search)
+module.exports=router;

@@ -60,13 +60,12 @@ const cmsController = require("../Controller/cmsPageController");
  */
 router.get("/getAllCmss", cmsController.getAllPages);
 
-
 /**
  * @swagger
  * /api/handlecmspagestatus/{id}:
  *   put:
  *     summary: Change the status of a CMS page
- *     description: Change the status of a CMS page by its ID
+ *     description: Change the status of a CMS page by its ID (1 = active, 0 = inactive)
  *     parameters:
  *       - in: path
  *         name: id
@@ -75,9 +74,48 @@ router.get("/getAllCmss", cmsController.getAllPages);
  *         schema:
  *           type: integer
  *           example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: integer
+ *                 description: Status of the CMS page (1 = active, 0 = inactive)
+ *                 example: 1
  *     responses:
  *       '200':
  *         description: ✅ Status changed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: ✅ Status changed successfully
+ *       '400':
+ *         description: 👎 Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 👎 Bad request
+ *       '404':
+ *         description: ❌ CMS page not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: ❌ CMS page not found
  *       '500':
  *         description: 🚫 Internal server error
  *         content:
@@ -197,37 +235,41 @@ router.put("/cmsupdatepage/:id", upload.none(), cmsController.updatePage);
  *           schema:
  *             type: object
  *             properties:
- *               name:
- *                 type: string
- *                 description: Name of the new CMS page
- *                 example: "home"
  *               title:
  *                 type: string
- *                 description: title of the new CMS page
- *                 example: "title"
+ *                 description: Title of the new CMS page
+ *                 example: "aboutus"
  *               description:
  *                 type: string
- *                 description: description of the new CMS page
- *                 example: "description"
+ *                 description: Description of the new CMS page
+ *                 example: "aboutus description"
  *               url:
  *                 type: string
- *                 description: url of the new CMS page
+ *                 description: URL of the new CMS page
  *                 example: "url"
  *               meta_title:
  *                 type: string
- *                 description: meta_title of the new CMS page
+ *                 description: Meta title of the new CMS page
  *                 example: "meta_title"
  *               meta_description:
  *                 type: string
- *                 description: meta_description of the new CMS page
+ *                 description: Meta description of the new CMS page
  *                 example: "meta_description"
  *               meta_keywords:
  *                 type: string
- *                 description: meta_keywords of the new CMS page
+ *                 description: Meta keywords of the new CMS page
  *                 example: "meta_keywords"
  *     responses:
  *       '200':
  *         description: ✅ Page added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: ✅ Page added successfully
  *       '500':
  *         description: 🚫 Internal server error
  *         content:
@@ -239,6 +281,7 @@ router.put("/cmsupdatepage/:id", upload.none(), cmsController.updatePage);
  *                   type: string
  *                   example: 🚫 Internal server error
  */
+
 
 router.post("/cmsaddpage", upload.none(), cmsController.addPage);
 
@@ -305,6 +348,81 @@ router.post("/cmsaddpage", upload.none(), cmsController.addPage);
  */
 
 router.get("/cmspageeditdata/:id", cmsController.getPageById);
+/**
+ * @swagger
+ * /api/SearchCMSPageData/{searchTerm}:
+ *   get:
+ *     summary: Search CMS pages
+ *     description: Retrieve a list of CMS pages that match the search term
+ *     parameters:
+ *       - in: path
+ *         name: searchTerm
+ *         required: true
+ *         description: The search term to filter CMS pages
+ *         schema:
+ *           type: string
+ *           example: "home"
+ *     responses:
+ *       '200':
+ *         description: ✅ A list of CMS data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: CMS ID
+ *                     example: 1
+ *                   title:
+ *                     type: string
+ *                     description: Title of the CMS page
+ *                     example: "Home Page"
+ *                   description:
+ *                     type: string
+ *                     description: Description of the CMS page
+ *                     example: "This is the home page."
+ *                   url:
+ *                     type: string
+ *                     description: URL of the CMS page
+ *                     example: "home"
+ *                   meta_title:
+ *                     type: string
+ *                     description: Meta title of the CMS page
+ *                     example: "Home Page"
+ *                   meta_description:
+ *                     type: string
+ *                     description: Meta description of the CMS page
+ *                     example: "Description for home page"
+ *                   meta_keywords:
+ *                     type: string
+ *                     description: Meta keywords for the CMS page
+ *                     example: "home, main"
+ *       '404':
+ *         description: ❌ No CMS pages found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: ❌ No CMS pages found
+ *       '500':
+ *         description: 🚫 Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 🚫 Internal server error
+ */
+
+router.get("/SearchCMSPageData/:searchTerm", cmsController.searchCMSData);
 
 
 module.exports = router;

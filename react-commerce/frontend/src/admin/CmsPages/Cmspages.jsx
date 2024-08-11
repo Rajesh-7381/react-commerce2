@@ -17,7 +17,7 @@ const Cmspages = () => {
     },[]);
 
     const cmspagetabledata=async()=>{
-        const response=await axios.get("http://localhost:8081/getAllCmss");
+        const response=await axios.get("http://localhost:8081/api/getAllCmss");
         setcmspagedata(response.data);
         setfilterdata(response.data);
     }
@@ -49,7 +49,7 @@ const Cmspages = () => {
     const handlecmspagedelete=async(id)=>{
         await DeleteEntity('Cms',id);
         // Fetch the updated data from the server and update the local state
-        const response = await axios.get("http://localhost:8081/getAllCmss");
+        const response = await axios.get("http://localhost:8081/api/getAllCmss");
         setcmspagedata(response.data);
         setfilterdata(response.data);
            

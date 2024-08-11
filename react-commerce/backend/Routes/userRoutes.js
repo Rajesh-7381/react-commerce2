@@ -155,7 +155,7 @@ router.get("/checkemail/:email", AdminUserController.checkEmail);
  *       500:
  *         description: Internal Server Error
  */
-router.get("/mobile/:mobile", AdminUserController.checkMobile);
+router.get("/checkmobile/:mobile", AdminUserController.Mobile);
 
 //   =====================END=======================================
 //   =====================START api/uuid check======================
@@ -203,20 +203,19 @@ router.get("/UniqueID/:unique_id", AdminUserController.checkUniqeID);
  *         schema:
  *           type: string
  *           example: "user@example.com"
- *       - in: body
- *         name: body
- *         description: The new password.
- *         schema:
- *           type: object
- *           required:
- *             - password
- *           properties:
- *             email:
- *               type: string
- *               example: "john@gmail.com"
- *             password:
- *               type: string
- *               example: "newpassword123"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 description: The new password.
+ *                 example: "newpassword123"
  *     responses:
  *       200:
  *         description: Password updated successfully
@@ -225,7 +224,8 @@ router.get("/UniqueID/:unique_id", AdminUserController.checkUniqeID);
  *       500:
  *         description: Internal server error
  */
-router.post("/passwordforgot/:email", AdminUserController.passwordForgot);
+
+router.post("/passwordforgot/:email", AdminUserController.forgotPassword);
 
 /**
  * @swagger
@@ -569,6 +569,7 @@ router.get("/SearchAdminSubAdminUser/:searchTerm",AdminUserController.SearchAdmi
  *        description: name through seached
  *        schema:   
  *          type: date
+ *          format: date
  *          example: 12-04-1998
  *    responses:
  *      '200': 
@@ -603,17 +604,17 @@ router.get("/registerUserParticularDate/:date",AdminUserController.registerUserP
  *       - in: path
  *         name: fromdate
  *         required: true
- *         description: Start date in the format YYYY-MM-DD
+ *         description: Start date in the format DD-MM-YYYY
  *         schema:
  *           type: string
- *           example: "2023-01-01"
+ *           example: "12-04-1998"
  *       - in: path
  *         name: todate
  *         required: true
- *         description: End date in the format YYYY-MM-DD
+ *         description: End date in the format DD-MM-YYYY
  *         schema:
  *           type: string
- *           example: "2023-12-31"
+ *           example: "31-12-2024"
  *     responses:
  *       '200':
  *         description: The count of users registered between the specified dates

@@ -1,255 +1,347 @@
-const { db }= require("../config/dbconfig");
+const { db } = require("../config/dbconfig");
+const fs = require("fs");
+const path = require("path");
+const sharp = require("sharp"); //The sharp library is a popular JavaScript library for image processing in Node.js. It provides a simple and efficient API for resizing, cropping, and transforming images in a variety of formats, including JPEG, PNG, WebP, and TIFF.
 
 const Product = {
-  getAll: () => {
+  // Get all products with category and parent category information
+  getAll: async () => {
     const query = `
       SELECT p.*, c.category_name AS category_name, pc.category_name AS parent_category_name
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN categories pc ON c.parent_id = pc.id
-      WHERE p.deleted_at IS NULL`;
+      WHERE p.deleted_at IS NULL
+    `;
 
-    return new Promise((resolve, reject) => {
-      db.query(query, (err, data) => {
-        if (err) {
-          return reject(err);
-        }
-        const products = data.map((product) => ({
-          ...product,
-          category_name: product.category_name || "No Category",
-          parent_category_name: product.parent_category_name || "No Parent Category",
-        }));
-        resolve(products);
-      });
-    });
+    try {
+      const [products] = await db.promise().query(query);
+      return products.map((product) => ({
+        ...product,
+        category_name: product.category_name || "No Category",
+        parent_category_name:
+          product.parent_category_name || "No Parent Category",
+      }));
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      throw error;
+    }
   },
 
-  updateById: (id, product) => {
+  // Update a product by ID
+  updateById: async (id, product) => {
     const {
-      category_id, product_name, product_code, product_color, family_color, group_code,
-      product_price, product_weight, product_discount, discount_type, final_price, product_video,
-      description, washcare, keywords, fabric, pattern, sleeve, fit,
-      meta_keywords, meta_description, meta_title, occassion, is_featured
+      category_id,
+      product_name,
+      product_code,
+      product_color,
+      family_color,
+      group_code,
+      product_price,
+      product_weight,
+      product_discount,
+      discount_type,
+      final_price,
+      product_video,
+      description,
+      washcare,
+      keywords,
+      fabric,
+      pattern,
+      sleeve,
+      fit,
+      meta_keywords,
+      meta_description,
+      meta_title,
+      occassion,
+      is_featured,
     } = product;
 
     const query = `
-      UPDATE products SET category_id=?, product_name=?, product_code=?, product_color=?, 
-      family_color=?, group_code=?, product_price=?, product_weight=?, product_discount=?, 
-      discount_type=?, final_price=?, product_video=?, description=?, washcare=?, keywords=?, 
-      fabric=?, pattern=?, sleeve=?, fit=?, meta_keywords=?, meta_description=?, meta_title=?, 
-      occassion=?, is_featured=? WHERE id=?`;
+      UPDATE products SET 
+        category_id=?, product_name=?, product_code=?, product_color=?, family_color=?, 
+        group_code=?, product_price=?, product_weight=?, product_discount=?, discount_type=?, 
+        final_price=?, product_video=?, description=?, washcare=?, keywords=?, fabric=?, 
+        pattern=?, sleeve=?, fit=?, meta_keywords=?, meta_description=?, meta_title=?, 
+        occassion=?, is_featured=? 
+      WHERE id=? AND deleted_at IS NULL
+    `;
 
-    return new Promise((resolve, reject) => {
-      db.query(query, [
-        category_id, product_name, product_code, product_color, family_color, group_code,
-        product_price, product_weight, product_discount, discount_type, final_price, product_video,
-        description, washcare, keywords, fabric, pattern, sleeve, fit,
-        meta_keywords, meta_description, meta_title, occassion, is_featured, id
-      ], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+    try {
+      const [result] = await db
+        .promise()
+        .query(query, [
+          category_id,
+          product_name,
+          product_code,
+          product_color,
+          family_color,
+          group_code,
+          product_price,
+          product_weight,
+          product_discount,
+          discount_type,
+          final_price,
+          product_video,
+          description,
+          washcare,
+          keywords,
+          fabric,
+          pattern,
+          sleeve,
+          fit,
+          meta_keywords,
+          meta_description,
+          meta_title,
+          occassion,
+          is_featured,
+          id,
+        ]);
+      return result;
+    } catch (error) {
+      console.error(`Error updating product with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  getById: (id) => {
-    const query = "SELECT * FROM products WHERE id=?";
-    return new Promise((resolve, reject) => {
-      db.query(query, id, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result[0]);
-      });
-    });
+  // Get a product by its ID
+  getById: async (id) => {
+    const query = "SELECT * FROM products WHERE id=? AND deleted_at IS NULL";
+    try {
+      const [result] = await db.promise().query(query, [id]);
+      return result[0];
+    } catch (error) {
+      console.error(`Error fetching product with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  deleteById: (id) => {
+  // Soft delete a product by its ID
+  deleteById: async (id) => {
     const query = "UPDATE products SET deleted_at=CURRENT_TIMESTAMP WHERE id=?";
-    return new Promise((resolve, reject) => {
-      db.query(query, id, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+    try {
+      const [result] = await db.promise().query(query, [id]);
+      return result;
+    } catch (error) {
+      console.error(`Error deleting product with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  toggleStatusById: (id, status) => {
-    const query = "UPDATE products SET status=? WHERE id=?";
-    return new Promise((resolve, reject) => {
-      db.query(query, [status, id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Toggle the status of a product by its ID
+  toggleStatusById: async (id, status) => {
+    const query =
+      "UPDATE products SET status=? WHERE id=? AND deleted_at IS NULL";
+    try {
+      const [result] = await db.promise().query(query, [status, id]);
+      return result;
+    } catch (error) {
+      console.error(`Error toggling status for product with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  getColors: () => {
+  // Get all colors
+  getColors: async () => {
     const query = "SELECT * FROM colors";
-    return new Promise((resolve, reject) => {
-      db.query(query, (err, data) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(data);
-      });
-    });
+    try {
+      const [colors] = await db.promise().query(query);
+      return colors;
+    } catch (error) {
+      console.error("Error fetching colors:", error);
+      throw error;
+    }
   },
 
-  getTotalCount: () => {
-    const query = "SELECT COUNT(*) AS total FROM products WHERE deleted_at IS NULL";
-    return new Promise((resolve, reject) => {
-      db.query(query, (err, data) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(data[0].total);
-      });
-    });
+  // Get total count of products
+  getTotalCount: async () => {
+    const query =
+      "SELECT COUNT(*) AS total FROM products WHERE deleted_at IS NULL";
+    try {
+      const [result] = await db.promise().query(query);
+      return result[0].total;
+    } catch (error) {
+      console.error("Error fetching total product count:", error);
+      throw error;
+    }
   },
 
-  addProduct: (product, images) => {
-    const {
-      category_id, product_name, product_code, product_color, family_color, group_code,
-      product_price, product_weight, product_discount, discount_type, final_price, product_video,
-      description, washcare, keywords, fabric, pattern, sleeve, fit,
-      meta_keywords, meta_description, meta_title, occassion, is_featured
-    } = product;
 
-    const query = `
-      INSERT INTO products (category_id, product_name, product_code, product_color, family_color,
-      group_code, product_price, product_weight, product_discount, discount_type, final_price,
-      product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords,
-      meta_description, meta_title, occassion, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    return new Promise((resolve, reject) => {
-      db.query(query, [
-        category_id, product_name, product_code, product_color, family_color, group_code,
-        product_price, product_weight, product_discount, discount_type, final_price, product_video,
-        description, washcare, keywords, fabric, pattern, sleeve, fit,
-        meta_keywords, meta_description, meta_title, occassion, is_featured
-      ], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        const productId = result.insertId;
-        if (images.length > 0) {
-          const imageValues = images.map((file, index) => [productId, file.filename, index + 1]);
-          const imagesQuery = "INSERT INTO products_image (product_id, image, image_sort) VALUES ?";
-          db.query(imagesQuery, [imageValues], (err, data) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(result);
-          });
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  },
-
-  getImages: () => {
+  // Get all product images
+  getImages: async () => {
     const query = "SELECT * FROM products_image WHERE deleted_at IS NULL";
-    return new Promise((resolve, reject) => {
-      db.query(query, (err, data) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(data);
-      });
-    });
+    try {
+      const [images] = await db.promise().query(query);
+      return images;
+    } catch (error) {
+      console.error("Error fetching product images:", error);
+      throw error;
+    }
   },
 
-  updateImageStatus: (id, status) => {
-    const query = "UPDATE products_image SET status=? WHERE id=?";
-    return new Promise((resolve, reject) => {
-      db.query(query, [status, id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Update the status of a product image by its ID
+  updateImageStatus: async (id, status) => {
+    const query =
+      "UPDATE products_image SET status=? WHERE id=? AND deleted_at IS NULL";
+    try {
+      const [result] = await db.promise().query(query, [status, id]);
+      return result;
+    } catch (error) {
+      console.error(`Error updating image status with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  deleteImageById: (id) => {
-    const query = "UPDATE products_image SET deleted_at=CURRENT_TIMESTAMP WHERE id=?";
-    return new Promise((resolve, reject) => {
-      db.query(query, id, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Soft delete a product image by its ID
+  deleteImageById: async (id) => {
+    const query =
+      "UPDATE products_image SET deleted_at=CURRENT_TIMESTAMP WHERE id=?";
+    try {
+      const [result] = await db.promise().query(query, [id]);
+      return result;
+    } catch (error) {
+      console.error(`Error deleting product image with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  imageStatus: (id)=>{
-    const query = "update products_image set status=? where id=?";
-    return new Promise((resolve, reject) => {
-      db.query(query, id, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Toggle the status of a product image by its ID
+  imageStatus: async (id, status) => {
+    const query =
+      "UPDATE products_image SET status=? WHERE id=? AND deleted_at IS NULL";
+    try {
+      const [result] = await db.promise().query(query, [status, id]);
+      return result;
+    } catch (error) {
+      console.error(`Error toggling image status with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  ProductAttributeById: (id)=>{
-    const query = "select * from product_attributes where product_id=?";
-    return new Promise((resolve, reject) => {
-      db.query(query, id, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Get all attributes of a product by product ID
+  ProductAttributeById: async (id) => {
+    const query =
+      "SELECT * FROM product_attributes WHERE product_id=? AND deleted_at IS NULL";
+    try {
+      const [attributes] = await db.promise().query(query, [id]);
+      return attributes;
+    } catch (error) {
+      console.error(
+        `Error fetching product attributes with product ID ${id}:`,
+        error
+      );
+      throw error;
+    }
   },
-  ProductAttributeByIdStatusChange: (id,status)=>{    
-    const newStatus = status === "Active" ? 1 : 0; // Convert status to integer
-    const query = "UPDATE product_attributes SET status = ? WHERE product_id = ?";
-    return new Promise((resolve, reject) => {
-      db.query(query, id, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+
+  // Toggle the status of a product attribute by product ID
+  ProductAttributeByIdStatusChange: async (id, status) => {
+    const query =
+      "UPDATE product_attributes SET status=? WHERE product_id=? AND deleted_at IS NULL";
+    try {
+      const [result] = await db.promise().query(query, [status, id]);
+      return result;
+    } catch (error) {
+      console.error(
+        `Error toggling product attribute status with product ID ${id}:`,
+        error
+      );
+      throw error;
+    }
   },
-  DeleteAttributeById: (id)=>{    
-    
-    const query = "UPDATE product_attributes SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
-    return new Promise((resolve, reject) => {
-      db.query(query, id, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+
+  // Soft delete a product attribute by its ID
+  DeleteAttributeById: async (id) => {
+    const query =
+      "UPDATE product_attributes SET deleted_at=CURRENT_TIMESTAMP WHERE id=?";
+    try {
+      const [result] = await db.promise().query(query, [id]);
+      return result;
+    } catch (error) {
+      console.error(`Error deleting product attribute with ID ${id}:`, error);
+      throw error;
+    }
   },
-  getAllProductsAttribute: ()=>{    
-    
+
+  // Get all product attributes
+  getAllProductsAttribute: async () => {
     const query = "SELECT * FROM product_attributes WHERE deleted_at IS NULL";
-    return new Promise((resolve, reject) => {
-      db.query(query, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
-  }
+    try {
+      const [attributes] = await db.promise().query(query);
+      return attributes;
+    } catch (error) {
+      console.error("Error fetching all product attributes:", error);
+      throw error;
+    }
+  },
 };
 
-module.exports = Product;
+
+const Products = {
+  addProduct: async (product, product_video, product_images,attributes) => {
+    const {
+      category_id, brand_id, product_name, product_code, product_color, family_color, group_code,
+      product_price, product_weight, product_discount, discount_type, final_price, description,
+      washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured
+    } = product;
+
+    const query = `
+      INSERT INTO products (category_id, brand_id, product_name, product_code, product_color, family_color,
+      group_code, product_price, product_weight, product_discount, discount_type, final_price,
+      product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords,
+      meta_description, meta_title, occassion, is_featured) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    try {
+      const [result] = await db.promise().query(query, [
+        category_id, brand_id, product_name, product_code, product_color, family_color, group_code,
+        product_price, product_weight, product_discount, discount_type, final_price, product_video,
+        description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description,
+        meta_title, occassion, is_featured
+      ]);
+
+      const productId = result.insertId;
+
+      if (product_images.length > 0) {
+        await Products.addProductImages(productId, product_images);
+      }
+
+      await Products.addProductAttributes(productId,attributes)
+      return productId;
+    } catch (error) {
+      console.error("Error adding new product:", error);
+      throw error;
+    }
+  },
+
+  addProductImages: async (productId, product_images) => {
+    const imageQuery = `
+      INSERT INTO products_image (product_id, image, image_sort) 
+      VALUES ?
+    `;
+
+    const imageValues = product_images.map((file, index) => [
+      productId, file.filename, index + 1,
+    ]);
+
+    await db.promise().query(imageQuery, [imageValues]);
+  },
+
+  addProductAttributes: async (productId, attributes) => {
+    const attributesQuery = `
+      INSERT INTO product_attributes (product_id, size, sku, price, stock) 
+      VALUES ?
+    `;
+
+    const attributeValues = attributes.map(attribute => [
+      productId, attribute.size, attribute.sku, attribute.price, attribute.stock,
+    ]);
+
+    await db.promise().query(attributesQuery, [attributeValues]);
+  },
+};
+
+
+module.exports = {Product,Products};

@@ -5,7 +5,7 @@ const productController=require("../Controller/productController");
 
 /**
  * @swagger
- * /api/allproducts:
+ * /api/getAllProducts:
  *   get:
  *     summary: Retrieve all products
  *     description: Retrieve a list of all products
@@ -244,6 +244,7 @@ const productController=require("../Controller/productController");
  *               - final_price
  *               - productdiscount_type
  *               - description
+ *               - attribute
  *               - washcare
  *               - fabric
  *               - keywords
@@ -258,9 +259,11 @@ const productController=require("../Controller/productController");
  *             properties:
  *               category_id:
  *                 type: integer
+ *                 example: 11
  *                 description: category id
  *               brand_id:
  *                 type: integer
+ *                 example: 14
  *                 description: brand id
  *               product_video:
  *                 type: string
@@ -288,13 +291,14 @@ const productController=require("../Controller/productController");
  *                 type: string
  *                 description: Color of the family want
  *               product_price:
- *                 type: float
- *                 format: float
+ *                 type: number
+ *                 example: 1000
  *                 description: Discount of the product
  *               product_discount:
  *                 type: number
+ *                 example: 10
  *                 format: float
- *                 description: Price of the product
+ *                 description: discount of the product
  *               product_weight:
  *                 type: string
  *                 format: float
@@ -309,6 +313,24 @@ const productController=require("../Controller/productController");
  *               description:
  *                 type: string
  *                 description: description of the product
+ *               attribute:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     size:
+ *                       type: string
+ *                       description: Size of the product.
+ *                     sku:
+ *                       type: string
+ *                       description: SKU of the product.
+ *                     price:
+ *                       type: number
+ *                       format: float
+ *                       description: Price of the attribute.
+ *                     stock:
+ *                       type: integer
+ *                       description: Stock available for the attribute.
  *               washcare:
  *                 type: string
  *                 description: washcare of the product
@@ -351,11 +373,9 @@ const productController=require("../Controller/productController");
  *         description: 🚫 Internal server error
  */
 
-
-
 /**
  * @swagger
- * /api/productsimage:
+ * /api/getAllproductsImages:
  *   get:
  *     summary: Retrieve product images
  *     description: Retrieve a list of product images
@@ -450,7 +470,7 @@ const productController=require("../Controller/productController");
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID of the product image  status
+ *         description: ID of the product image status
  *         schema:
  *           type: integer
  *           example: 1
@@ -460,19 +480,21 @@ const productController=require("../Controller/productController");
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - status
  *             properties:
  *               status:
  *                 type: string
  *                 description: New status of the product image status
  *                 example: "active"
  *     responses:
- *       '200':
+ *       200:
  *         description: ✅ Product image status updated successfully
- *       '400':
+ *       400:
  *         description: 👎 Bad request
- *       '404':
+ *       404:
  *         description: ❌ Product image not found
- *       '500':
+ *       500:
  *         description: 🚫 Internal server error
  */
 
@@ -606,21 +628,25 @@ const productController=require("../Controller/productController");
  *                   example: 🚫 Internal server error
  */
 
-router.get("/allproducts", productController.getAllProducts);
+router.get("/getAllProducts", productController.getAllProducts);
 router.put("/updateproducts/:id", upload.single("product_video"), productController.updateProduct);
 router.get("/productedit/:id", productController.getProductById);
 router.delete("/productdelete/:id", productController.deleteProduct);
-router.put("/updatestatus/:id", productController.updateProductStatus);
+router.put("/updateproducts/:id", productController.updateProductStatus);
 router.get("/productcolor", productController.getProductColors);
 router.get("/allproductcount", productController.getProductCount);
 router.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, { name: 'product_image', maxCount: 20 }]), productController.addProduct);
-router.get("/productsimage", productController.getProductImages);
-router.put("/handleproductsstatus/:id", productController.updateImageStatus);
-router.delete("/productsimagedelete/:id", productController.deleteImage);
+router.get("/getAllproductsImages", productController.getProductImages);
+router.put("/handleproductstatus/:id", productController.updateProductStatus);
+
+
+router.delete("/ProductsImageDelete/:id", productController.deleteImage);
 router.put("/handleproductImagesstatus/:id", productController.handleproductImagesstatus);
 router.get("/editproductattributes/:id", productController.editproductattributes);
-router.put("/ProductAttributesStatusChange/:id", productController.ProductAttributesStatusChange);
+router.put("/handleproductImagesstatus/:id", productController.ProductAttributesStatusChange);
 router.delete("/deleteattribute/:id", productController.deleteattribute);
 router.get("/allproductsAttributes", productController.allproductsAttributes);
+router.get("/SearchProducts/:searchTerm");
+router.get("/ProductAttributesStatusChange/:id");
 
 module.exports=router;

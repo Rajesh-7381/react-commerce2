@@ -4,9 +4,11 @@ const path = require("path");
 const sharp = require("sharp");
 
 exports.getAllProducts = async (req, res) => {
+  // console.log(1)
   try {
     const products = await Product.getAll();
-    res.json(products);
+    // console.log(products)
+    res.json({message:"products fetched successfully!",products});
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
@@ -34,7 +36,7 @@ exports.getProductById = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Data not found!" });
     }
-    const data = { ...product, category_image: `http://localhost:8081/uploads/categories/${product.category_image}` };
+    const data = { ...product, product_video: `http://localhost:8081/uploads/products/${product.product_video}` };
     res.status(200).json({ message: "Data fetched!", data });
   } catch (err) {
     console.error(err);
@@ -55,7 +57,9 @@ exports.deleteProduct = async (req, res) => {
 
 exports.updateProductStatus = async (req, res) => {
   const id = req.params.id;
+  // console.log(id)
   const { status } = req.body;
+  // console.log(status)
   try {
     await Product.toggleStatusById(id, status);
     res.status(200).json({ message: "Status updated successfully!" });
@@ -85,34 +89,6 @@ exports.getProductCount = async (req, res) => {
   }
 };
 
-exports.addProduct = async (req, res) => {
-  try {
-    const {
-      category_id, product_name, product_code, product_color, family_color, group_code,
-      product_price, product_weight, product_discount, discount_type, final_price, description,
-      washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description,
-      meta_title, occassion, is_featured
-    } = req.body;
-
-    const product_video = req.files['product_video'] ? req.files['product_video'][0].filename : null;
-    const product_images = req.files['product_image'] ? req.files['product_image'] : [];
-    const is_featured_val = is_featured === 'Yes' ? 'Yes' : 'No';
-
-    const product = {
-      category_id, product_name, product_code, product_color, family_color, group_code,
-      product_price, product_weight, product_discount, discount_type, final_price, product_video,
-      description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description,
-      meta_title, occassion, is_featured: is_featured_val
-    };
-
-    await Product.addProduct(product, product_images);
-    res.status(200).json({ message: "Product added successfully!" });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
 
 exports.getProductImages = async (req, res) => {
   try {
@@ -149,8 +125,10 @@ exports.deleteImage = async (req, res) => {
 
 exports.handleproductImagesstatus=async(req,res)=>{
   const id = req.params.id;
+  const { status }=req.body;
+  // console.log(id)
   try {
-    await Product.imageStatus(id);
+    await Product.imageStatus(id,status);
     res.status(200).json({ message: "image status successfully!" });
   } catch (err) {
     console.error(err);
@@ -182,9 +160,10 @@ exports.ProductAttributesStatusChange=async(req,res)=>{
 }
 exports.deleteattribute=async(req,res)=>{
   const id = req.params.id;
-  
+  // console.log(id)
   try {
     await Product.DeleteAttributeById(id);
+    // console.log(1)
     res.status(200).json({ message: "attribute deleted successfully!" });
   } catch (err) {
     console.error(err);
@@ -193,11 +172,56 @@ exports.deleteattribute=async(req,res)=>{
 }
 
 exports.allproductsAttributes=async(req,res)=>{  
+  // console.log(1)
   try {
-    await Product.getAllProductsAttribute();
-    res.status(200).json({ message: "attribute get successfully!" });
+    const result=await Product.getAllProductsAttribute();
+    // console.log(1)
+    res.status(200).json({ message: "attribute get successfully!" ,result});
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+
+exports.addProduct = async (req, res) => {
+  try {
+    const {
+      category_id, brand_id, product_name, product_code, product_color, family_color, group_code,
+      product_price, product_weight, product_discount, discount_type, final_price, description,
+      washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured
+    } = req.body;
+
+    let attributes = req.body.attribute;
+
+    if (typeof attributes === 'string') {
+      attributes = JSON.parse(attributes);
+    }
+    console.log(req.body)
+
+     const product_price_number = parseFloat(product_price);
+     console.log(product_price_number)
+     if (isNaN(product_price_number)) {
+       return res.status(400).json({ message: "Invalid product price" });
+     }
+    const product_video = req.files['product_video'] ? req.files['product_video'][0].filename : null;
+    const product_images = req.files['product_image'] ? req.files['product_image'] : [];
+    const is_featured_val = is_featured === 'true' ? 'Yes' : 'No';
+
+    const product = {
+      category_id, brand_id, product_name, product_code, product_color, family_color, group_code,
+      product_price_number, product_weight, product_discount, discount_type, final_price, description,
+      washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured: is_featured_val
+    };
+
+    if (Array.isArray(attributes) && attributes.length > 0) {
+      await Product.Products.addProduct(product, product_video, product_images,attributes);
+    }
+
+    res.status(200).json({ message: "Product added successfully!" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

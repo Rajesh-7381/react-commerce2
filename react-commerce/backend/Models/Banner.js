@@ -1,78 +1,91 @@
-const { db }=require("../config/dbconfig");
+const { db } = require("../config/dbconfig");
+const { v4: uuidv4 } = require("uuid");
 
 const Banner = {
-  getAll: () => {
-    return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM Banners WHERE deleted_at IS NULL";
-      db.query(query, (err, data) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(data);
-      });
-    });
+  // Fetch all active banners (non-deleted)
+  getAll: async () => {
+    const query = "SELECT * FROM Banners WHERE deleted_at IS NULL";
+    try {
+      const [rows] = await db.promise().query(query);
+      return rows;
+    } catch (error) {
+      console.error("Error fetching banners:", error);
+      throw error;
+    }
   },
 
-  updateStatus: (id, status) => {
-    return new Promise((resolve, reject) => {
-      const query = "UPDATE Banners SET status=? WHERE id=?";
-      db.query(query, [status, id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Update banner status by ID
+  updateStatus: async (id, status) => {
+    const query = "UPDATE Banners SET status = ? WHERE id = ?";
+    try {
+      const [result] = await db.promise().query(query, [status, id]);
+      return result;
+    } catch (error) {
+      console.error(`Error updating status for banner with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  delete: (id) => {
-    return new Promise((resolve, reject) => {
-      const query = "UPDATE Banners SET deleted_at=CURRENT_TIMESTAMP WHERE id=?";
-      db.query(query, [id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Soft delete a banner by setting deleted_at
+  delete: async (id) => {
+    const query = "UPDATE Banners SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
+    try {
+      const [result] = await db.promise().query(query, [id]);
+      return result;
+    } catch (error) {
+      console.error(`Error deleting banner with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  update: (id, page) => {
-    const { title, url, description, meta_title, meta_keywords, meta_description } = page;
-    return new Promise((resolve, reject) => {
-      const query = "UPDATE Banners SET title=?, url=?, description=?, meta_title=?, meta_keywords=?, meta_description=? WHERE id=?";
-      db.query(query, [title, url, description, meta_title, meta_keywords, meta_description, id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Update banner details by ID
+  update: async (id, page) => {
+    const { url, description, meta_title, meta_keywords, meta_description } = page;
+    const query = `
+      UPDATE Banners 
+      SET 
+        url = ?, 
+        description = ?, 
+        meta_title = ?, 
+        meta_keywords = ?, 
+        meta_description = ? 
+      WHERE id = ?`;
+
+    try {
+      const [result] = await db.promise().query(query, [url, description, meta_title, meta_keywords, meta_description, id]);
+      return result;
+    } catch (error) {
+      console.error(`Error updating banner with ID ${id}:`, error);
+      throw error;
+    }
   },
 
-  add: (page) => {
-    const { title, url, description, meta_title, meta_keywords, meta_description } = page;
-    return new Promise((resolve, reject) => {
-      const query = "INSERT INTO Banners (title, url, description, meta_title, meta_keywords, meta_description) VALUES (?, ?, ?, ?, ?, ?)";
-      db.query(query, [title, url, description, meta_title, meta_keywords, meta_description], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Add a new banner
+  add: async (page) => {
+    const { image, type, link, alt } = page;
+    const query = `INSERT INTO Banners (UUID, image, type, link, alt)  VALUES (?, ?, ?, ?, ?)`;
+    const UUID = uuidv4();
+
+    try {
+      const [result] = await db.promise().query(query, [UUID, image, type, link, alt]);
+      // console.log(result)
+      return result;
+    } catch (error) {
+      console.error("Error adding new banner:", error);
+      throw error;
+    }
   },
 
-  getById: (id) => {
-    return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM Banners WHERE id=?";
-      db.query(query, [id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+  // Get a single banner by ID
+  getById: async (id) => {
+    const query = "SELECT * FROM Banners WHERE id = ?";
+    try {
+      const [rows] = await db.promise().query(query, [id]);
+      return rows[0];
+    } catch (error) {
+      console.error(`Error fetching banner with ID ${id}:`, error);
+      throw error;
+    }
   }
 };
 

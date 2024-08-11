@@ -1,13 +1,14 @@
 const express=require("express");
 const router=express.Router();
 const upload=require("../utils/multerConfig");
+const BannerController = require("../Controller/BannerController");
 
 /**
  * @swagger
  * /api/AddBanners:
  *   post:
  *     summary: Add a new Banner
- *     description: Add a new Banner
+ *     description: Add a new Banner with an image and associated details.
  *     requestBody:
  *       required: true
  *       content:
@@ -15,34 +16,31 @@ const upload=require("../utils/multerConfig");
  *           schema:
  *             type: object
  *             properties:
- *               name:
- *                 type: string
- *                 description: Banner
- *               image:
+ *               BannerImage:  # this was matched otherwise shown error
  *                 type: string
  *                 format: binary
- *                 description: Banner
- *               alt:
- *                 type: string
- *                 example: alternative name
- *                 description: alt              
- *               link:
- *                 type: string
- *                 example: https://github.com/Rajesh-7381/react-commerce2
- *                 description: link
+ *                 description: The image file for the banner.
  *               type:
  *                 type: string
- *                 description: type of banner
- *               
- *               
+ *                 description: The type of the banner.
+ *                 example: homepage
+ *               link:
+ *                 type: string
+ *                 description: A URL link associated with the banner.
+ *                 example: https://github.com/Rajesh-7381/react-commerce2
+ *               alt:
+ *                 type: string
+ *                 description: Alternative text for the banner image.
+ *                 example: alternative name
  *     responses:
  *       '200':
- *         description: ✅ Banner added successfully
+ *         description: ✅ Banner added successfully.
  *       '400':
- *         description: ❌ Bad request(type "/%" at the end of the URL)
+ *         description: ❌ Bad request. Make sure the request is correct.
  *       '500':
- *         description: 🚫 Internal server error
+ *         description: 🚫 Internal server error.
  */
+
 
 /**
  * @swagger
@@ -317,9 +315,11 @@ const upload=require("../utils/multerConfig");
  *         description: 🚫 Internal server error
  */
 
-router.post("AddBanners")
-router.get("getAllBanners")
+router.post("/AddBanners",upload.single("BannerImage"),BannerController.addBanner)
+router.get("/getAllBanners")
 router.get("EditBannerDetails/:id")
 router.put("UpdateBanners/:id")
 router.put("handlebannerstatus/:id")
 router.delete("DeleteBanners/:id")
+
+module.exports=router;

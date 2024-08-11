@@ -26,7 +26,7 @@ export const StatusEntity = async (entityType, id, currentStatus, setData, data)
                 break;
 
             case 'CmsStatus':
-                url = `http://localhost:8081/handlecmsstatus/${id}`;
+                url = `http://localhost:8081/api/handlecmsstatus/${id}`;
                 break;
 
             case 'ProductStatus':

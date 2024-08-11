@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
-
+const upload=require("../utils/multerConfig")
 const categoryController=require("../Controller/categoryController");
+
 /**
  * @swagger
- * /api/categories:
+ * /api/getAllCategorys:
  *   get:
  *     summary: Retrieve all categories
  *     description: Retrieve a list of all categories
@@ -28,33 +29,33 @@ const categoryController=require("../Controller/categoryController");
  *                     example: "Electronics"
  *                   category_image:
  *                     type: string
- *                     description: Category name
+ *                     description: Category image
  *                     format: binary
  *                     example: "category2.png"
  *                   category_discount:
- *                     type: float
+ *                     type: number
  *                     description: Category discount
- *                     example: "20"
+ *                     example: 20.0
  *                   description:
- *                     type: float
+ *                     type: string
  *                     description: Category description
  *                     example: "well category"
  *                   url:
- *                     type: float
- *                     description: Category url
- *                     example: "url"
+ *                     type: string
+ *                     description: Category URL
+ *                     example: "https://example.com"
  *                   meta_title:
- *                     type: float
- *                     description: Category meta_title
+ *                     type: string
+ *                     description: Category meta title
  *                     example: "meta_title"
  *                   meta_description:
- *                     type: float
- *                     description: Category meta_description
+ *                     type: string
+*                     description: Category meta description
  *                     example: "meta_description"
  *                   meta_keyword:
- *                     type: float
- *                     description: Category meta_keyword
- *                     example: "meta_description"
+ *                     type: string
+ *                     description: Category meta keyword
+ *                     example: "meta_keyword"
  *       '500':
  *         description: 🚫 Internal server error
  *         content:
@@ -69,28 +70,16 @@ const categoryController=require("../Controller/categoryController");
 
 /**
  * @swagger
- * /api/categories/add:
+ * /api/addcategory:
  *   post:
  *     summary: Add a new category
  *     description: Add a new category to the list
- *     consumes: 
- *       - application/json
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             type: object
- *             required:    
- *               - parent_id    
- *               - category_name    
- *               - category_image    
- *               - category_discount    
- *               - description    
- *               - url    
- *               - meta_title    
- *               - meta_description    
- *               - meta_keyword    
+ *             type: object    
  *             properties:    
  *               parent_id:    
  *                 type: integer
@@ -104,7 +93,8 @@ const categoryController=require("../Controller/categoryController");
  *                 example: "furniture.jpg"
  *               category_discount:    
  *                 type: float
- *                 example: 10
+ *                 maxLength: 10
+ *                 example: 10.50
  *               description:    
  *                 type: string
  *                 example: "good category"
@@ -132,7 +122,7 @@ const categoryController=require("../Controller/categoryController");
 
 /**
  * @swagger
- * /api/categories/{id}:
+ * /api/categoryeditdata/{id}:
  *   get:
  *     summary: Retrieve a category by ID
  *     description: Retrieve a specific category by its ID.
@@ -216,7 +206,7 @@ const categoryController=require("../Controller/categoryController");
 
 /**
  * @swagger
- * /api/categories/{id}:
+ * /api/updatecategory/{id}:
  *   put:
  *     summary: Update a category by ID
  *     description: Update a specific category by its ID
@@ -280,7 +270,7 @@ const categoryController=require("../Controller/categoryController");
 
 /**
  * @swagger
- * /api/categories/{id}:
+ * /api/categorydelete/{id}:
  *   delete:
  *     summary: Delete a category by ID
  *     description: Delete a specific category by its ID
@@ -303,20 +293,20 @@ const categoryController=require("../Controller/categoryController");
 
 /**
  * @swagger
- * /api/categories/status/{id}:
+ * /api/handlecategorystatus/{id}:
  *   put:
  *     summary: Update category status by ID
- *     description: Update the status of a specific category by its ID
+ *     description: Update the status of a specific category by its ID (provide only 1 or 0 , 1means active 0 means inactive)
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID of the category to update status
+ *         description: ID of the category to update status 
  *         schema:
  *           type: integer
  *           example: 1
  *     requestBody:
- *       required: true
+ *       required: true 
  *       content:
  *         application/json:
  *           schema:
@@ -325,7 +315,7 @@ const categoryController=require("../Controller/categoryController");
  *               status:
  *                 type: string
  *                 description: New status of the category
- *                 example: "active"
+ *                 example: 1
  *     responses:
  *       '200':
  *         description: ✅ Category status updated successfully
@@ -339,7 +329,7 @@ const categoryController=require("../Controller/categoryController");
 
 /**
  * @swagger
- * /api/categories/unique:
+ * /api/uniquecategories:
  *   get:
  *     summary: Retrieve unique categories
  *     description: Retrieve a list of unique categories
@@ -367,21 +357,13 @@ const categoryController=require("../Controller/categoryController");
 
 /**
  * @swagger
- * /api/categories/{ids}:
+ * /api/categories:
  *   get:
- *     summary: Retrieve categories by IDs
- *     description: Retrieve specific categories by their IDs
- *     parameters:
- *       - in: path
- *         name: ids
- *         required: true
- *         description: Comma-separated IDs of the categories to retrieve
- *         schema:
- *           type: string
- *           example: "1,2,3"
+ *     summary: Retrieve all categories with ID and name
+ *     description: Retrieve a list of all categories with their ID and name
  *     responses:
  *       '200':
- *         description: ✅ A list of categories
+ *         description: A list of categories
  *         content:
  *           application/json:
  *             schema:
@@ -393,19 +375,17 @@ const categoryController=require("../Controller/categoryController");
  *                     type: integer
  *                     description: Category ID
  *                     example: 1
- *                   name:
+ *                   category_name:
  *                     type: string
  *                     description: Category name
  *                     example: "Electronics"
- *       '404':
- *         description: ❌ Categories not found
  *       '500':
- *         description: 🚫 Internal server error
+ *         description: Internal server error
  */
 
 /**
  * @swagger
- * /api/categories/parent/{parentId}:
+ * /api/parentcategory/{parentId}:
  *   get:
  *     summary: Retrieve categories by parent ID
  *     description: Retrieve categories that have the specified parent ID
@@ -441,14 +421,15 @@ const categoryController=require("../Controller/categoryController");
  *         description: 🚫 Internal server error
  */
 
-router.get("/",categoryController.categories);
-router.post("/add",categoryController.addCategory);
-router.get("/:id",categoryController.categoryEditData);
-router.put("/:id",categoryController.updateCategory);
-router.delete("/:id",categoryController.categoryDelete);
-router.put("/status/:id",categoryController.updateCategoryStatus);
-router.get("/unique",categoryController.uniqueCategories);
-router.get("/:ids",categoryController.categories2);
-router.get("/parent/:parentId",categoryController.parentCategory);
+router.get("/getAllCategorys",categoryController.getAll);
+router.post("/addcategory",upload.single("category_image"),categoryController.create);
+router.get("/categoryeditdata/:id",categoryController.categoryEditData);
+router.put("/updatecategory/:id",categoryController.updateCategory);
+router.delete("/categorydelete/:id",categoryController.categoryDelete);
+router.put("/handlecategorystatus/:id",categoryController.updateCategoryStatus);
+router.get("/uniquecategories",categoryController.uniqueCategories);
+router.get("/categories",categoryController.categories2);
+router.get("/parentcategory/:parentId",categoryController.parentCategory);
+router.get("/SearchCategories/:searchTerm");
 
 module.exports=router;

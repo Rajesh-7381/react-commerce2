@@ -17,7 +17,7 @@ export const DeleteEntity = async (entity, id) => {
       if (confirmed.isConfirmed) {
         switch (entity) {
           case 'Category':
-            await axios.delete(`http://localhost:8081/categorydelete/${id}`);
+            await axios.delete(`http://localhost:8081/api/categorydelete/${id}`);
             break;
 
           case 'Brand':

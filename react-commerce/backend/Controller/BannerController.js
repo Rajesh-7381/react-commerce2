@@ -1,4 +1,3 @@
-const { db } =require("../config/dbconfig");
 const Banner = require("../Models/Banner");
 
 exports.getAllBanners=async(req,res)=>{
@@ -57,20 +56,16 @@ exports.deleteBanner = async (req, res) => {
   };
   
   exports.addBanner = async (req, res) => {
-    const { title, url, description, meta_title, meta_keywords, meta_description } = req.body;
-  
-    const newBanner = {
-      title,
-      url,
-      description,
-      meta_title,
-      meta_keywords,
-      meta_description
-    };
+    // console.log("banner")
+  const {  type, link, alt}=req.body;
+  const image = req.file ? req.file.filename : null;
+  // console.log(req.body)
+    const newBanner = {image,  type, link, alt };
   
     try {
-      await Banner.add(newBanner);
-      res.status(200).json({ message: "Insertion successful" });
+      const result=await Banner.add(newBanner);
+      // console.log(result)
+      res.status(200).json({ message: "new Banner added successful" });
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Internal server error" });

@@ -52,7 +52,7 @@ const AddEditBanners = () => {
         });
         NotificationManager.success("Banner updated successfully!");
       } else {
-        await axios.post("http://localhost:8081/AddBanners", form, {
+        await axios.post("http://localhost:8081/api/AddBanners", form, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

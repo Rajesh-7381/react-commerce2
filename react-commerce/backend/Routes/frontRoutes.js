@@ -1,7 +1,7 @@
 const express=require("express");
 const router=express.Router();
 const upload=require("../utils/multerConfig");
-
+const frontController=require("../Controller/frontController")
 
 /**
  * @swagger
@@ -9,6 +9,8 @@ const upload=require("../utils/multerConfig");
  *   post:
  *     summary: Add a contact form
  *     description: Add a contact form
+ *     consumes:
+ *       - multipart/form-data
  *     requestBody:
  *       required: true
  *       content:
@@ -32,13 +34,12 @@ const upload=require("../utils/multerConfig");
  *                 type: string
  *                 description: message
  *                 example: "good service"
- *               
  *     responses:
- *       '201':
- *         description: contact form added successfully
- *       '400':
+ *       201:
+ *         description: Contact form added successfully
+ *       400:
  *         description: Bad request
- *       '500':
+ *       500:
  *         description: Internal server error
  */
 
@@ -232,10 +233,12 @@ const upload=require("../utils/multerConfig");
  *       '500':
  *         description: Internal server error
  */
-router.post("/ContactUS")
+router.post("/ContactUS",upload.none(),frontController.contactUs)
 router.get("/AllProductDetailsShown")
 router.get("/listingproduct")
 router.get("/productDetails/:id")
 router.get("/productdetailscount")
 router.post("/create-payment-intent")
 router.post("/DeliveryAddress")
+
+module.exports=router

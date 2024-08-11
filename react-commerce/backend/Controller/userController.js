@@ -93,7 +93,7 @@ class RegisterUser{
       const user=new User.User(name,mobile,email,password,req.file ? await cloudinary.uploader.upload(req.file.path) :null,uuid)
       // console.log(1)
       await user.Save();
-      console.log(1)
+      // console.log(1)
       await sendMail(email, "Welcome to E-commerce", `Hi ${name}, thank you for registering.`)
       res.json({message:"✅ User created successfully!"});
     } catch (error) {
@@ -117,12 +117,13 @@ class AdminUserController{
   }
 
   static async checkEmail(req,res){
+    // console.log(1)
     try {
       const email = req.params.email;
-      console.log(email)
+      // console.log(email)
       const result=await User.EmailCheck.findByEmail(email);
       const emailExists=result.length > 0;
-      console.log(emailExists)
+      // console.log(emailExists)
       res.json({ emailExists })
     } catch (error) {
         console.error("Error checking email:", error);
@@ -130,32 +131,42 @@ class AdminUserController{
     }
   }
 
-  static async checkMobile(req,res){
-    try {
-      const mobile=req.params.mobile;
-      const result=await User.MobileCheck.findByMobile(mobile);
-      const mobileExists=result.length > 0;
-      res.json({ mobileExists })
-    } catch (error) {
+  static async Mobile(req,res){
+    // console.log(1)
+      try {
+        const { mobile } = req.params; 
+        // console.log(`Checking mobile: ${mobile}`);
+  
+        const result = await User.MobileCheck.findByMobile(mobile);
+        const mobileExists = result.length > 0;
+  
+        res.status(200).json({ mobileExists }); 
+      } catch (error) {
         console.error("Error checking mobile:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+        res.status(500).json({ error: "Internal Server Error" }); 
+      }
+    
   }
 
-  static async passwordForgot(req,res){
+  static async forgotPassword(req,res){
+    // console.log(1)
     try {
       const { error }=passwordForgotSchema.validate(req.body)
+      // console.log(req.body)
       if(error){
+        // console.log(error)
         return res
         .status(400)
         .json({ message: "🚫 invalid request body", error: error.details });
   
       }
       const email=req.params.email;
-      const newPassword=req.body.password;
-      console.log(email + " "+newPassword)
+      const  newPassword =req.body.password;
+      // console.log(newPassword)
+      // console.log(email + " "+newPassword)
       
       await User.forgotPassword.updatePassword(email,newPassword)
+      // console.log("success")
       return res.status(200).json({message:"✅ Password updated successfully!"})
     } catch (error) {
         console.error(error);
@@ -166,49 +177,55 @@ class AdminUserController{
   static async countUser(req,res){
     try {
       const count=await User.TotalUser.TotalUser();
-      res.json({count:count})
+      // console.log(count)
+      res.json(count)
     } catch (error) {
-      
+        console.log(error)
     }
   }
   static async countAdmin(req,res){
     try {
       const Admincount=await User.TotalAdmin.TotalAdmin();
-      res.json({Admincount:Admincount})
+      // console.log(Admincount)
+      res.json(Admincount)
     } catch (error) {
-      
+        console.log(error)
     }
   }
   static async countSubAdmin(req,res){
     try {
       const subaAdmincount=await User.TotalSubAdmin.TotalSubAdmin();
-      res.json({subaAdmincount:subaAdmincount})
+      res.json(subaAdmincount)
     } catch (error) {
-      
+        console.log(error)
     }
   }
   static async getAllAdminSubadminUsers(req,res){
     try {
       const result=await User.getAllAdminSubadminUsers.TotalAdminSubAdminUser();
+      // console.log(result)
       res.json(result)
     } catch (error) {
-      
+        console.log(error)
     }
   }
 
   static async indvidualDetails(req,res){
     try {const id=req.params.id;
       const result=await User.indvidualDetails.SingleUserAdminSubadmibDetails(id);
+      // console.log(result.length)
       res.json(result)
     } catch (error) {
-      
+        res.json({message:"wrong id entered,please enter coorect id"})
     }
   }
   static async EditDetails(req,res){
     try {
       const id=req.params.id;
-      const result=await User.indvidualDetails.SingleUserAdminSubadmibDetails(id);
-      res.json(result)
+      // console.log(id)
+      const result=await User.indvidualDetails.SingleData(id);
+      // console.log("success")
+      res.json(result,{message:"updated successfully!"})
     } catch (error) {
       
     }
@@ -217,45 +234,53 @@ class AdminUserController{
   static async Update(req,res){
     try {
       const id=req.params.id;
+      // console.log(id)
       const { name, mobile, email, password, role } = req.body;
       const result=await User.UpdateDetails.Update(name, mobile, email, password, role, id);
-      res.json(result)
+      // console.log(result)
+      // console.log(1)
+      res.json({message:"deleted successfully!"})
     } catch (error) {
-      
+        console.log(error)
     }
   }
 
-  static async deleteAdminSubAdminUser(req,res){
+  static async deleteAdminSubAdminUser(req, res) {
     try {
-      const id=req.params.id;
-      
-      const result=await User.Delete.DeleteData(id);
-      res.json(result)
+      const id = req.params.id;
+      const result = await User.Delete.deleteData(id);
+      res.json({ message: "deleted successfully!" });
     } catch (error) {
-      
+      res.status(500).json({ message: "Error deleting user", error: error.message });
     }
   }
 
   static async SearchAdminSubAdminUser(req,res){
     const searchTerm = req.params.searchTerm;
+    // console.log(searchTerm)
     const results=await User.SearchAdminSubAdminUser.SearchDetails(searchTerm)
+    // console.log(results)
     res.json(results)
   }
   static async registerUserParticularDate(req,res){
     const date = req.params.date;
+    // console.log(date)
     const results=await User.registerUserParticularDate.SearchDate(date)
+    // console.log(results)
     res.json(results)
   }
   static async registerUserfromrDateTotodate(req,res){
     const fromdate = req.params.fromdate;
     const todate = req.params.todate;
-    const results=await User.registerUserfromrDateTotodate(fromdate, todate)
+    const results=await User.registerUserfromrDateTotodate.SearchDate(fromdate, todate)
+    // console.log(results)
     res.json(results)
   }
 
   static async getAllSubAdminData(req,res){
     
     const results=await User.getAllSubAdminData.getAll()
+    // console.log(results)
     res.json(results)
   }
 }
