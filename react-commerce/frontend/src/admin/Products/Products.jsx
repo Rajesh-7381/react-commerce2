@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { NotificationContainer } from 'react-notifications';
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -17,7 +17,7 @@ const Products = () => {
     },[]);
     const retrivedData= async()=>{
         try {
-           const response=await axios.get("http://localhost:8081/getAllProducts") ;
+           const response=await axios.get("http://localhost:8081/api/getAllProducts") ;
            setproductdata(response.data);
         } catch (error) {
             console.error(error);
@@ -33,7 +33,8 @@ const Products = () => {
         // alert(1)
        const data=await DeleteEntity('Product',id);
         // Fetch the updated data from the server and update the local state
-        const response = await axios.get("http://localhost:8081/getAllProducts");
+        const response = await axios.get("http://localhost:8081/api/getAllProducts");
+        // console.log(response.data.products)
         setproductdata(response.data);
         // setFilterData(response.data);
     }
@@ -52,7 +53,9 @@ const Products = () => {
     const lastIndex=currentpage * recordsPerPage;
     const firstIndex=lastIndex - recordsPerPage;
     const totalPages= Math.ceil(productdata.length /recordsPerPage);
+    // console.log(totalPages)
     const numbers=[...Array(totalPages + 1).keys()].slice(1);
+    // console.log(numbers)
 
     const prepage =()=>{
         if(currentpage > 1){
@@ -70,9 +73,17 @@ const Products = () => {
     }
 
     // searching functionality
-    const searchfunction=(event)=>{
+    const debounce=(func,wait)=>{
+        let timerId;
+        return (...args)=>{
+            // console.log(args)
+            clearTimeout(timerId);
+            timerId=setTimeout(() => func(...args), wait);
+        }
+    }
+    const callApi=async(event)=>{
         const searchdata=event.target.value.toLowerCase().trim();
-        console.log(searchdata)
+        // console.log(searchdata)
         if(searchdata === ""){
             setproductdata(productdata)
         }else{
@@ -85,8 +96,9 @@ const Products = () => {
             );
             setproductdata(filtered);
         }
-    
     }
+    // console.log(callApi)
+    const debounceCallApi=useMemo(()=>debounce(callApi,1000),[])
   return (
     <div>
     <div>
@@ -157,10 +169,10 @@ const Products = () => {
                             
                             <form className='d-flex align-items-center justify-content-end'>
                                 <div className="input-group">
-                                    <input className="form-control mr-2" type="search" placeholder="Search using name, url, title etc..." aria-label="Search" onKeyUp={searchfunction}  />
+                                    <input className="form-control mr-2" type="search" placeholder="Search using name, url, title etc..." aria-label="Search" onChange={(e)=>{debounceCallApi(e)}}  />
                                     <div className="input-group-append">
                                         <button className="btn btn-outline-success mr-2" type="button">Search</button>
-                                        <button className='btn btn-primary ' onClick={()=>handleedit()}>Add</button>
+                                        <button className='btn btn-primary '  onClick={()=>handleedit()}>Add</button>
                                     </div>
                                 </div>
                             </form>
@@ -182,6 +194,7 @@ const Products = () => {
                                     </thead>
                                     <tbody>
                                             {
+                                                productdata && productdata.length > 0 ?
                                                 productdata.slice((currentpage-1) * recordsPerPage , currentpage * recordsPerPage).map((item, index) => (
                                                     <tr key={item.id} className={item.status === 'Active' ? 'bg-primary' : ''}>
                                                         <td style={{ width: "1px" }}>{index + 1 + (currentpage - 1) * recordsPerPage}</td>
@@ -200,6 +213,10 @@ const Products = () => {
                                                         </td>
                                                     </tr>
                                                 ))
+                                                :
+                                                <tr>
+                                                    <td colSpan={6}>No data found</td>
+                                                </tr>
                                             }
                                         </tbody>
                                 </table>

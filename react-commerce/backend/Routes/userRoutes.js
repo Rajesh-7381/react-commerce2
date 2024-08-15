@@ -49,11 +49,11 @@ const registerusercontroller = new RegisterUser();
  *               example: "john.png"
  *     responses:
  *       200:
- *         description: User registered successfully
+ *         description: ✅ User registered successfully
  *       400:
  *         description: Invalid input
  *       500:
- *         description: Internal server error
+ *         description: 🚫 Internal server error
  */
 router.post("/register", upload.single("image"), (req, res) => {
   registerusercontroller.CreateRegisterAdminUser(req, res);
@@ -84,15 +84,15 @@ router.post("/register", upload.single("image"), (req, res) => {
  *                 example: "password123"
  *     responses:
  *       200:
- *         description: User or admin or subadmin verified successfully
+ *         description: ✅ User or admin or subadmin verified successfully
  *       201:
  *         description: Created
  *       409:
  *         description: Conflict
  *       404:
- *         description: Not Found
+ *         description: ❌ Not Found
  *       500:
- *         description: Server Error
+ *         description: 🚫 Internal Server Error
  */
 router.post("/login", Login);
 
@@ -113,7 +113,7 @@ router.post("/login", Login);
  *           example: "user@example.com"
  *     responses:
  *       200:
- *         description: Email existence status
+ *         description: ✅ Email existence status
  *         content:
  *           application/json:
  *             schema:
@@ -122,7 +122,7 @@ router.post("/login", Login);
  *                 emailExists:
  *                   type: boolean
  *       500:
- *         description: Internal Server Error
+ *         description: 🚫 Internal Server Error
  */
 router.get("/checkemail/:email", AdminUserController.checkEmail);
 
@@ -144,7 +144,7 @@ router.get("/checkemail/:email", AdminUserController.checkEmail);
  *           example: "9090390396"
  *     responses:
  *       200:
- *         description: mobile existence status
+ *         description: ✅ mobile existence status
  *         content:
  *           application/json:
  *             schema:
@@ -153,7 +153,7 @@ router.get("/checkemail/:email", AdminUserController.checkEmail);
  *                 emailExists:
  *                   type: boolean
  *       500:
- *         description: Internal Server Error
+ *         description: 🚫 Internal Server Error
  */
 router.get("/checkmobile/:mobile", AdminUserController.Mobile);
 
@@ -176,7 +176,7 @@ router.get("/checkmobile/:mobile", AdminUserController.Mobile);
  *           example: 703d08e6-87d6-4fd4-9c7c-67d8c1304f7b
  *     responses:
  *       200:
- *         description: UUID existence status
+ *         description: ✅ UUID existence status
  *         content:
  *           application/json:
  *             schema:
@@ -185,7 +185,7 @@ router.get("/checkmobile/:mobile", AdminUserController.Mobile);
  *                 exists:
  *                   type: boolean
  *       500:
- *         description: Internal server error
+ *         description: 🚫 Internal server error
  */
 router.get("/UniqueID/:unique_id", AdminUserController.checkUniqeID);
 
@@ -218,11 +218,11 @@ router.get("/UniqueID/:unique_id", AdminUserController.checkUniqeID);
  *                 example: "newpassword123"
  *     responses:
  *       200:
- *         description: Password updated successfully
+ *         description: ✅ Password updated successfully
  *       400:
  *         description: Invalid request body
  *       500:
- *         description: Internal server error
+ *         description: 🚫 Internal server error
  */
 
 router.post("/passwordforgot/:email", AdminUserController.forgotPassword);
@@ -235,7 +235,7 @@ router.post("/passwordforgot/:email", AdminUserController.forgotPassword);
  *    description: Retrieve the total count of users with the role 'user'
  *    responses:
  *      '200':
- *        description: The total count of users
+ *        description: ✅ The total count of users
  *        content:
  *          application/json:
  *            schema:
@@ -246,7 +246,7 @@ router.post("/passwordforgot/:email", AdminUserController.forgotPassword);
  *                  description: The total count of users
  *                  example: 42
  *      '500':
- *        description: Internal server error
+ *        description: 🚫 Internal server error
  *        content:
  *          application/json:
  *            schema:
@@ -266,7 +266,7 @@ router.get("/countuser", AdminUserController.countUser);
  *    description: Retrieve the total count of admin with the role 'user'
  *    responses:
  *      '200':
- *        description: The total count of admin
+ *        description: ✅ The total count of admin
  *        content:
  *          application/json:
  *            schema:
@@ -277,7 +277,7 @@ router.get("/countuser", AdminUserController.countUser);
  *                  description: The total count of admin
  *                  example: 42
  *      '500':
- *        description: Internal server error
+ *        description: 🚫 Internal server error
  *        content:
  *          application/json:
  *            schema:
@@ -285,7 +285,7 @@ router.get("/countuser", AdminUserController.countUser);
  *              properties:
  *                message:
  *                  type: string
- *                  example: '🚫 Internal server error'
+ *                  example: '🚫 🚫 Internal server error'
  */
 router.get("/countadmin", AdminUserController.countAdmin);
 
@@ -297,7 +297,7 @@ router.get("/countadmin", AdminUserController.countAdmin);
  *    description: Retrieve the total count of subadmin with the role 'user'
  *    responses:
  *      '200':
- *        description: The total count of subadmin
+ *        description: ✅ The total count of subadmin
  *        content:
  *          application/json:
  *            schema:
@@ -308,7 +308,7 @@ router.get("/countadmin", AdminUserController.countAdmin);
  *                  description: The total count of subadmin
  *                  example: 43
  *      '500':
- *        description: Internal server error
+ *        description: 🚫 Internal server error
  *        content:
  *          application/json:
  *            schema:
@@ -329,7 +329,7 @@ router.get("/countsubadmin", AdminUserController.countSubAdmin);
  *     description: Retrieve the total count of Admin and Subadmin users
  *     responses:
  *       '200':
- *         description: Retrieve the total count of Admin and Subadmin users
+ *         description: ✅ Retrieve the total count of Admin and Subadmin users
  *         content:
  *           application/json:
  *             schema:
@@ -340,7 +340,7 @@ router.get("/countsubadmin", AdminUserController.countSubAdmin);
  *                   description: The total count of Admin and Subadmin users
  *                   example: 42
  *       '500':
- *         description: Internal server error
+ *         description: 🚫 Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -348,7 +348,7 @@ router.get("/countsubadmin", AdminUserController.countSubAdmin);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 'Internal server error'
+ *                   example: '🚫 Internal server error'
  */
 router.get("/getAllAdminSubadminUsers", AdminUserController.getAllAdminSubadminUsers);
 
@@ -367,7 +367,7 @@ router.get("/getAllAdminSubadminUsers", AdminUserController.getAllAdminSubadminU
  *           example: 56
  *     responses:
  *       '200':
- *         description: ID existence status
+ *         description: ✅ ID existence status
  *         content:
  *           application/json:
  *             schema:
@@ -376,7 +376,7 @@ router.get("/getAllAdminSubadminUsers", AdminUserController.getAllAdminSubadminU
  *                 exists:
  *                   type: boolean
  *       '500':
- *         description: Internal server error
+ *         description: 🚫 Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -384,7 +384,7 @@ router.get("/getAllAdminSubadminUsers", AdminUserController.getAllAdminSubadminU
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 'Internal server error'
+ *                   example: '🚫 Internal server error'
  */
 router.get("/singledata/:id",AdminUserController.indvidualDetails);
 /**
@@ -402,7 +402,7 @@ router.get("/singledata/:id",AdminUserController.indvidualDetails);
  *           example: 56
  *     responses:
  *       '200':
- *         description: ID existence status
+ *         description: ✅ ID existence status
  *         content:
  *           application/json:
  *             schema:
@@ -411,7 +411,7 @@ router.get("/singledata/:id",AdminUserController.indvidualDetails);
  *                 exists:
  *                   type: boolean
  *       '500':
- *         description: Internal server error
+ *         description: 🚫 Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -419,7 +419,7 @@ router.get("/singledata/:id",AdminUserController.indvidualDetails);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 'Internal server error'
+ *                   example: '🚫 Internal server error'
  */
 router.get("/editdata/:id",AdminUserController.EditDetails);
 
@@ -460,7 +460,7 @@ router.get("/editdata/:id",AdminUserController.EditDetails);
  *                 example: user
  *     responses:
  *       '200':
- *         description: Data updated successfully
+ *         description: ✅ Data updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -470,7 +470,7 @@ router.get("/editdata/:id",AdminUserController.EditDetails);
  *                   type: string
  *                   example: ✅ Data updated successfully!
  *       '500':
- *         description: Internal server error
+ *         description: 🚫 Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -498,7 +498,7 @@ router.put("/update/:id",AdminUserController.Update)
  *           example: 1
  *     responses:
  *       '200':
- *         description: User deleted successfully
+ *         description: ✅ User deleted successfully
  *         content:
  *           application/json:
  *             schema:
@@ -508,7 +508,7 @@ router.put("/update/:id",AdminUserController.Update)
  *                   type: string
  *                   example: ✅ deleted successfully!
  *       '500':
- *         description: Internal server error
+ *         description: 🚫 Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -516,7 +516,7 @@ router.put("/update/:id",AdminUserController.Update)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 🚫 internal server error
+ *                   example: 🚫 🚫 Internal server error
  */
 router.delete("/deleteAdminSubAdminUser/:id", AdminUserController.deleteAdminSubAdminUser);
 
@@ -553,7 +553,7 @@ router.delete("/deleteAdminSubAdminUser/:id", AdminUserController.deleteAdminSub
  *                propoties: 
  *                  message: 
  *                    type: string
- *                    example: 🚫 internal server error
+ *                    example: 🚫 Internal server error
  */
 router.get("/SearchAdminSubAdminUser/:searchTerm",AdminUserController.SearchAdminSubAdminUser)
 
@@ -591,7 +591,7 @@ router.get("/SearchAdminSubAdminUser/:searchTerm",AdminUserController.SearchAdmi
  *                propoties: 
  *                  message: 
  *                    type: string
- *                    example: 🚫 internal server error
+ *                    example: 🚫 🚫 Internal server error
  */
 router.get("/registerUserParticularDate/:date",AdminUserController.registerUserParticularDate)
 
@@ -617,7 +617,7 @@ router.get("/registerUserParticularDate/:date",AdminUserController.registerUserP
  *           example: "31-12-2024"
  *     responses:
  *       '200':
- *         description: The count of users registered between the specified dates
+ *         description: ✅ The count of users registered between the specified dates
  *         content:
  *           application/json:
  *             schema:
@@ -628,7 +628,7 @@ router.get("/registerUserParticularDate/:date",AdminUserController.registerUserP
  *                   description: The count of users
  *                   example: 42
  *       '500':
- *         description: Internal server error
+ *         description: 🚫 Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -648,7 +648,7 @@ router.get("/registerUserfromrDateTotodate/:fromdate/:todate",AdminUserControlle
  *     description: Retrieve all records from AdminUser where the role is either 'subadmin' or 'user'
  *     responses:
  *       '200':
- *         description: A list of SubAdmin and User data
+ *         description: ✅ A list of SubAdmin and User data
  *         content:
  *           application/json:
  *             schema:
@@ -677,7 +677,7 @@ router.get("/registerUserfromrDateTotodate/:fromdate/:todate",AdminUserControlle
  *                     description: The role of the user
  *                     example: "subadmin"
  *       '500':
- *         description: Internal server error
+ *         description: 🚫 Internal server error
  *         content:
  *           application/json:
  *             schema:

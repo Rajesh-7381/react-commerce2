@@ -221,10 +221,12 @@ const Product = {
 
   // Get all attributes of a product by product ID
   ProductAttributeById: async (id) => {
+    console.log(id)
     const query =
-      "SELECT * FROM product_attributes WHERE product_id=? AND deleted_at IS NULL";
+      "SELECT * FROM product_attributes WHERE id=? AND deleted_at IS NULL";
     try {
       const [attributes] = await db.promise().query(query, [id]);
+      // console.log(attributes)
       return attributes;
     } catch (error) {
       console.error(
@@ -275,11 +277,27 @@ const Product = {
       throw error;
     }
   },
+
+  // search products
+  searchProducts: async (searchTerm) => {
+    console.log(searchTerm);
+    const query = "SELECT * FROM products WHERE product_name LIKE ? AND deleted_at IS NULL";
+  
+    try {
+      const [result] = await db.promise().query(query, [`%${searchTerm}%`]);
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error("Error fetching all product attributes:", error);
+      throw error;
+    }
+  }
 };
 
 
+
 const Products = {
-  addProduct: async (product, product_video, product_images,attributes) => {
+  addProduct: async (product, product_video, product_images, attributes) => {
     const {
       category_id, brand_id, product_name, product_code, product_color, family_color, group_code,
       product_price, product_weight, product_discount, discount_type, final_price, description,
@@ -305,10 +323,56 @@ const Products = {
       const productId = result.insertId;
 
       if (product_images.length > 0) {
+        const outputDirs = {
+          large: path.join(__dirname, "../uploads/productImages/large"),
+          medium: path.join(__dirname, "../uploads/productImages/medium"),
+          small: path.join(__dirname, "../uploads/productImages/small"),
+        };
+
+        const resolutions = {
+          large: { width: 1280, height: 760 },
+          medium: { width: 760, height: 480 },
+          small: { width: 480, height: 320 },
+        };
+
+        // Ensure directories exist
+        for (const [key, dir] of Object.entries(outputDirs)) {
+          if (!fs.existsSync(dir)) {
+            console.log(`Creating directory: ${dir}`);
+            fs.mkdirSync(dir, { recursive: true });
+          }
+        }
+
+        // Process and save the images in different resolutions
+        await Promise.all(
+          product_images.map(async (file) => {
+            await Promise.all(
+              Object.entries(resolutions).map(
+                async ([key, { width, height }]) => {
+                  const outputPath = path.join(
+                    outputDirs[key],
+                    file.filename
+                  );
+                  // console.log(`Processing image: ${outputPath}`);//path check
+
+                  try {
+                    await sharp(file.path)
+                      .resize(width, height)
+                      .toFile(outputPath);
+                  } catch (error) {
+                    console.error(`Failed to process image: ${outputPath}`, error);
+                    throw error;
+                  }
+                }
+              )
+            );
+          })
+        );
+
         await Products.addProductImages(productId, product_images);
       }
 
-      await Products.addProductAttributes(productId,attributes)
+      await Products.addProductAttributes(productId, attributes);
       return productId;
     } catch (error) {
       console.error("Error adding new product:", error);
@@ -342,6 +406,7 @@ const Products = {
     await db.promise().query(attributesQuery, [attributeValues]);
   },
 };
+
 
 
 module.exports = {Product,Products};

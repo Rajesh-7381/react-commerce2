@@ -26,7 +26,7 @@ const Categories = () => {
   }, []);
 
   const handlecategorydata = async () => {
-    const response = await axios.get("http://localhost:8081/getAllCategorys");
+    const response = await axios.get("http://localhost:8081/api/getAllCategorys");
     setcategorydata(response.data);
     setFilterData(response.data);
   };
@@ -65,7 +65,7 @@ const Categories = () => {
   const handledelete = async (id) => {
     DeleteEntity("Category", id);
     // Fetch the updated data from the server and update the local state
-    const response = await axios.get("http://localhost:8081/getAllCategorys");
+    const response = await axios.get("http://localhost:8081/api/getAllCategorys");
 
     setcategorydata(response.data);
     setFilterData(response.data);
@@ -210,7 +210,8 @@ const Categories = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {filterData
+                              { filterData && filterData.length > 0 ?
+                                filterData
                                 .slice(
                                   (currentpage - 1) * recordsPerPage,
                                   currentpage * recordsPerPage
@@ -244,16 +245,10 @@ const Categories = () => {
                                     </td>
 
                                     <td>
-                                      <Link
-                                        to={
-                                          `http://localhost:8081/CategoryImage/` +
-                                          item.category_image
-                                        }
-                                        target="_blank"
-                                      >
+                                      <Link to={`http://localhost:8081/api/CategoryImage/`+item.category_image}target="_blank" >
                                         <img
                                           src={
-                                            `http://localhost:8081/CategoryImage/` +
+                                            `http://localhost:8081/api/CategoryImage/` +
                                             item.category_image
                                           }
                                           alt={item.category_name}
@@ -306,7 +301,12 @@ const Categories = () => {
                                       </button>
                                     </td>
                                   </tr>
-                                ))}
+                                ))
+                                : 
+                                <tr>
+                                  <td colSpan={6}>No data found</td>
+                                </tr>  
+                                }
                             </tbody>
                           </table>
                           <br></br>

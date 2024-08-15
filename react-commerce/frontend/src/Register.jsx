@@ -92,7 +92,7 @@ const Register = () => {
             NotificationManager.success("Form submitted successfully!");
             setTimeout(() => {
               action.resetForm();
-            //   here add loader logic
+            //   here add loader 
               navigate("/");
             }, 3000);
           }

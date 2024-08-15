@@ -69,14 +69,14 @@ const AddEditProducts = () => {
 
   const productcolor = async () => {
     try {
-      const response = await axios.get("http://localhost:8081/productcolor");
+      const response = await axios.get("http://localhost:8081/api/productcolor");
       setcolorname(response.data);
       // console.log(response.data);
     } catch (error) {}
   };
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`http://localhost:8081/getAllCategorys`);
+      const response = await axios.get(`http://localhost:8081/api/getAllCategorys`);
       setCategories(response.data);
     } catch (error) {
       console.error(error);
@@ -98,12 +98,12 @@ const AddEditProducts = () => {
   const handleProductUpdate = async (id) => {
     try {
       const response = await axios.get(
-        `http://localhost:8081/productedit/${id}`
+        `http://localhost:8081/api/productedit/${id}`
       );
       const productdata = response.data.data;
 
       const response2 = await axios.get(
-        `http://localhost:8081/editproductattributes/${id}`
+        `http://localhost:8081/api/editproductattributes/${id}`
       );
       const productattributes = response2.data.data;
       // console.log(productattributes)
@@ -805,7 +805,7 @@ const AddEditProducts = () => {
                               <p>Only accepted jpg,jpeg,webp,png and gif</p>
                               <img
                                 src={
-                                  `http://localhost:8081/productsimage/` +
+                                  `http://localhost:8081/api/productsimage/` +
                                   data.image
                                 }
                                 alt=""

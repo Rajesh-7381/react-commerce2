@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, NavLink } from 'react-router-dom'
 
 const Header = () => {
     const navigate=useNavigate();
@@ -20,9 +20,9 @@ const Header = () => {
       }, [ navigate]); 
       const fetchuserdata=async(id)=>{
         try {
-          const reponse=await axios.get(`http://localhost:8081/singledata/${id}`);
+          const reponse=await axios.get(`http://localhost:8081/api/singledata/${id}`);
           setUserData(reponse.data.data);
-          console.log(reponse.data.data)
+          // console.log(reponse.data.data)
         } catch (error) {
           
         }
@@ -173,15 +173,15 @@ const Header = () => {
   <aside className="main-sidebar sidebar-dark-primary elevation-4">
     {/* Brand Logo */}
     <Link to={"/admindashboard1"} className="brand-link">
-      <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" className="brand-image img-circle elevation-3" style={{opacity: '.8'}} />
-      <span className="brand-text font-weight-light">AdminLTE 3</span>
+      <img src={"./pngtree-e-letter-logo-ecommerce-shop-store-design-png-image_4381099 (1).png"} alt="AdminLTE Logo" className="brand-image img-circle elevation-3 rounded-circle" style={{opacity: '.8'}}  />
+      <span className="brand-text font-weight-light">e-Com</span>
     </Link>
     {/* Sidebar */}
     <div className="sidebar">
       {/* Sidebar user panel (optional) */}
       <div className="user-panel mt-3 pb-3 mb-3 d-flex">
         <div className="image">
-        <img src={`http://localhost:8081/profile/${userData && userData.image}`} className="img-circle elevation-2" alt={userData && userData.name} />
+        <img src={`http://localhost:8081/api/profile/${userData && userData.image}`} className="img-circle elevation-2" alt={userData && userData.name} />
         </div>
         <div className='text-light '>{userData && userData.name}</div>
         <div className="info">
@@ -215,52 +215,52 @@ const Header = () => {
             </a>
             <ul className="nav nav-treeview">
               <li className="nav-item">
-                <Link to={"/registeruser"} className="nav-link ">
+                <NavLink to={"/registeruser"} className={({isActive})=>isActive ? "nav-link active":"nav-link"}>
                   <i className="far fa-circle nav-icon" />
                   <p>Registered User</p>
-                </Link>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link to={"/subadmins"} className="nav-link">
+                <NavLink to={"/subadmins"} className={({isActive})=>isActive ? "nav-link active" :"nav-link"}>
                   <i className="far fa-circle nav-icon" />
                   <p>Subadmins</p>
-                </Link>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link to={"/cmspages"} className="nav-link">
+                <NavLink to={"/cmspages"} className={({isActive})=>isActive ? "nav-link active" :"nav-link"}>
                   <i className="far fa-circle nav-icon" />
                   <p>CmsPages</p>
-                </Link>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link to={"/categories"} className="nav-link">
+                <NavLink to={"/categories"} className={({isActive})=>isActive ? "nav-link active" :"nav-link"}>
                   <i className="far fa-circle nav-icon" />
                   <p>Categories</p>
-                </Link>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link to={"/products"} className="nav-link">
+                <NavLink to={"/products"} className={({isActive})=>isActive ? "nav-link active" :"nav-link"}>
                   <i className="far fa-circle nav-icon" />
                   <p>Products</p>
-                </Link>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link to={"/productsimage"} className="nav-link">
+                <NavLink to={"/productsimage"} className={({isActive})=>isActive ? "nav-link active" :"nav-link"}>
                   <i className="far fa-circle nav-icon" />
                   <p>ProductsImage</p>
-                </Link>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link to={"/brands"} className="nav-link">
+                <NavLink to={"/brands"} className={({isActive})=>isActive ? "nav-link active" :"nav-link"}>
                   <i className="far fa-circle nav-icon" />
                   <p>Brands</p>
-                </Link>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link to={"/banners"} className="nav-link">
+                <NavLink to={"/banners"} className={({isActive})=>isActive ? "nav-link active" :"nav-link"}>
                   <i className="far fa-circle nav-icon" />
                   <p>Banners</p>
-                </Link>
+                </NavLink>
               </li>
               
             </ul>

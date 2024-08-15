@@ -106,6 +106,7 @@ class AdminUserController{
   static async checkUniqeID(req,res){
     try {
       const unique_id=req.params.unique_id;
+      // console.log(un)
       const result=await User.AdminUserModel.findByUUID(unique_id);
      
       const UniqueIdExists=result.length > 0
@@ -151,15 +152,13 @@ class AdminUserController{
   static async forgotPassword(req,res){
     // console.log(1)
     try {
-      const { error }=passwordForgotSchema.validate(req.body)
-      // console.log(req.body)
-      if(error){
-        // console.log(error)
-        return res
-        .status(400)
-        .json({ message: "🚫 invalid request body", error: error.details });
-  
-      }
+      // const { error }=passwordForgotSchema.validate(req.body)
+      // // console.log(req.body)
+      // if(error){
+      //   // console.log(error)
+      //   return res
+      //   .status(400)
+      //   .json({ message: "🚫 invalid request body", error: error.details });
       const email=req.params.email;
       const  newPassword =req.body.password;
       // console.log(newPassword)
@@ -168,6 +167,9 @@ class AdminUserController{
       await User.forgotPassword.updatePassword(email,newPassword)
       // console.log("success")
       return res.status(200).json({message:"✅ Password updated successfully!"})
+  
+      
+      
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "🚫 Internal server error" });
@@ -178,7 +180,7 @@ class AdminUserController{
     try {
       const count=await User.TotalUser.TotalUser();
       // console.log(count)
-      res.json(count)
+      res.json({userCount:count})
     } catch (error) {
         console.log(error)
     }
@@ -187,7 +189,7 @@ class AdminUserController{
     try {
       const Admincount=await User.TotalAdmin.TotalAdmin();
       // console.log(Admincount)
-      res.json(Admincount)
+      res.json({adminCount:Admincount,message:"count successfully!"})
     } catch (error) {
         console.log(error)
     }
@@ -195,7 +197,7 @@ class AdminUserController{
   static async countSubAdmin(req,res){
     try {
       const subaAdmincount=await User.TotalSubAdmin.TotalSubAdmin();
-      res.json(subaAdmincount)
+      res.json({subAdminCount:subaAdmincount,message:"count successfully!"})
     } catch (error) {
         console.log(error)
     }
@@ -223,9 +225,9 @@ class AdminUserController{
     try {
       const id=req.params.id;
       // console.log(id)
-      const result=await User.indvidualDetails.SingleData(id);
+      const result=await User.indvidualDetails.SingleUserAdminSubadmibDetails(id);
       // console.log("success")
-      res.json(result,{message:"updated successfully!"})
+      res.json({message:"updated successfully!",result})
     } catch (error) {
       
     }
@@ -264,6 +266,9 @@ class AdminUserController{
   }
   static async registerUserParticularDate(req,res){
     const date = req.params.date;
+    console.log(date)
+    // const formattedDate = date.split('-').reverse().join('-');
+  // console.log(formattedDate)
     // console.log(date)
     const results=await User.registerUserParticularDate.SearchDate(date)
     // console.log(results)

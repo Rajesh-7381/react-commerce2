@@ -38,18 +38,19 @@ const Dashboard1 = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userResponse = await axios.get("http://localhost:8081/countuser");
-        const adminResponse = await axios.get("http://localhost:8081/countadmin");
-        const subadminResponse = await axios.get("http://localhost:8081/countsubadmin");
-        const uniquecategoriesResponse =await axios.get("http://localhost:8081/uniquecategories");
-        const productcountResponse=await axios.get("http://localhost:8081/allproductcount");
-        const BrandcountResponse=await axios.get("http://localhost:8081/AllBrandCount");
-        setUserCount(userResponse.data.count);
-        setAdminCount(adminResponse.data.Admincount);
-        setSubadminCount(subadminResponse.data.subaAdmincount);
+        const userResponse = await axios.get("http://localhost:8081/api/countuser");
+        const adminResponse = await axios.get("http://localhost:8081/api/countadmin");
+        const subadminResponse = await axios.get("http://localhost:8081/api/countsubadmin");
+        const uniquecategoriesResponse =await axios.get("http://localhost:8081/api/uniquecategories");
+        const productcountResponse=await axios.get("http://localhost:8081/api/allproductcount");
+        const BrandcountResponse=await axios.get("http://localhost:8081/api/AllBrandCount");
+        // console.log(userResponse)
+        setUserCount(userResponse.data.userCount);
+        setAdminCount(adminResponse.data.adminCount);
+        setSubadminCount(subadminResponse.data.subAdminCount);
         setcategoriesCount(uniquecategoriesResponse.data.catcount)
         setallproductcount(productcountResponse.data.productcount);
-        setallbrandcount(BrandcountResponse.data.Brandcount);
+        setallbrandcount(BrandcountResponse.data.allBrandCount);
         // Cookies.get("id",id);
       } catch (error) {
         console.error("Error fetching count data:", error);
@@ -98,7 +99,7 @@ const Dashboard1 = () => {
   const UserQuery = async (pdate) => {
     // alert(pdate)
     try {
-      const response = await axios.get(`http://localhost:8081/registerUserParticularDate/${pdate}`);
+      const response = await axios.get(`http://localhost:8081/api/registerUserParticularDate/${pdate}`);
       // console.log(response.data);
       setregisteruserdata(response.data.count);
       setuserDetails(response.data.data)
@@ -112,7 +113,7 @@ const Dashboard1 = () => {
 
   const UserQuery2 = async () => {
     try {
-      const response = await axios.get(`http://localhost:8081/registerUserfromrDateTotodate/${fromdate}/${todate}`);
+      const response = await axios.get(`http://localhost:8081/api/registerUserfromrDateTotodate/${fromdate}/${todate}`);
       setregisteruserdata3(response.data.count);
     } catch (error) {
       console.error(error);
@@ -144,7 +145,7 @@ const Dashboard1 = () => {
     try {
       const { unique_id }=values;
       console.log(unique_id)
-      const UniqueIdResponse=await axios.get(`http://localhost:8081/UniqueID/${unique_id}`)
+      const UniqueIdResponse=await axios.get(`http://localhost:8081/api/UniqueID/${unique_id}`)
       // console.log(UniqueIdResponse)
       if(UniqueIdResponse.data.UniqueIdExists){
         NotificationManager.success("yes")
@@ -277,7 +278,7 @@ const Dashboard1 = () => {
             <div className="small-box" style={{backgroundColor:"teal"}}>
               <div className="inner">
                 <h3>{allbrandcount}</h3>
-                <p>Unique Brands</p>
+                <p>All Brands</p>
               </div>
               <div className="icon">
                 <i className="ion ion-stats-bars" />

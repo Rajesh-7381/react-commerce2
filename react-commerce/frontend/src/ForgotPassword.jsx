@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -10,12 +10,16 @@ const ForgotPassword = () => {
     const navigate=useNavigate();
     const [passwordStrength, setPasswordStrength] = useState(0);
     // console.log(passwordStrength)
+
+    useEffect(()=>{
+        document.title="forgotPassword";
+    })
     const initialValues = {
         email: '',
         password: ''
     };
-    console.log(initialValues.email)
-    console.log(initialValues.password)
+    // console.log(initialValues.email)
+    // console.log(initialValues.password)
     const validationSchema = Yup.object({
         email: Yup.string().email('Invalid email format').required('Email is required'),
         password: Yup.string().max(25).min(8)

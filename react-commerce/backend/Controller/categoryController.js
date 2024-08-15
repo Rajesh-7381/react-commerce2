@@ -105,7 +105,7 @@ exports.categoryDelete = async (req, res) => {
 exports.uniqueCategories = async (req, res) => {
     try {
         const catcount=await Category.countDistinct();
-        res.json({catcount});
+        res.json({catcount:catcount});
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });

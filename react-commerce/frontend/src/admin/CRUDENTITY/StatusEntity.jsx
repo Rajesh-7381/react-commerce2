@@ -10,19 +10,19 @@ export const StatusEntity = async (entityType, id, currentStatus, setData, data)
         switch (entityType) {
            
             case 'ProductsImageStatus':
-                url = `http://localhost:8081/handleproductImagesstatus/${id}`;
+                url = `http://localhost:8081/api/handleproductImagesstatus/${id}`;
                 break;
 
             case 'CategoryStatus':
-                url = `http://localhost:8081/handlecategorystatus/${id}`;
+                url = `http://localhost:8081/api/handlecategorystatus/${id}`;
                 break;
 
             case 'BrandStatus':
-                url = `http://localhost:8081/handlebrandstatus/${id}`;
+                url = `http://localhost:8081/api/handlebrandstatus/${id}`;
                 break;
 
             case 'BannerStatus':
-                url = `http://localhost:8081/handlebannerstatus/${id}`;
+                url = `http://localhost:8081/vhandlebannerstatus/${id}`;
                 break;
 
             case 'CmsStatus':
@@ -30,7 +30,7 @@ export const StatusEntity = async (entityType, id, currentStatus, setData, data)
                 break;
 
             case 'ProductStatus':
-                url = `http://localhost:8081/handleproductstatus/${id}`;
+                url = `http://localhost:8081/api/handleproductstatus/${id}`;
                 break;
 
             default:

@@ -153,7 +153,8 @@ const Cmspages = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {
+                                        { 
+                                          filterdata && filterdata.length > 0 ?
                                             filterdata.map((item,index)=>(
                                                 <tr  key={item.id}>
                                                     <td > {index+1}</td>
@@ -167,6 +168,10 @@ const Cmspages = () => {
                                                     </td>
                                                 </tr>
                                             ))
+                                            :
+                                            <tr>
+                                              <td colSpan={6}>No data found</td>
+                                            </tr>
                                         }
                                     </tbody>
                                 </table>

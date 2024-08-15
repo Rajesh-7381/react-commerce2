@@ -17,7 +17,7 @@ const Brands = () => {
 
     const GETALLBRANDS=async()=>{
         try {
-            const response=await axios.get("http://localhost:8081/getAllBrands");
+            const response=await axios.get("http://localhost:8081/api/getAllBrands");
             setbrandData(response.data);
         } catch (error) {
             console.log(error)
@@ -34,7 +34,7 @@ const Brands = () => {
       // alert(id)
             const data=await DeleteEntity('Brand',id);
             // Fetch the updated data from the server and update the local state
-            const response = await axios.get("http://localhost:8081/getAllBrands");
+            const response = await axios.get("http://localhost:8081/api/getAllBrands");
             setbrandData(response.data);
     }
     // for status change
@@ -138,18 +138,19 @@ const Brands = () => {
                             </tr>
                           </thead>
                           <tbody>
-                          {brandData.map((item, index) => (
+                          { brandData && brandData.length > 0 ?
+                            brandData.map((item, index) => (
                             <tr key={index}>
                               <td>{index+1}</td>
                               <td>{item.brand_name}  </td>
                               <td>
-                                    <Link to={`http://localhost:8081/brandimage/`+  item.brand_image} target="_blank" id='image-constrained'>
-                                        <img src={`http://localhost:8081/brandimage/` + item.brand_image} width={50} height={50} alt="" />
+                                    <Link to={`http://localhost:8081/api/brandimage/`+  item.brand_image} target="_blank" id='image-constrained'>
+                                        <img src={`http://localhost:8081/api/brandimage/` + item.brand_image} width={50} height={50} alt="" />
                                     </Link>
                               </td>
                               <td>
-                                  <Link to={`http://localhost:8081/brandlogo/`+  item.brand_logo} target="_blank" id='image-constrained'>
-                                      <img src={`http://localhost:8081/brandlogo/` + item.brand_logo} width={50} height={50} alt="" />
+                                  <Link to={`http://localhost:8081/api/brandlogo/`+  item.brand_logo} target="_blank" id='image-constrained'>
+                                      <img src={`http://localhost:8081/api/brandlogo/` + item.brand_logo} width={50} height={50} alt="" />
                                   </Link>
                               </td>
                               <td>{item.brand_discount} </td>
@@ -162,7 +163,12 @@ const Brands = () => {
                               <button className='btn btn-danger btn-sm ' onClick={()=>DeleteBrand(item.id)}><i className='fas fa-trash'></i></button>
                               </td>
                             </tr>
-                          ))}
+                          ))
+                          :
+                          <tr>
+                            <td colSpan={6}>No data found</td>
+                          </tr>
+                        }
                           </tbody>
                         </table>
                       </div>

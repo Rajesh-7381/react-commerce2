@@ -25,7 +25,7 @@ const AddEditBrands = () => {
 
     const GetSingleBrands = async (id) => {
         try {
-            const response = await axios.get(`http://localhost:8081/GetSingleBrandDetals/${id}`);
+            const response = await axios.get(`http://localhost:8081/api/GetSingleBrandDetals/${id}`);
             const brandData = response.data.data[0];
             setBrandData(brandData);
             // Set form values
@@ -63,14 +63,14 @@ const AddEditBrands = () => {
 
             if (id) {
                 // Update brand
-                await axios.put(`http://localhost:8081/UpdateBrand/${id}`, form, {
+                await axios.put(`http://localhost:8081/api/UpdateBrand/${id}`, form, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
             } else {
                 // Add new brand
-                await axios.post('http://localhost:8081/AddBrand', form, {
+                await axios.post('http://localhost:8081/api/AddBrand', form, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -189,7 +189,7 @@ const AddEditBrands = () => {
                                             <div>
                                               <img 
                                                 ref={imageRef} 
-                                                src={`http://localhost:8081/brandimage/${brandData.brand_image}`} 
+                                                src={`http://localhost:8081/api/brandimage/${brandData.brand_image}`} 
                                                 width={50} 
                                                 height={50} 
                                                 alt="" 
@@ -275,7 +275,7 @@ const AddEditBrands = () => {
                                                       <div>
                                                         <img 
                                                           ref={imageRef2} 
-                                                          src={`http://localhost:8081/brandlogo/${brandData.brand_logo}`} 
+                                                          src={`http://localhost:8081/api/brandlogo/${brandData.brand_logo}`} 
                                                           width={50} 
                                                           height={50} 
                                                           alt="" 

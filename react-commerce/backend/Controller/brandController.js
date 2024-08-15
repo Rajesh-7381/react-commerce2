@@ -80,7 +80,7 @@ exports.deleteBrand = async (req, res) => {
     try {
       const result = await Brand.getById(id);
       // console.log(result.length)
-      if (result.length === 0) {
+      if (!result) {
         return res.status(404).json({ message: "Data not found!" });
       }
       res.status(200).json({message:"found successfully!", data: result });
@@ -93,7 +93,7 @@ exports.deleteBrand = async (req, res) => {
 exports.brandCount=async (req,res)=>{
   try {
     const result=await Brand.allBrandCount();
-    res.json({message:`Total Brand::`,result})
+    res.json({allBrandCount:result})
   } catch (error) {
       console.log(error)
   }
@@ -101,6 +101,6 @@ exports.brandCount=async (req,res)=>{
 
 exports.Search=async (req,res)=>{
   const searchTerm=req.params.searchTerm
-  const result=await await Brand.SearchTerm(searchTerm);
+  const result=await await Brand.searchTerm(searchTerm);
   res.json(result)
 }

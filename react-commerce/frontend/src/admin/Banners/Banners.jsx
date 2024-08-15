@@ -18,7 +18,7 @@ const Banners = () => {
 
     const BannerData=async()=>{
         try {
-            const response=await axios.get("http://localhost:8081/getAllBanners");
+            const response=await axios.get("http://localhost:8081/api/getAllBanners");
             setbannerData(response.data);
             // console.log(bannerData)
             
@@ -40,7 +40,7 @@ const Banners = () => {
     // banner delete
     const BannerDelete=async(id)=>{
       const data=await DeleteEntity('Banner',id);
-      const response=await axios.get("http://localhost:8081/getAllBanners");
+      const response=await axios.get("http://localhost:8081/api/getAllBanners");
       setbannerData(response.data);
       
     }
@@ -131,14 +131,15 @@ const Banners = () => {
                         </tr>
                       </thead>
                       <tbody>
-                      {bannerData.map((item, index) => (
+                      { bannerData && bannerData.length > 0 ?
+                        bannerData.map((item, index) => (
                         <tr key={index}>
                           <td>{index+1}</td>
                           <td>{item.type}</td>
                           
                           <td>
-                                <Link to={`http://localhost:8081/bannerImage/`+  item.image} target="_blank" id='image-constrained'>
-                                    <img src={`http://localhost:8081/bannerImage/` + item.image} width={50} height={50} alt="" />
+                                <Link to={`http://localhost:8081/api/bannerImage/`+  item.image} target="_blank" id='image-constrained'>
+                                    <img src={`http://localhost:8081/api/bannerImage/` + item.image} width={50} height={50} alt="" />
                                 </Link>
                           </td>
                           
@@ -153,7 +154,12 @@ const Banners = () => {
                           <button className='btn btn-danger btn-sm ' onClick={()=>BannerDelete(item.id)}><i className='fas fa-trash'></i></button>
                           </td>
                         </tr>
-                      ))}
+                      ))
+                      :
+                      <tr>
+                        <td  colSpan={6}>No data found</td>
+                      </tr>
+                    }
                       </tbody>
                     </table>
                   </div>

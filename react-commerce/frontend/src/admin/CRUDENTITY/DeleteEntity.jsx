@@ -21,31 +21,31 @@ export const DeleteEntity = async (entity, id) => {
             break;
 
           case 'Brand':
-            await axios.delete(`http://localhost:8081/branddelete/${id}`);
+            await axios.delete(`http://localhost:8081/api/branddelete/${id}`);
             break;
 
           case 'Product':
-            await axios.delete(`http://localhost:8081/productdelete/${id}`);
+            await axios.delete(`http://localhost:8081/api/productdelete/${id}`);
             break;
 
           case 'Banner':
-            await axios.delete(`http://localhost:8081/DeleteBanners/${id}`);
+            await axios.delete(`http://localhost:8081/api/DeleteBanners/${id}`);
             break;
 
           case 'Cms':
-            await axios.delete(`http://localhost:8081/cmsdelete/${id}`);
+            await axios.delete(`http://localhost:8081/api/cmsdelete/${id}`);
             break;
 
           case 'ProductsImage':
-            await axios.delete(`http://localhost:8081/ProductsImageDelete/${id}`);
+            await axios.delete(`http://localhost:8081/api/ProductsImageDelete/${id}`);
             break;
 
           case 'SubAdmin':
-            await axios.delete(`http://localhost:8081/deleteAdminSubAdminUser/${id}`);
+            await axios.delete(`http://localhost:8081/api/deleteAdminSubAdminUser/${id}`);
             break;  
 
           case 'Admin':
-            await axios.delete(`http://localhost:8081/deleteAdminSubAdminUser/${id}`);
+            await axios.delete(`http://localhost:8081/api/deleteAdminSubAdminUser/${id}`);
             break;  
 
           default:

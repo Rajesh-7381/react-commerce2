@@ -35,7 +35,7 @@ const Subadmin = (args) => {
     // Fetch data
     const handleData = async () => {
         try {
-            const response = await axios.get("http://localhost:8081/getAllSubAdminData");
+            const response = await axios.get("http://localhost:8081/api/getAllSubAdminData");
             setData(response.data);
             setFilterData(response.data);
         } catch (error) {
@@ -54,14 +54,12 @@ const Subadmin = (args) => {
     // Searching function
     const searchFunction = (event) => {
         const searchData = event.target.value.toLowerCase().trim();
+        // console.log(searchData)
         if (searchData === '') {
             setFilterData(data);
         } else {
             const filtered = data.filter(item =>
-                item.name.toLowerCase().includes(searchData) ||
-                item.email.toLowerCase().includes(searchData) ||
-                item.mobile.toLowerCase().includes(searchData) ||
-                item.role.toLowerCase().includes(searchData)
+              item &&  item.name.toLowerCase().includes(searchData) 
             );
             setFilterData(filtered);
         }
@@ -69,7 +67,7 @@ const Subadmin = (args) => {
     // single data using modal 
     const toggle = async (id) => {
         try {
-          const response = await axios.get(`http://localhost:8081/singledata/${id}`);
+          const response = await axios.get(`http://localhost:8081/api/singledata/${id}`);
           setmodaldata(response.data.data);
           setModal(!modal);
         } catch (error) {
@@ -87,7 +85,7 @@ const Subadmin = (args) => {
     const handledelete = async (id) => {
         await DeleteEntity('SubAdmin',id)
         // Fetch the updated data from the server and update the local state
-        const response = await axios.get("http://localhost:8081/getAllAdminSubadminUsers");
+        const response = await axios.get("http://localhost:8081/api/getAllAdminSubadminUsers");
         setData(response.data);
         setFilterData(response.data);
          
@@ -225,7 +223,9 @@ const Subadmin = (args) => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {filterData.slice((currentPage -1) * recordsPerPage ,currentPage * recordsPerPage).map((item, index) => (
+                                            {
+                                              filterData && filterData.length > 0 ? 
+                                              filterData.slice((currentPage -1) * recordsPerPage ,currentPage * recordsPerPage).map((item, index) => (
                                                 <tr key={item.id}>
                                                     <td>{index + 1 +(currentPage -1) * recordsPerPage}</td>
                                                     <td>{item.name}</td>
@@ -239,7 +239,12 @@ const Subadmin = (args) => {
                                                         <button className='btn btn-danger btn-sm' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
                                                     </td>
                                                </tr>
-                                            ))}
+                                            ))
+                                            : 
+                                            <tr>
+                                              <td colSpan={6}>No data found</td>
+                                            </tr>
+                                            }
                                         </tbody>
                                     </table>
                                     <nav className='float-right'>
@@ -271,7 +276,7 @@ const Subadmin = (args) => {
               Hi <span className='bg-warning'>{modaldata.name}</span> 
             </ModalHeader>
             <div className="text-center">
-              <img src={`http://localhost:8081/profile/${modaldata.image}`} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
+              <img src={`http://localhost:8081/api/profile/${modaldata.image}`} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
             </div>
             <ModalBody>
               <div className="container">

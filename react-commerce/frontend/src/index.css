@@ -12,3 +12,13 @@ code {
     monospace;
 }
 
+.loader-container{
+  background: rgba(0, 0, 0, 0.84);
+  background-image: url("https://i.gifer.com/ZZ5H.gif");
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 1;
+}

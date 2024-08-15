@@ -18,7 +18,7 @@ const ProductImages = () => {
     },[]);
 
     const productsimagetabledata=async()=>{
-        const response=await axios.get("http://localhost:8081/getAllproductsImages");
+        const response=await axios.get("http://localhost:8081/api/getAllproductsImages");
         // console.log(response.data)
         setproductsimage(response.data);
         setfilterdata(response.data);
@@ -114,13 +114,14 @@ const ProductImages = () => {
                                             </thead>
                                             <tbody>
                                                 {
+                                                    filterdata && filterdata.length > 0 ?
                                                     filterdata.map((item,index)=>(
                                                         <tr  key={item.id}>
                                                             <td > {index+1}</td>
 
                                                             <td >
-                                                                <Link to={`http://localhost:8081/productsimage/`+  item.image} target="_blank" id='image-constrained'>
-                                                                    <img src={`http://localhost:8081/productsimage/` + item.image} width={50} height={50} alt="" />
+                                                                <Link to={`http://localhost:8081/api/productsimage/`+  item.image} target="_blank" id='image-constrained'>
+                                                                    <img src={`http://localhost:8081/api/productsimage/` + item.image} width={50} height={50} alt="" />
                                                                 </Link>
                                                             </td>
 
@@ -135,6 +136,10 @@ const ProductImages = () => {
                                                             </td>
                                                         </tr>
                                                     ))
+                                                    :
+                                                    <tr>
+                                                        <td colSpan={6}>No data found</td>
+                                                    </tr>
                                                 }
                                             </tbody>
                                         </table>

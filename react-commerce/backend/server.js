@@ -20,6 +20,7 @@ const stripe=require('stripe')(process.env.STRIPE_SECRET_KEY)
 const swaggerUi = require('swagger-ui-express');
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
+const ejs=require("ejs")
 
 const checkAuth = require("./Auth/RouteCheckAuth");
 const errhandler = require("./Middleware/ErrorHandler");
@@ -36,6 +37,8 @@ const productRoutes=require("./Routes/productRoutes")
 const bannerRoutes=require("./Routes/bannerRoutes")
 const brandRoutes=require("./Routes/brandRoute")
 const frontRoutes=require("./Routes/frontRoutes")
+
+
 const app = express(); //create express.js(framework) instance
 
             // middleware
@@ -272,52 +275,19 @@ app.use("/api",productRoutes)
 app.use("/api",brandRoutes)
 app.use("/api",bannerRoutes)
 app.use("/api",frontRoutes)
-// add category
-app.post("/addcategory", upload.single("category_image"), (req, res) => {
-  const combinedData = { ...req.body, category_image: req.file };
-  const { error } = CategorySchema.validate(combinedData);
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: "🚫 Invalid request body!", error: error.details });
-  }
 
-  const {
-    category_name,
-    parent_id,
-    category_discount,
-    description,
-    url,
-    meta_title,
-    meta_description,
-    meta_keyword,
-  } = req.body;
-  const category_image = req.file.filename;
-  const query =
-    "INSERT INTO categories (category_name,parent_id,category_image, category_discount, description, url, meta_title, meta_description, meta_keyword) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)";
-  db.query(
-    query,
-    [
-      category_name,
-      parent_id,
-      category_image,
-      category_discount,
-      description,
-      url,
-      meta_title,
-      meta_description,
-      meta_keyword,
-    ],
-    (err, result) => {
-      if (err) {
-        console.error("🚫 " + err);
-        res.status(500).json({ error: "🚫Internal server error" });
-        return;
-      }
-      res.status(200).json({ message: "✅ Data inserted successfully!" });
-    }
-  );
-});
+
+app.set('view engine','ejs')
+app.set('vviews','../views/index')
+app.get("/",(req,res)=>{
+  const data = {
+    username: 'Rajesh!',
+    date: new Date().toDateString(),
+    Swagger: 'http://localhost:8081/api-docs'
+  };
+  
+  res.render('index',data)
+})
 // update categories
 app.put("/updatecategory/:id", upload.single("category_image"), (req, res) => {
   const combinedData = { ...req.body, category_image: req.file };
@@ -365,197 +335,6 @@ app.put("/updatecategory/:id", upload.single("category_image"), (req, res) => {
   );
 });
 
-app.post(
-  "/addproducts",
-  upload.fields([
-    { name: "product_video", maxCount: 1 },
-    { name: "product_image", maxCount: 20 },
-  ]),
-  async (req, res) => {
-    const combinedData = {
-      ...req.body,
-      product_video: req.files["product_video"] ? req.files["product_video"][0] : null,
-      product_image: req.files["product_image"] ? req.files["product_image"] : [],
-    };
-    const { error } = ProductSchema.validate(combinedData);
-    if (error) {
-      return res
-        .status(400)
-        .json({ message: "🚫 Invalid request body!", error: error.details });
-    }
-    try {
-      const {
-        category_id,
-        brand_id,
-        product_name,
-        product_code,
-        product_color,
-        family_color,
-        group_code,
-        product_price,
-        product_weight,
-        product_discount,
-        discount_type,
-        final_price,
-        description,
-        washcare,
-        keywords,
-        fabric,
-        pattern,
-        sleeve,
-        fit,
-        meta_keywords,
-        meta_description,
-        meta_title,
-        occassion,
-        is_featured,
-      } = req.body;
-
-      const product_video = req.files["product_video"]
-        ? req.files["product_video"][0].filename
-        : null;
-      const product_images = req.files["product_image"]
-        ? req.files["product_image"]
-        : [];
-      const is_featured_val = is_featured === "Yes" ? "Yes" : "No";
-
-      // Insert product data into the database
-      const query =
-        "INSERT INTO products (category_id,brand_id,  product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description, meta_title, occassion, is_featured) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-      const values = [
-        category_id,
-         brand_id,
-        product_name,
-        product_code,
-        product_color,
-        family_color,
-        group_code,
-        product_price,
-        product_weight,
-        product_discount,
-        discount_type,
-        final_price,
-        product_video,
-        description,
-        washcare,
-        keywords,
-        fabric,
-        pattern,
-        sleeve,
-        fit,
-        meta_keywords,
-        meta_description,
-        meta_title,
-        occassion,
-        is_featured_val,
-      ];
-
-      db.query(query, values, async (err, result) => {
-        if (err) {
-          console.error("🚫 " + err);
-          return res
-            .status(500)
-            .json({ message: "🚫 Internal Server Error" });
-        }
-
-        const productId = result.insertId;
-
-        if (product_images.length > 0) {
-          const outputDirs = {
-            large: "uploads/productImages/large",
-            medium: "uploads/productImages/medium",
-            small: "uploads/productImages/small",
-          };
-
-          const resolutions = {
-            large: { width: 1280, height: 760 },
-            medium: { width: 760, height: 480 },
-            small: { width: 480, height: 320 },
-          };
-
-          // Ensure directories exist
-          for (const dir of Object.values(outputDirs)) {
-            if (!fs.existsSync(dir)) {
-              fs.mkdirSync(dir, { recursive: true });
-            }
-          }
-
-          // Process and save the images in different resolutions
-          await Promise.all(
-            product_images.map(async (file) => { //file: Represents the current file object, which includes properties like path (temporary location on the server) and filename.
-              await Promise.all(
-                Object.entries(resolutions).map( //Object.entries(resolutions).map(...): Iterates over each resolution defined in the resolutions object. This gives access to both the key (like large) and the resolution values (width, height).
-                  async ([key, { width, height }]) => { //[key, { width, height }]: Destructures the current resolution object into key, width, and height.
-                    const outputPath = path.join(
-                      __dirname, //outputPath: The full path where the resized image will be saved. It combines the current directory (__dirname), the directory for the specific size (outputDirs[key]), and the original filename (file.filename).
-                      outputDirs[key],
-                      file.filename
-                    );
-                    await sharp(file.path)
-                      .resize(width, height)
-                      .toFile(outputPath);
-                  }
-                )
-              );
-            })
-          );
-
-          // Insert each product image into the database
-          const imagesQuery =
-            "INSERT INTO products_image (product_id, image, image_sort) VALUES ?";
-          const imageValues = product_images.map((file, index) => [
-            productId,
-            file.filename,
-            index + 1,
-          ]);
-
-          db.query(imagesQuery, [imageValues], (err, data) => {
-            if (err) {
-              console.error("🚫 " + err);
-              return res
-                .status(500)
-                .json({ message: "🚫 Internal Server Error" });
-            }
-          });
-        }
-
-        // Handle product attributes
-        let attributes = req.body.attributes;
-        if (typeof attributes === "string") { //typeof attributes === "string": This checks if the attributes data is a string. This could happen if the attributes were sent as a JSON string.
-          attributes = JSON.parse(attributes); //convert into objects or array
-        }
-
-        if (Array.isArray(attributes) && attributes.length > 0) {
-          const attributesQuery =
-            "INSERT INTO product_attributes (product_id, size, sku, price, stock) VALUES ?";
-          const attributeValues = attributes.map((attribute) => [
-            productId,
-            attribute.size,
-            attribute.sku,
-            attribute.price,
-            attribute.stock,
-          ]);
-
-          db.query(attributesQuery, [attributeValues], (err, data) => {
-            if (err) {
-              console.error("🚫 " + err);
-              return res
-                .status(500)
-                .json({ message: "🚫 Internal Server Error" });
-            }
-          });
-        }
-
-        return res
-          .status(200)
-          .json({ message: "✅ Product added successfully!" });
-      });
-    } catch (error) {
-      console.error("🚫 " + error);
-      return res.status(500).json({ message: " 🚫 Internal Server Error" });
-    }
-  }
-);
 
 app.put(
   "/updateproducts/:id",
@@ -647,19 +426,6 @@ app.put(
     );
   }
 );
-// for searching product
-app.get("/SearchProducts/:searchTerm", (req, res) => {
-  const searchTerm = req.params.searchTerm;
-  const query = "SELECT * FROM products WHERE product_name LIKE? ";
-  db.query(query, [`%${searchTerm}%`], (err, results) => {
-    if (err) {
-      console.error("🚫 Error searching for products", err);
-      res.status(500).json({ error: "🚫 internal Server Error" });
-      return;
-    }
-    res.json(results);
-  });
-});
 
 app.put(
   "/UpdateBrand/:id",
@@ -808,6 +574,6 @@ app.post("/DeliveryAddress",(req,res)=>{
 })
 
 app.listen(process.env.SERVERPORT, () => {
-  console.log(`server listening at port ${process.env.SERVERPORT}`);
+  console.log(`server listening at port http://localhost:${process.env.SERVERPORT}`);
   console.log(`Swagger UI is available at http://localhost:${process.env.SERVERPORT}/api-docs`);
 });

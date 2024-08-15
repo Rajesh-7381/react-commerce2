@@ -111,9 +111,11 @@ const CmsPage = {
 
   // Get a CMS page by its ID
   getById: async (id) => {
+    // console.log(id)
     const query = "SELECT * FROM cmspages WHERE id=? AND deleted_at IS NULL";
     try {
       const [rows] = await db.promise().query(query, [id]);
+      // console.log(rows)
       return rows[0];
     } catch (error) {
       console.error(`Error fetching CMS page with ID ${id}:`, error);

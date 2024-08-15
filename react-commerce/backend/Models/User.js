@@ -1,26 +1,29 @@
 const { db }= require("../config/dbconfig");
 const bcrypt=require("bcrypt")
-// const s=10;
 const SALT=parseInt(process.env.GEN_SALT);
 // console.log(SALT)
 
 const CheckAdminUserLogin=async(email,callback)=>{
-    
-    const query="SELECT * FROM AdminUser WHERE email = ?"
-    db.query(query,[email],async(err,results)=>{
-      if(err){
-        return callback(err,null)
-      }
-        return callback(null,results[0]);
-        //  console.log(results[0])
-    })
+    try {
+      const query="SELECT * FROM AdminUser WHERE email = ?"
+      db.query(query,[email],async(err,results)=>{
+        if(err){
+          return callback(err,null)
+        }
+          return callback(null,results[0]);
+          //  console.log(results[0])
+      })
+    } catch (error) {
+        console.error(error)
+    }
   }
 class AdminUserModel{
   static async findByUUID(uuid){
+    // console.log(uuid)
     try {
-      const query="select * from AdminUser where uuid=?";
-      const [rows]=await db.Promise().query(query,[uuid])
-      console.log(rows)
+      const query="select * from AdminUser where uuid=? and deleted_at is null";
+      const rows=await db.promise().query(query,[uuid])
+      // console.log(rows)
       return rows;
     } catch (error) {
         throw error
@@ -65,9 +68,13 @@ class User{
 
 class EmailCheck{
   static async findByEmail(email){
-    const query = "SELECT * FROM AdminUser WHERE email=?";
-    const [result]=await db.promise().query(query, [email]);
-    return result;
+    try {
+      const query = "SELECT * FROM AdminUser WHERE email=?";
+      const [result]=await db.promise().query(query, [email]);
+      return result;
+    } catch (error) {
+        console.error(error)
+    }
   }
 }
 class MobileCheck{
@@ -77,113 +84,145 @@ class MobileCheck{
       const [result] = await db.promise().query(query, [mobile]);
       return result;
     } catch (error) {
-      console.error("Error in MobileCheck.findByMobile:", error);
-      throw error; 
+        console.error("Error in MobileCheck.findByMobile:", error);
+        throw error; 
     }
   }
 }
 
 class forgotPassword{
   static async updatePassword(email,newPassword){
-      const SALT=await bcrypt.genSalt(s);
-      // console.log(SALT)
-      const hashedPassword=await bcrypt.hash(newPassword,SALT);
-      // console.log(hashedPassword)
-      const query="UPDATE AdminUser SET password=? WHERE email=?";
-      await new Promise((resolve,reject)=>{
-        db.query(query,[hashedPassword,email],(err,results)=>{
-          if(err){
-            return reject(err)
-          }
-          resolve(results)
-          // console.log(results)
+      try {
+        const HashedSALT=await bcrypt.genSalt(SALT);
+        // console.log(SALT)
+        const hashedPassword=await bcrypt.hash(newPassword,HashedSALT);
+        // console.log(hashedPassword)
+        const query="UPDATE AdminUser SET password=? WHERE email=?";
+        await new Promise((resolve,reject)=>{
+          db.query(query,[hashedPassword,email],(err,results)=>{
+            if(err){
+              return reject(err)
+            }
+            resolve(results)
+            // console.log(results)
+          })
         })
-      })
+      } catch (error) {
+          console.error(error)
+      }
   }
 }
 
 class TotalUser{
   static async TotalUser(){
-    const query = "SELECT COUNT(id) AS count FROM AdminUser where role='user'"; // Alias 'count(id)' as 'total'
-    // console.log(query)
-    const result=await new Promise((resolve,reject)=>{
-      db.query(query,(err,results)=>{
-        // console.log(results)
-        if(err){
-          return reject(err)
-        }
-        resolve(results)
-        // console.log(results[0].count)
+    try {
+      const query = "SELECT COUNT(id) AS count FROM AdminUser where role='user'"; // Alias 'count(id)' as 'total'
+      // console.log(query)
+      const result=await new Promise((resolve,reject)=>{
+        db.query(query,(err,results)=>{
+          // console.log(results)
+          if(err){
+            return reject(err)
+          }
+          resolve(results)
+          // console.log(results[0].count)
+        })
       })
-    })
-    return result[0].count;
+      return result[0].count;
+    } catch (error) {
+        console.error(error)
+    }
   }
 }
 class TotalAdmin{
   static async TotalAdmin(){
-    const query = "SELECT COUNT(id) AS total FROM AdminUser where role='admin'"; // Alias 'count(id)' as 'total'
-    const result=await new Promise((resolve,reject)=>{
-      db.query(query,(err,results)=>{
-        if(err){
-          return reject(err)
-        }
-        resolve(results)
+    try {
+      const query = "SELECT COUNT(id) AS total FROM AdminUser where role='admin'"; // Alias 'count(id)' as 'total'
+      const result=await new Promise((resolve,reject)=>{
+        db.query(query,(err,results)=>{
+          if(err){
+            return reject(err)
+          }
+          resolve(results)
+        })
+        
       })
-      
-    })
-    return result[0].total
+      return result[0].total
+    } catch (error) {
+        console.error(error)
+    }
   }
 }
 class TotalSubAdmin{
   static async TotalSubAdmin(){
-    const query = "SELECT COUNT(id) AS total FROM AdminUser where role='subadmin'"; // Alias 'count(id)' as 'total'
-    const result=await new Promise((resolve,reject)=>{
-      db.query(query,(err,results)=>{
-        if(err){
-          return reject(err)
-        }
-        resolve(results)
+    try {
+      const query = "SELECT COUNT(id) AS total FROM AdminUser where role='subadmin'"; // Alias 'count(id)' as 'total'
+      const result=await new Promise((resolve,reject)=>{
+        db.query(query,(err,results)=>{
+          if(err){
+            return reject(err)
+          }
+          resolve(results)
+        })
       })
-    })
-    return result[0].total
+      return result[0].total
+    } catch (error) {
+        throw error
+    }
   }
 }
 class getAllAdminSubadminUsers{
   static async TotalAdminSubAdminUser(){
-    const query = "SELECT * FROM AdminUser where deleted_at is null"; // Alias 'count(id)' as 'total'
-    const result=await new Promise((resolve,reject)=>{
-      db.query(query,(err,results)=>{
-        if(err){
-          return reject(err)
-        }
-        resolve(results)
+    try {
+      const query = "SELECT * FROM AdminUser where deleted_at is null"; // Alias 'count(id)' as 'total'
+      const result=await new Promise((resolve,reject)=>{
+        db.query(query,(err,results)=>{
+          if(err){
+            return reject(err)
+          }
+          resolve(results)
+        })
       })
-    })
-    return result;
+      return result;
+    } catch (error) {
+        throw error
+    }
   }
 }
 class indvidualDetails{
   static async SingleUserAdminSubadmibDetails(id){
-    const query = "select *  from AdminUser where id=?";
-    const [result]=await db.promise().query(query,[id]);
-    console.log(result)
-    return result;
+    try {
+      const query = "select *  from AdminUser where id=?";
+      const [result]=await db.promise().query(query,[id]);
+      // console.log(result)
+      return result;
+    } catch (error) {
+        throw error
+    }
   }
 }
 class EditDetails{
   static async SingleData(id){
-    const query = "select * from AdminUser where id=?";
-    const [result]=await db.promise().query(query,[id]);
-    return result;
+    try {
+      const query = "select * from AdminUser where id=?";
+      const [result]=await db.promise().query(query,[id]);
+      return result;
+    } catch (error) {
+        throw error
+    }
   }
 }
 class UpdateDetails{
   static async Update(name, mobile, email, password, role,id){
-    const hashedPassword=await bcrypt.hash(password,SALT)
-    // console.log(hashedPassword)
-    const query = "UPDATE AdminUser SET name=?, mobile=?, email=?, password=?, role=? WHERE id=?";
-    const [result]=await db.promise().query(query,[name, mobile, email, hashedPassword, role, id]);
-    return result;
+    try {
+      const hashedPassword=await bcrypt.hash(password,SALT)
+      // console.log(hashedPassword)
+      const query = "UPDATE AdminUser SET name=?, mobile=?, email=?, password=?, role=? WHERE id=?";
+      const [result]=await db.promise().query(query,[name, mobile, email, hashedPassword, role, id]);
+      return result;
+    } catch (error) {
+        throw error
+    }
   }
 }
 class Delete {
@@ -207,56 +246,65 @@ class Delete {
 }
 class SearchAdminSubAdminUser{
   static async SearchDetails(searchTerm){
-    const query = "SELECT * FROM AdminUser WHERE name LIKE? OR email LIKE?";
-    const result=await new Promise((resolve,reject)=>{
-      db.query(query,[`%${searchTerm}%`, `%${searchTerm}%`],(err,results)=>{
-        if(err){
-          return reject(err);
-        }
-        resolve(results)
+    try {
+      const query = "SELECT * FROM AdminUser WHERE name LIKE? OR email LIKE?";
+      const result=await new Promise((resolve,reject)=>{
+        db.query(query,[`%${searchTerm}%`, `%${searchTerm}%`],(err,results)=>{
+          if(err){
+            return reject(err);
+          }
+          resolve(results)
+        })
       })
-    })
-    return result;
+      return result;
+    } catch (error) {
+        console.error(error)
+    }
   }
 }
 class registerUserParticularDate{
   static async SearchDate(date){
      // console.log(date)
-  const formattedDate = date.split('-').reverse().join('-');
-  // console.log(formattedDate)
-
   // here issue is created_at stored date time format but i want to show date format thats why we use  'CAST' or 'DATE_FORMAT'
   // const query="SELECT COUNT(*) AS count FROM AdminUser WHERE role='user' AND CAST(created_at AS DATE) = ?";
-    const query = "SELECT * FROM AdminUser WHERE role='user' and date(created_at) = ?";
-    const  result=await new Promise((resolve,reject)=>{
-      db.query(query,[formattedDate],(err,results)=>{
-        if(err){
-          return reject(err);
-        }
-        resolve(results)
-        // console.log(results)
+    try {
+      const query = "SELECT * FROM AdminUser WHERE role='user' and date(created_at) = ?";
+      const  [result]=await new Promise((resolve,reject)=>{
+        db.query(query,[date],(err,results)=>{
+          if(err){
+            return reject(err);
+          }
+          resolve(results)
+          // console.log(results)
+        })
       })
-    })
-    return result;
+      return result;
+    } catch (error) {
+        console.error(error)
+    }
   }
 }
 class registerUserfromrDateTotodate{
   static async SearchDate(fromdate,todate){
-    const formDate=fromdate.split("-").reverse().join("-")
-    const toDate=todate.split("-").reverse().join("-")
-    // console.log(formDate + " "+toDate)
-    const query = "SELECT COUNT(*) AS count FROM AdminUser WHERE created_at BETWEEN ? AND ?";
-    const result=await new Promise((resolve,reject)=>{
-      db.query(query,[formDate, toDate],(err,results)=>{
-        if(err){
-          return reject(err);
-        }
-        resolve(results)
-        // console.log(results)
+    try {
+      const formDate=fromdate.split("-").reverse().join("-")
+      const toDate=todate.split("-").reverse().join("-")
+      // console.log(formDate + " "+toDate)
+      const query = "SELECT COUNT(*) AS count FROM AdminUser WHERE created_at BETWEEN ? AND ?";
+      const result=await new Promise((resolve,reject)=>{
+        db.query(query,[formDate, toDate],(err,results)=>{
+          if(err){
+            return reject(err);
+          }
+          resolve(results)
+          // console.log(results)
+        })
       })
-    })
-    // console.log(result[0].count)
-    return result[0].count;
+      // console.log(result[0].count)
+      return result[0].count;
+    } catch (error) {
+        console.error(error)
+    }
   }
 }
 class getAllSubAdminData{

@@ -6,9 +6,9 @@ const sharp = require("sharp");
 exports.getAllProducts = async (req, res) => {
   // console.log(1)
   try {
-    const products = await Product.getAll();
+    const products = await Product.Product.getAll();
     // console.log(products)
-    res.json({message:"products fetched successfully!",products});
+    res.json(products);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
@@ -21,7 +21,7 @@ exports.updateProduct = async (req, res) => {
   const productData = { ...req.body, product_video };
 
   try {
-    await Product.updateById(id, productData);
+    await Product.Product.updateById(id, productData);
     res.status(200).json({ message: "Updated successfully!" });
   } catch (err) {
     console.error(err);
@@ -31,8 +31,9 @@ exports.updateProduct = async (req, res) => {
 
 exports.getProductById = async (req, res) => {
   const id = req.params.id;
+  // console.log(id)
   try {
-    const product = await Product.getById(id);
+    const product = await Product.Product.getById(id);
     if (!product) {
       return res.status(404).json({ message: "Data not found!" });
     }
@@ -71,7 +72,7 @@ exports.updateProductStatus = async (req, res) => {
 
 exports.getProductColors = async (req, res) => {
   try {
-    const colors = await Product.getColors();
+    const colors = await Product.Product.getColors();
     res.json(colors);
   } catch (err) {
     console.error(err);
@@ -81,7 +82,7 @@ exports.getProductColors = async (req, res) => {
 
 exports.getProductCount = async (req, res) => {
   try {
-    const productCount = await Product.getTotalCount();
+    const productCount = await Product.Product.getTotalCount();
     res.json({ productcount: productCount });
   } catch (err) {
     console.error(err);
@@ -92,7 +93,7 @@ exports.getProductCount = async (req, res) => {
 
 exports.getProductImages = async (req, res) => {
   try {
-    const images = await Product.getImages();
+    const images = await Product.Product.getImages();
     res.json(images);
   } catch (err) {
     console.error(err);
@@ -139,8 +140,8 @@ exports.handleproductImagesstatus=async(req,res)=>{
 exports.editproductattributes=async(req,res)=>{
   const id = req.params.id;
   try {
-    await Product.ProductAttributeById(id);
-    res.status(200).json({ message: "updated successfully!" });
+    const result=await Product.Product.ProductAttributeById(id);
+    res.status(200).json({ message: "found successfully!",result });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
@@ -154,7 +155,7 @@ exports.ProductAttributesStatusChange=async(req,res)=>{
     await Product.ProductAttributeByIdStatusChange(id,status);
     res.status(200).json({ message: "status updated successfully!" });
   } catch (err) {
-    console.error(err);
+    console.error(err); 
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
@@ -174,7 +175,7 @@ exports.deleteattribute=async(req,res)=>{
 exports.allproductsAttributes=async(req,res)=>{  
   // console.log(1)
   try {
-    const result=await Product.getAllProductsAttribute();
+    const result=await Product.Product.getAllProductsAttribute();
     // console.log(1)
     res.status(200).json({ message: "attribute get successfully!" ,result});
   } catch (err) {
@@ -183,6 +184,17 @@ exports.allproductsAttributes=async(req,res)=>{
   }
 }
 
+exports.SearchProduct = async (req, res) => {
+  try {
+    const searchTerm = req.params.searchTerm;
+    console.log(searchTerm);
+    const result = await Product.Product.searchProducts(searchTerm);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
 
 exports.addProduct = async (req, res) => {
   try {

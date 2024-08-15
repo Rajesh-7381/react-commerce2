@@ -22,7 +22,7 @@ const AddEditBanners = () => {
 
   const GetBannerDetails = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8081/EditBannerDetails/${id}`);
+      const response = await axios.get(`http://localhost:8081/api/EditBannerDetails/${id}`);
       const data = response.data.data[0];
       setBannerData(data);
       setValue("type", data.type);
@@ -45,14 +45,14 @@ const AddEditBanners = () => {
       }
 
       if (id) {
-        await axios.put(`http://localhost:8081/UpdateBanners/${id}`, form, {
+        await axios.put(`http://localhost:8081/api/UpdateBanners/${id}`, form, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
         NotificationManager.success("Banner updated successfully!");
       } else {
-        await axios.post("http://localhost:8081/api/AddBanners", form, {
+        await axios.post("http://localhost:8081/api/api/AddBanners", form, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

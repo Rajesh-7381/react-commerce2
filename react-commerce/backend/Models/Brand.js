@@ -128,10 +128,12 @@ const Brand = {
   // Search for brands by a search term
   searchTerm: async (searchTerm) => {
     const searchLowerCase = searchTerm.toLowerCase();
+    // console.log(searchLowerCase)
     const query = "SELECT * FROM Brands WHERE LOWER(brand_name) LIKE ? AND deleted_at IS NULL";
     try {
       const [results] = await db.promise().query(query, [`%${searchLowerCase}%`]);
-      return results;
+      console.log(results)
+      // return results;
     } catch (error) {
       console.error("Error searching for brands:", error);
       throw error;

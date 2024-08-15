@@ -572,26 +572,40 @@ const productController=require("../Controller/productController");
 
 /**
  * @swagger
- * /api/deleteattribute/{id}:
- *   delete:
- *     summary: Delete a product attribute by ID
- *     description: Delete a specific product attribute by its ID
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID of the product attribute to delete
- *         schema:
- *           type: integer
- *           example: 1
- *     responses:
- *       '200':
- *         description: ✅ Product attribute deleted successfully
- *       '404':
- *         description: ❌ Product attribute not found
- *       '500':
- *         description: 🚫 Internal server error
+ * /api/SearchProducts/{searchTerm}:
+ *  get:
+ *    summary: search product name through
+ *    parameters:
+ *      - in: path
+ *        name: searchTerm
+ *        required: 
+ *        description: product name through seached
+ *        schema:   
+ *          type: string
+ *          example: 'ele'
+ *    responses:
+ *      '200': 
+ *        description: 
+ *          content: 
+ *            application/json: 
+ *              schema: 
+ *                type: object
+ *                propoties: 
+ *                  message: 
+ *                    type: string
+ *                    example: ✅ found successfully!
+ *      '500': 
+ *        description: 
+ *          content: 
+ *            application/json: 
+ *              schema: 
+ *                type: object
+ *                propoties: 
+ *                  message: 
+ *                    type: string
+ *                    example: 🚫 Internal server error
  */
+
 /**
  * @swagger
  * /api/allproductsAttributes:
@@ -628,6 +642,29 @@ const productController=require("../Controller/productController");
  *                   example: 🚫 Internal server error
  */
 
+/**
+ * @swagger
+ * /api/SearchProducts/{searchTerm}:
+ *   get:
+ *     summary: search product by name
+ *     description: search product by name
+ *     parameters:
+ *       - in: path
+ *         name: searchTerm
+ *         required: true
+ *         description: product name
+ *         schema:
+ *           type: string
+ *           example: 'electronics'
+ *     responses:
+ *       '200':
+ *         description: ✅ Product found successfully
+ *       '404':
+ *         description: ❌ Product not found
+ *       '500':
+ *         description: 🚫 Internal server error
+ */
+
 router.get("/getAllProducts", productController.getAllProducts);
 router.put("/updateproducts/:id", upload.single("product_video"), productController.updateProduct);
 router.get("/productedit/:id", productController.getProductById);
@@ -646,7 +683,7 @@ router.get("/editproductattributes/:id", productController.editproductattributes
 router.put("/handleproductImagesstatus/:id", productController.ProductAttributesStatusChange);
 router.delete("/deleteattribute/:id", productController.deleteattribute);
 router.get("/allproductsAttributes", productController.allproductsAttributes);
-router.get("/SearchProducts/:searchTerm");
+router.get("/SearchProducts/:searchTerm",productController.SearchProduct);
 router.get("/ProductAttributesStatusChange/:id");
 
 module.exports=router;

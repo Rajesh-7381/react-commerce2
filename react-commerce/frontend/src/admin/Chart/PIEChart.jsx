@@ -12,10 +12,11 @@ const PIEChart = () => {
     allProductCount: 0,
     allBrandCount: 0,
 });
-
+// console.log(counts)
 useEffect(() => {
     const getCounts = async () => {
         const data = await fetchDataEntity();
+        console.log(data)
         if (data) setCounts(data);
     };
 

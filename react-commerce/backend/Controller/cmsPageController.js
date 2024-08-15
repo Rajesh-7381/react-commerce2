@@ -94,12 +94,14 @@ exports.addPage = async (req, res) => {
 
 exports.getPageById = async (req, res) => {
   const id = req.params.id;
+  // console.log(id)
   try {
     const result = await CmsPage.getById(id);
-    if (result.length === 0) {
-      return res.status(404).json({ message: "Data not found!" });
+    if(result){
+    res.status(200).json({message:"found successfully!", data: result });
+    }else{
+      res.status(200).json({message:"not found successfully!" });
     }
-    res.status(200).json({ data: result[0] });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
@@ -110,7 +112,7 @@ exports.searchCMSData = async (req, res) => {
   const searchTerm = req.params.searchTerm;
   try {
     const result = await CmsPage.searchTerm(searchTerm);
-    res.status(200).json({ message: " successfully get" });
+    res.status(200).json({ message: " successfully get" ,result});
   } catch (error) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });

@@ -4,6 +4,7 @@ import { useFormik } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
 import Cookies from 'js-cookie';
+import { SpinnerCircular } from 'spinners-react';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 
 const Login = () => {
@@ -12,6 +13,7 @@ const Login = () => {
   }
   const navigate = useNavigate();
   const [pass, setPass] = useState(false);
+  const [loading, setloading] = useState(false);
 
   useEffect(()=>{
     document.title="Login";
@@ -28,6 +30,7 @@ const Login = () => {
       password: Yup.string().required("Please enter your password!")
     }),
     onSubmit: async (values, action) => {
+      setloading(true)
       try {
         const response = await axios.post("http://localhost:8081/api/login", values);
         const data = response.data;
@@ -49,7 +52,9 @@ const Login = () => {
             case 'admin':
             case 'subadmin':
               
-              navigate("/admindashboard1");
+              setTimeout(() => {
+                navigate("/admindashboard1");
+              }, 1000);
               break;
             case 'user':
               
@@ -62,7 +67,35 @@ const Login = () => {
           NotificationManager.error("Invalid email or password");
         }
       } catch (error) {
-        NotificationManager.error("Invalid email or password");
+          if(error.response){
+            switch (error.response.status){
+              case 400:
+                NotificationManager.error("Bad Request. Please check the data you have entered.");
+                break;
+              case 401:
+                  NotificationManager.error("Unauthorized access. Invalid email or password.");
+                  break;
+              case 403:
+                  NotificationManager.error("You do not have permission to perform this action.");
+                  break;
+              case 404:
+                  NotificationManager.error("Requested resource not found.");
+                  break;
+              case 500:
+                  NotificationManager.error("Internal Server Error. Please try again later.");
+                  break;  
+              default:
+                NotificationManager.error("An unexpected error occurred. Please try again.");
+            } 
+          }else if(error.request){
+              NotificationManager.error("No response from the server. Please check your network connection.");
+
+          }else{
+            NotificationManager.error("An unexpected error occurred. Please try again.");
+
+          }
+      }finally{
+        setloading(false)
       }
     }
   });
@@ -152,7 +185,7 @@ const Login = () => {
                         <div className="gl-inline ">
                           <div className="u-s-m-b-30">
                             <NotificationContainer />
-                            <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary w-75" type="submit">LOGIN</button>
+                            <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary w-75" type="submit" >{loading ? <span>Login  <SpinnerCircular thickness={180} speed={169} size={39}  color="rgba(57, 162, 172, 1)" secondaryColor='rgba(172, 57, 59, 0.86)' /></span> : "LOGIN"}</button>
                           </div>
                           <div className="u-s-m-b-30">
                             <Link className="gl-link" to={"/forgotpassword"}>Lost Your Password?</Link>

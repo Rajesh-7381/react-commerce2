@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { jsPDF } from "jspdf";
 import 'jspdf-autotable';
@@ -34,7 +34,7 @@ const AddEditRegisterUser = (args) => {
 
   const toggle = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8081/singledata/${id}`);
+      const response = await axios.get(`http://localhost:8081/api/singledata/${id}`);
       setmodaldata(response.data.data);
       // console.log(modaldata)
       setModal(!modal);
@@ -52,7 +52,7 @@ const AddEditRegisterUser = (args) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8081/getAllAdminSubadminUsers");
+        const response = await axios.get("http://localhost:8081/api/getAllAdminSubadminUsers");
         setData(response.data);
         setFilterData(response.data);  // Initialize filterData as well
       } catch (error) {
@@ -62,10 +62,39 @@ const AddEditRegisterUser = (args) => {
     fetchData();
   }, []);
 
-  const searchFunction = async (event,searchentity) => {
-  const searchTerm = event.target.value.toUpperCase().trim();
+//   const searchFunction = async (event,searchentity) => {
+//   const searchTerm = event.target.value.toUpperCase().trim();
+//   try {
+//     const response = await axios.get(`http://localhost:8081/api/SearchAdminSubAdminUser/${searchTerm}`);
+//     // console.log(response.data);
+//     let filteredData = response.data;
+//     if (searchTerm!== "") {
+//       filteredData = filteredData.filter(item =>
+//         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//         item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//         item.role.toLowerCase().includes(searchTerm.toLowerCase())
+//       );
+//     }
+//     setFilterData(filteredData);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+const debounce=(func,wait)=>{
+  let timerId;
+  // console.log(timerId)
+  return (...args)=>{
+    // console.log(args[0])
+    clearTimeout(timerId)
+    // console.log(timerId)
+    timerId=setTimeout(()=>func(...args),wait)
+    // console.log(timerId)
+  }
+}
+const callApi=async(e)=>{
+  const searchTerm=e.target.value.toUpperCase().trim();
   try {
-    const response = await axios.get(`http://localhost:8081/SearchAdminSubAdminUser/${searchTerm}`);
+    const response = await axios.get(`http://localhost:8081/api/SearchAdminSubAdminUser/${searchTerm}`);
     // console.log(response.data);
     let filteredData = response.data;
     if (searchTerm!== "") {
@@ -77,9 +106,10 @@ const AddEditRegisterUser = (args) => {
     }
     setFilterData(filteredData);
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
-};
+}
+  const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
 
   // csv download
   const headers = [
@@ -157,7 +187,7 @@ const AddEditRegisterUser = (args) => {
 
   const onSubmitForm = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8081/editdata/${id}`);
+      const response = await axios.get(`http://localhost:8081/api/editdata/${id}`);
       const { data } = response.data;
       formik.setValues({
         name: data.name,
@@ -179,10 +209,10 @@ const AddEditRegisterUser = (args) => {
       return;
     }
     try {
-      await axios.put(`http://localhost:8081/update/${id}`, values);
+      await axios.put(`http://localhost:8081/api/update/${id}`, values);
       NotificationManager.success("Form updated successfully!");
       // Fetch the updated data from the server and update the local state
-      const response = await axios.get("http://localhost:8081/getAllAdminSubadminUsers");
+      const response = await axios.get("http://localhost:8081/api/getAllAdminSubadminUsers");
       setData(response.data);
       setFilterData(response.data);
       setModal2(false); // Close the modal after successful submission
@@ -203,17 +233,17 @@ const AddEditRegisterUser = (args) => {
   });
 
 //   delete functionality
-const handledelete = async (id) => {
+  const handledelete = async (id) => {
     await DeleteEntity('Admin',id);  
     // Fetch the updated data from the server and update the local state
-    const response = await axios.get("http://localhost:8081/getAllAdminSubadminUsers");
+    const response = await axios.get("http://localhost:8081/api/getAllAdminSubadminUsers");
     setData(response.data);
     setFilterData(response.data);
       
   };
   
  // Function to handle password change and update password strength
- const handlePasswordChange = (event) => {
+  const handlePasswordChange = (event) => {
     const { value } = event.target;
     const result = zxcvbn(value);
     setPasswordStrength(result.score);
@@ -293,7 +323,7 @@ const handledelete = async (id) => {
                 <div className="card-body">
                   <form className='d-flex align-items-center justify-content-end'>
                     <div className="input-group">
-                      <input className="mr-2" type="search" placeholder="Search" aria-label="Search" onChange={searchFunction} />
+                      <input className="mr-2" type="search" placeholder="Search" aria-label="Search" onChange={(e)=>{debounceCallApi(e)}} />
                       <div className="input-group-append">
                         <button className="btn btn-outline-success mr-5" type="button" >Search</button>
                         <NotificationContainer />

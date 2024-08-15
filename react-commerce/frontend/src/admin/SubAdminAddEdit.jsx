@@ -25,7 +25,7 @@ const SubAdminAddEdit = () => {
 
     const handledit = async (id) => {
         try {
-            const response = await axios.get(`http://localhost:8081/editdata/${id}`);
+            const response = await axios.get(`http://localhost:8081/api/editdata/${id}`);
             const userData = response.data.data;
             setEditdata(userData);
             setRole(userData.role);
@@ -48,7 +48,7 @@ const SubAdminAddEdit = () => {
 
     const handlesubmit = async (formData) => {
         try {
-            const response = await axios.put(`http://localhost:8081/update/${id}`, formData);
+            const response = await axios.put(`http://localhost:8081/api/update/${id}`, formData);
             console.log(response.data.message); // Log success message
             NotificationManager.success("form updated successfully!")
             setTimeout(()=>navigate("/subadmins"),2000);
