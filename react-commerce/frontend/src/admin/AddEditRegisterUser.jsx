@@ -25,6 +25,7 @@ const AddEditRegisterUser = (args) => {
 
   // inside modal data shown(eye)
   const [modaldata, setmodaldata] = useState({});
+  // console.log(modaldata)
 
   const [id, setId] = useState(""); // Define id state
   const [passwordstrength,setPasswordStrength]=useState(0);
@@ -35,7 +36,8 @@ const AddEditRegisterUser = (args) => {
   const toggle = async (id) => {
     try {
       const response = await axios.get(`http://localhost:8081/api/singledata/${id}`);
-      setmodaldata(response.data.data);
+      // console.log(response.data)
+      setmodaldata(response.data[0]);
       // console.log(modaldata)
       setModal(!modal);
     } catch (error) {
@@ -62,24 +64,6 @@ const AddEditRegisterUser = (args) => {
     fetchData();
   }, []);
 
-//   const searchFunction = async (event,searchentity) => {
-//   const searchTerm = event.target.value.toUpperCase().trim();
-//   try {
-//     const response = await axios.get(`http://localhost:8081/api/SearchAdminSubAdminUser/${searchTerm}`);
-//     // console.log(response.data);
-//     let filteredData = response.data;
-//     if (searchTerm!== "") {
-//       filteredData = filteredData.filter(item =>
-//         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//         item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//         item.role.toLowerCase().includes(searchTerm.toLowerCase())
-//       );
-//     }
-//     setFilterData(filteredData);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
 const debounce=(func,wait)=>{
   let timerId;
   // console.log(timerId)
@@ -188,7 +172,8 @@ const callApi=async(e)=>{
   const onSubmitForm = async (id) => {
     try {
       const response = await axios.get(`http://localhost:8081/api/editdata/${id}`);
-      const { data } = response.data;
+      const  data =response.data.result[0];
+      // console.log(data)
       formik.setValues({
         name: data.name,
         mobile: data.mobile,
@@ -398,10 +383,14 @@ const callApi=async(e)=>{
       {/* for show singledata modal*/}
       <Modal isOpen={modal} toggle={toggle} {...args}>
         <ModalHeader toggle={toggle} className="bg-primary text-white">
-          Hi <span className='bg-warning'>{modaldata.name}</span> 
+          Hi {modaldata?.name ? <span className='bg-warning'>{modaldata.name}</span> : <span>No name</span>}
         </ModalHeader>
         <div className="text-center">
-          <img src={modaldata.image} className='rounded-circle img-thumbnail mx-auto d-block' height={150}  width={150}  alt={modaldata.name}/>
+          {modaldata?.image ? (
+            <img src={modaldata.image} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
+          ) : (
+            <p>No image</p>
+          )}
         </div>
         <ModalBody>
           <div className="container">
@@ -416,7 +405,7 @@ const callApi=async(e)=>{
                 <p style={{ fontWeight: "bolder" }}>ID:</p>
               </div>
               <div className="col-md-4">
-                <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span></p>
+                <p>{modaldata?.id ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span> : <span>No ID</span>}</p>
               </div>
             </div>
             <div className="row">
@@ -424,7 +413,7 @@ const callApi=async(e)=>{
                 <p style={{ fontWeight: "bolder" }}>Name:</p>
               </div>
               <div className="col-md-4">
-                <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span></p>
+                <p>{modaldata?.name ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span> : <span>No name</span>}</p>
               </div>
             </div>
             <div className="row">
@@ -432,7 +421,7 @@ const callApi=async(e)=>{
                 <p style={{ fontWeight: "bolder" }}>Email:</p>
               </div>
               <div className="col-md-4">
-                <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span></p>
+                <p>{modaldata?.email ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span> : <span>No email</span>}</p>
               </div>
             </div>
             <div className="row">
@@ -440,7 +429,7 @@ const callApi=async(e)=>{
                 <p style={{ fontWeight: "bolder" }}>Role:</p>
               </div>
               <div className="col-md-4">
-                <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span></p>
+                <p>{modaldata?.role ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span> : <span>No role</span>}</p>
               </div>
             </div>
           </div>
@@ -454,6 +443,7 @@ const callApi=async(e)=>{
           </Button>
         </ModalFooter>
       </Modal>
+
       {/* for update modal*/}
       <Modal isOpen={modal2} toggle={toggle2} {...args}>
         <ModalHeader toggle={toggle2}>Hi This is Your Personal Information</ModalHeader>

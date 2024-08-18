@@ -85,7 +85,7 @@ const AddEditProducts = () => {
 
   const fetchBrands=async()=>{
     try {
-      const response=await axios.get("http://localhost:8081/getAllBrands");
+      const response=await axios.get("http://localhost:8081/api/getAllBrands");
       setbrands(response.data);
     } catch (error) {
         console.error(error)
@@ -187,8 +187,8 @@ const AddEditProducts = () => {
       });
 
       const url = id
-        ? `http://localhost:8081/updateproducts/${id}`
-        : `http://localhost:8081/addproducts`;
+        ? `http://localhost:8081/api/updateproducts/${id}`
+        : `http://localhost:8081/api/addproducts`;
       const method = id ? "put" : "post";
 
       await axios[method](url, form, {

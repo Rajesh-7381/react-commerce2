@@ -3,6 +3,10 @@ import axios from 'axios';
 import { NotificationManager } from 'react-notifications';
 
 export const StatusEntity = async (entityType, id, currentStatus, setData, data) => {
+    // console.log(entityType)
+    // console.log(id)
+    // console.log(setData)
+    // console.log(data)
     try {
         const newStatus = currentStatus === 1 ? 0 : 1;
         let url = '';
@@ -22,10 +26,11 @@ export const StatusEntity = async (entityType, id, currentStatus, setData, data)
                 break;
 
             case 'BannerStatus':
-                url = `http://localhost:8081/vhandlebannerstatus/${id}`;
+                url = `http://localhost:8081/handlebannerstatus/${id}`;
                 break;
 
             case 'CmsStatus':
+                // console.log(id)
                 url = `http://localhost:8081/api/handlecmsstatus/${id}`;
                 break;
 

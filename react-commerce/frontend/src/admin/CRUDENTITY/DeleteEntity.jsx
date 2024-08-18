@@ -51,7 +51,7 @@ export const DeleteEntity = async (entity, id) => {
           default:
             throw new Error(`Unknown entity: ${entity}`);
         }
-        NotificationManager.success(`Successfully deleted ${entity} data`);
+        NotificationManager.success(`Successfully deleted by ${entity} `);
         
       } else {
         NotificationManager.error(`Data not deleted  successfully!`);

@@ -128,7 +128,7 @@ router.get("/getAllCmss", cmsController.getAllPages);
  *                   example: 🚫 Internal server error
  */
 
-router.put("/handlecmspagestatus/:id", cmsController.updatePageStatus);
+router.put("/handlecmsstatus/:id", cmsController.updatePageStatus);
 
 /**
  * @swagger

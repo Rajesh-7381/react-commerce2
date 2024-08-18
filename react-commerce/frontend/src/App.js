@@ -4,8 +4,19 @@ import './App.css';
 import 'react-notifications/lib/notifications.css';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+
+import Dashboard2 from './user/Dashboard2';
 import Success from './user/Account/Success';
 import Cancel from './user/Account/Cancel';
+import Contact from './user/Contact';
+import MyAccount from './user/Account/MyAccount';
+import WishList from './user/Account/WishList';
+import Order from './user/Account/Order';
+import MyCart from './user/Account/MyCart';
+import ProductDetails from './user/Account/ProductDetails';
+import Listing from './user/Account/Listing';
+import Checkout from './user/Account/Checkout';
+import Cart from './user/Account/Cart';
 
 const stripePromise = loadStripe('pk_test_51Ph8kgFnMqw8LC18U63JgNUhD8F5wAKZfjQAyrnfgoKNwI5fbZtwBYZfXwkVE7VdsxMmKziLUOKi6AXbI7XJN9Oe00iO9DHFpM');
 function withDelay(promise, delay = 1000) {
@@ -28,7 +39,6 @@ const Categories = React.lazy(() => withDelay(import('./admin/Categories/Categor
 const CategoryAddEdit = React.lazy(() => withDelay(import('./admin/Categories/CategoryAddEdit'), 1000));
 const Cmspages = React.lazy(() => withDelay(import('./admin/CmsPages/Cmspages'), 1000));
 const CmspageAddEdit = React.lazy(() => withDelay(import('./admin/CmsPages/CmspageAddEdit'), 1000));
-const Dashboard2 = React.lazy(() => withDelay(import('./user/Dashboard2'), 1000));
 const Products = React.lazy(() => withDelay(import('./admin/Products/Products'), 1000));
 const AddEditProducts = React.lazy(() => withDelay(import('./admin/Products/AddEditProducts'), 1000));
 const ForgotPassword = React.lazy(() => withDelay(import('./ForgotPassword'), 1000));
@@ -38,15 +48,7 @@ const Brands = React.lazy(() => withDelay(import('./admin/Brands/Brands'), 1000)
 const AddEditBrands = React.lazy(() => withDelay(import('./admin/Brands/AddEditBrands'), 1000));
 const Banners = React.lazy(() => withDelay(import('./admin/Banners/Banners'), 1000));
 const AddEditBanners = React.lazy(() => withDelay(import('./admin/Banners/AddEditBanners'), 1000));
-const Contact = React.lazy(() => withDelay(import('./user/Contact'), 1000));
-const MyAccount = React.lazy(() => withDelay(import('./user/Account/MyAccount'), 1000));
-const WishList = React.lazy(() => withDelay(import('./user/Account/WishList'), 1000));
-const Order = React.lazy(() => withDelay(import('./user/Account/Order'), 1000));
-const MyCart = React.lazy(() => withDelay(import('./user/Account/MyCart'), 1000));
-const ProductDetails = React.lazy(() => withDelay(import('./user/Account/ProductDetails'), 1000));
-const Listing = React.lazy(() => withDelay(import('./user/Account/Listing'), 1000));
-const Checkout = React.lazy(() => withDelay(import('./user/Account/Checkout'), 1000));
-const Cart = React.lazy(() => withDelay(import('./user/Account/Cart'), 1000));
+
 
 
 function App() {

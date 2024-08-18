@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const transporter = require("../utils/email");
 const { registerSchema, passwordForgotSchema } = require("../utils/Validation");
-const { uploadImage, cloudinary } = require("../helper/cloudinaryConfig");
+const {  cloudinary } = require("../helper/cloudinaryConfig");
 const  sendMail  = require("../utils/email");
 const { UUID } = require("../utils/UserIID");
 
@@ -266,13 +266,17 @@ class AdminUserController{
   }
   static async registerUserParticularDate(req,res){
     const date = req.params.date;
-    console.log(date)
+    // console.log(date)
     // const formattedDate = date.split('-').reverse().join('-');
   // console.log(formattedDate)
     // console.log(date)
-    const results=await User.registerUserParticularDate.SearchDate(date)
-    // console.log(results)
-    res.json(results)
+    const data=await User.registerUserParticularDate.SearchDate(date)
+    // console.log(data.length)
+    // console.log(data.length)
+    res.json({
+      count:data.length,
+      data:data
+    })
   }
   static async registerUserfromrDateTotodate(req,res){
     const fromdate = req.params.fromdate;

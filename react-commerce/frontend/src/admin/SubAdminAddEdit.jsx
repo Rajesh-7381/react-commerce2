@@ -26,7 +26,8 @@ const SubAdminAddEdit = () => {
     const handledit = async (id) => {
         try {
             const response = await axios.get(`http://localhost:8081/api/editdata/${id}`);
-            const userData = response.data.data;
+            // console.log(response.data.result[0])
+            const userData = response.data.result[0];
             setEditdata(userData);
             setRole(userData.role);
 
@@ -82,7 +83,7 @@ const SubAdminAddEdit = () => {
               <div className="container-fluid">
                 <div className="row mb-2">
                   <div className="col-sm-12">
-                    <h1 className="m-0 float-start">Edit/Update CMS</h1>
+                    <h1 className="m-0 float-start">Edit/Update By SubAdmin</h1>
                     <section className="content-header">
                       <div className="container-fluid">
                         <div className="row mb-2">

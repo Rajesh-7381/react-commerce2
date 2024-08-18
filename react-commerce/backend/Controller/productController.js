@@ -62,7 +62,7 @@ exports.updateProductStatus = async (req, res) => {
   const { status } = req.body;
   // console.log(status)
   try {
-    await Product.toggleStatusById(id, status);
+    await Product.Product.toggleStatusById(id, status);
     res.status(200).json({ message: "Status updated successfully!" });
   } catch (err) {
     console.error(err);
@@ -105,7 +105,7 @@ exports.updateImageStatus = async (req, res) => {
   const id = req.params.id;
   const { status } = req.body;
   try {
-    await Product.updateImageStatus(id, status);
+    await Product.Product.updateImageStatus(id, status);
     res.status(200).json({ message: "Status updated successfully!" });
   } catch (err) {
     console.error(err);
@@ -116,7 +116,7 @@ exports.updateImageStatus = async (req, res) => {
 exports.deleteImage = async (req, res) => {
   const id = req.params.id;
   try {
-    await Product.deleteImageById(id);
+    await Product.Product.deleteImageById(id);
     res.status(200).json({ message: "Data deleted successfully!" });
   } catch (err) {
     console.error(err);
@@ -129,7 +129,7 @@ exports.handleproductImagesstatus=async(req,res)=>{
   const { status }=req.body;
   // console.log(id)
   try {
-    await Product.imageStatus(id,status);
+    await Product.Product.imageStatus(id,status);
     res.status(200).json({ message: "image status successfully!" });
   } catch (err) {
     console.error(err);

@@ -68,7 +68,8 @@ const Subadmin = (args) => {
     const toggle = async (id) => {
         try {
           const response = await axios.get(`http://localhost:8081/api/singledata/${id}`);
-          setmodaldata(response.data.data);
+          // console.log(response.data[0])
+          setmodaldata(response.data[0]);
           setModal(!modal);
         } catch (error) {
           console.error("error fetching data", error);
@@ -272,63 +273,67 @@ const Subadmin = (args) => {
             </section>
             {/* for show singledata modal*/}
             <Modal isOpen={modal} toggle={toggle} {...args}>
-            <ModalHeader toggle={toggle} className="bg-primary text-white">
-              Hi <span className='bg-warning'>{modaldata.name}</span> 
-            </ModalHeader>
-            <div className="text-center">
-              <img src={`http://localhost:8081/api/profile/${modaldata.image}`} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
-            </div>
-            <ModalBody>
-              <div className="container">
-                <div className="row">
-                  <div className="col-md-12">
-                    <h5 className="text-primary">Personal Information</h5>
-                    <hr />
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-md-4">
-                    <p style={{ fontWeight: "bolder" }}>ID:</p>
-                  </div>
-                  <div className="col-md-4">
-                    <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span></p>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-md-4">
-                    <p style={{ fontWeight: "bolder" }}>Name:</p>
-                  </div>
-                  <div className="col-md-4">
-                    <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span></p>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-md-4">
-                    <p style={{ fontWeight: "bolder" }}>Email:</p>
-                  </div>
-                  <div className="col-md-4">
-                    <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span></p>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-md-4">
-                    <p style={{ fontWeight: "bolder" }}>Role:</p>
-                  </div>
-                  <div className="col-md-4">
-                    <p><span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span></p>
-                  </div>
-                </div>
+        <ModalHeader toggle={toggle} className="bg-primary text-white">
+          Hi {modaldata?.name ? <span className='bg-warning'>{modaldata.name}</span> : <span>No name</span>}
+        </ModalHeader>
+        <div className="text-center">
+          {modaldata?.image ? (
+            <img src={modaldata.image} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
+          ) : (
+            <p>No image</p>
+          )}
+        </div>
+        <ModalBody>
+          <div className="container">
+            <div className="row">
+              <div className="col-md-12">
+                <h5 className="text-primary">Personal Information </h5>
+                <hr />
               </div>
-            </ModalBody>
-            <ModalFooter className="bg-light">
-              <Button color="primary" onClick={toggle}>
-                Ok
-              </Button>{' '}
-              <Button color="danger" onClick={toggle}>
-                Cancel
-              </Button>
-            </ModalFooter>
-            </Modal>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>ID:</p>
+              </div>
+              <div className="col-md-4">
+                <p>{modaldata?.id ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span> : <span>No ID</span>}</p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>Name:</p>
+              </div>
+              <div className="col-md-4">
+                <p>{modaldata?.name ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span> : <span>No name</span>}</p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>Email:</p>
+              </div>
+              <div className="col-md-4">
+                <p>{modaldata?.email ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span> : <span>No email</span>}</p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>Role:</p>
+              </div>
+              <div className="col-md-4">
+                <p>{modaldata?.role ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span> : <span>No role</span>}</p>
+              </div>
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter className="bg-light">
+          <Button color="primary" onClick={toggle}>
+            Ok
+          </Button>{' '}
+          <Button color="danger" onClick={toggle}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
           </div>
     
           {/* /.content-wrapper */}

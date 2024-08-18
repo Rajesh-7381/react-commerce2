@@ -5,8 +5,12 @@ import { Link, useNavigate, NavLink } from 'react-router-dom'
 const Header = () => {
     const navigate=useNavigate();
     const [userData, setUserData] = useState(null);
+    const [CurrentPosition, setCurrentPosition] = useState(null);
 
     useEffect(() => {
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(showPosition)
+      }
         document.title = 'Dashboard';
           // navigate("/"); 
           const id=sessionStorage.getItem("id");
@@ -18,6 +22,10 @@ const Header = () => {
           }   
         
       }, [ navigate]); 
+      // const x=document.getElementById("position");
+      function showPosition(position){
+        setCurrentPosition(position.coords.latitude +" "+position.coords.longitude)
+      }
       const fetchuserdata=async(id)=>{
         try {
           const reponse=await axios.get(`http://localhost:8081/api/singledata/${id}`);
@@ -41,7 +49,7 @@ const Header = () => {
         <a className="nav-link" data-widget="pushmenu" href="#" role="button"><i className="fas fa-bars" /></a>
       </li>
       <li className="nav-item d-none d-sm-inline-block">
-        <a href="index3.html" className="nav-link">Home</a>
+        <Link to={"/admindashboard1"} className="nav-link">Home</Link>
       </li>
       <li className="nav-item d-none d-sm-inline-block">
         <button  onClick={handlelogout} className="nav-link">Logout</button>
@@ -175,6 +183,7 @@ const Header = () => {
     <Link to={"/admindashboard1"} className="brand-link">
       <img src={"./pngtree-e-letter-logo-ecommerce-shop-store-design-png-image_4381099 (1).png"} alt="AdminLTE Logo" className="brand-image img-circle elevation-3 rounded-circle" style={{opacity: '.8'}}  />
       <span className="brand-text font-weight-light">e-Com</span>
+      <p id='position' className='text-danger'>{CurrentPosition}</p>
     </Link>
     {/* Sidebar */}
     <div className="sidebar">

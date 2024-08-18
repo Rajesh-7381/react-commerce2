@@ -16,8 +16,10 @@ exports.getAllBrands=async(req,res)=>{
 exports.updateBrandStatus=async(req,res)=>{
     const id=req.params.id;
     const {status}=req.body;
+    // console.log(status)
     try {
         await Brand.updateStatus(id,status);
+        // console.log(1)
         res.status(200).json({ message: "Status updated successfully!" });
     } catch (error) {
         console.error(err);

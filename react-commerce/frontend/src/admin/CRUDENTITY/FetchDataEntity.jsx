@@ -10,7 +10,7 @@ const fetchDataEntity = async () => {
             axios.get("http://localhost:8081/api/allproductcount"),
             axios.get("http://localhost:8081/api/AllBrandCount")
         ]);
-        console.log(responses[0])
+        // console.log(responses[0])
         return {
             userCount: responses[0].data.userCount,
             adminCount: responses[1].data.adminCount,

@@ -56,7 +56,9 @@ const Cmspages = () => {
     }
     // status change
     const handlecmspagetoggle=async(id,status)=>{
-        await StatusEntity('CmsStatus',id,status,setfilterdata,filterdata);        
+      // alert(id)
+        await StatusEntity('CmsStatus',id,status,setfilterdata,filterdata);    
+        // alert(2)    
     }
 
   return (

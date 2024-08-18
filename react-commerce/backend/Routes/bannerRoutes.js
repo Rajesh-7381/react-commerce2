@@ -316,10 +316,10 @@ const BannerController = require("../Controller/BannerController");
  */
 
 router.post("/AddBanners",upload.single("BannerImage"),BannerController.addBanner)
-router.get("/getAllBanners")
-router.get("EditBannerDetails/:id")
-router.put("UpdateBanners/:id")
-router.put("handlebannerstatus/:id")
-router.delete("DeleteBanners/:id")
+router.get("/getAllBanners",BannerController.getAllBanners)
+router.get("EditBannerDetails/:id",BannerController.getBannerById)
+router.put("UpdateBanners/:id",BannerController.updateBanner)
+router.put("handlebannerstatus/:id",BannerController.updateBannerStatus)
+router.delete("DeleteBanners/:id",BannerController.deleteBanner)
 
 module.exports=router;

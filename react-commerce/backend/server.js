@@ -288,6 +288,7 @@ app.get("/",(req,res)=>{
   
   res.render('index',data)
 })
+
 // update categories
 app.put("/updatecategory/:id", upload.single("category_image"), (req, res) => {
   const combinedData = { ...req.body, category_image: req.file };

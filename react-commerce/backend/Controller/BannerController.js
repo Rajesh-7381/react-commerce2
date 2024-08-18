@@ -24,8 +24,10 @@ exports.updateBannerStatus=async(req,res)=>{
 
 exports.deleteBanner = async (req, res) => {
     const id = req.params.id;
+    console.log(id)
     try {
       await Banner.delete(id);
+      console.log(id)
       res.status(200).json({ message: "Deleted successfully!" });
     } catch (err) {
       console.error(err);

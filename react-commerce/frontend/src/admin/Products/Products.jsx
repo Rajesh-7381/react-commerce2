@@ -209,7 +209,7 @@ const Products = () => {
                                                             <NotificationContainer />
                                                             <button className='btn btn-success btn-sm mr-1' onClick={()=>handleedit(item.id)}><i className='fas fa-pencil-alt'></i></button>
                                                             <button className='btn btn-danger btn-sm mr-1' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
-                                                            <button className='btn btn-dark btn-sm' onClick={()=>toggleclick(item.status,item.id)}><i className={item.status === 'Active' ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
+                                                            <button className='btn btn-dark btn-sm' onClick={()=>toggleclick(item.status,item.id)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
                                                         </td>
                                                     </tr>
                                                 ))

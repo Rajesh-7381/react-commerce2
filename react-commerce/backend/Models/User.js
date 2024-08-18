@@ -247,37 +247,40 @@ class Delete {
 class SearchAdminSubAdminUser{
   static async SearchDetails(searchTerm){
     try {
-      const query = "SELECT * FROM AdminUser WHERE name LIKE? OR email LIKE?";
-      const result=await new Promise((resolve,reject)=>{
-        db.query(query,[`%${searchTerm}%`, `%${searchTerm}%`],(err,results)=>{
-          if(err){
+      const query = "SELECT * FROM AdminUser WHERE role = 'user' AND DATE(created_at) = ?";
+      const result = await new Promise((resolve, reject) => {
+        db.query(query, [date], (err, results) => {
+          if (err) {
             return reject(err);
           }
-          resolve(results)
-        })
-      })
+          resolve(results);
+        });
+      });
       return result;
     } catch (error) {
-        console.error(error)
+      console.error("Error fetching users by date:", error);
+      throw error;
     }
   }
 }
 class registerUserParticularDate{
   static async SearchDate(date){
-     // console.log(date)
+    //  console.log(date)
   // here issue is created_at stored date time format but i want to show date format thats why we use  'CAST' or 'DATE_FORMAT'
   // const query="SELECT COUNT(*) AS count FROM AdminUser WHERE role='user' AND CAST(created_at AS DATE) = ?";
     try {
-      const query = "SELECT * FROM AdminUser WHERE role='user' and date(created_at) = ?";
-      const  [result]=await new Promise((resolve,reject)=>{
+      const query = "SELECT * FROM AdminUser WHERE role='user' and DATE(created_at) = ?";
+      const  result=await new Promise((resolve,reject)=>{
         db.query(query,[date],(err,results)=>{
           if(err){
             return reject(err);
           }
           resolve(results)
-          // console.log(results)
+          // console.log(results.length)
         })
       })
+      // console.log(result.length)
+      // console.log(result)
       return result;
     } catch (error) {
         console.error(error)
@@ -287,12 +290,12 @@ class registerUserParticularDate{
 class registerUserfromrDateTotodate{
   static async SearchDate(fromdate,todate){
     try {
-      const formDate=fromdate.split("-").reverse().join("-")
-      const toDate=todate.split("-").reverse().join("-")
+      // const formDate=fromdate.split("-").reverse().join("-")
+      // const toDate=todate.split("-").reverse().join("-")
       // console.log(formDate + " "+toDate)
-      const query = "SELECT COUNT(*) AS count FROM AdminUser WHERE created_at BETWEEN ? AND ?";
+      const query = "SELECT COUNT(*) AS count FROM AdminUser WHERE DATE(created_at) BETWEEN ? AND ?";
       const result=await new Promise((resolve,reject)=>{
-        db.query(query,[formDate, toDate],(err,results)=>{
+        db.query(query,[fromdate, todate],(err,results)=>{
           if(err){
             return reject(err);
           }
@@ -332,3 +335,4 @@ module.exports={ AdminUserModel,CheckAdminUserLogin,
   indvidualDetails,EditDetails,UpdateDetails,Delete,
   SearchAdminSubAdminUser,registerUserParticularDate,
   registerUserfromrDateTotodate,getAllSubAdminData }
+

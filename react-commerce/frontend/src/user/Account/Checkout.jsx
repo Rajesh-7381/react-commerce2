@@ -12,6 +12,9 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { NotificationManager } from 'react-notifications';
+import QRCodeGenerator from './QRCodeGenerator';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import Swal from "sweetalert2";
 
 const Checkout = () => {
     const stripe = useStripe();
@@ -22,8 +25,17 @@ const Checkout = () => {
   const [success, setSuccess] = useState(false);
   const paymentMethod=useSelector((state)=>state.payment.paymentMethod);
   const [dis,setdis]=useState(null)
-  
+  const [modal, setModal] = useState(false);
 
+  const toggle = () => setModal(!modal);
+  async function handleCancel(){
+    const confirmed = await Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "You Cancelled!"
+      });
+  }
+  
   useEffect(()=>{
     document.title="Checkout"
   })
@@ -135,8 +147,9 @@ const handlePaymentChange=(event)=>{
         case 'cash-on-delivery':
             alert(paymentMethod)
             break;
-        case 'pay-with-check':
-            alert(paymentMethod)
+        case 'scanner':
+            setModal(true)
+            
             break;
         case 'pay-pal':
             alert(paymentMethod)
@@ -385,6 +398,7 @@ const handlePaymentChange=(event)=>{
                             </div>
                             </div>
                         </form>
+                        
                         </div>
                         <div className="col-lg-6">
                         <h1 className="checkout-f__h1">ORDER SUMMARY</h1>
@@ -497,9 +511,9 @@ const handlePaymentChange=(event)=>{
                                     <div className="u-s-m-b-10 text-start">
                                         {/*====== Radio Box ======*/}
                                         <div className="radio-box">
-                                        <input type="radio" id="pay-with-check" name="payment" value="pay-with-check" onChange={handlePaymentChange}/>
+                                        <input type="radio" id="scanner" name="payment" value="scanner" onChange={handlePaymentChange}/>
                                         <div className="radio-box__state radio-box__state--primary">
-                                            <label className="radio-box__label" htmlFor="pay-with-check">Pay With Check</label></div>
+                                            <label className="radio-box__label" htmlFor="scanner">Scanner Through</label></div>
                                         </div>
                                         {/*====== End - Radio Box ======*/}
                                         <span className="gl-text u-s-m-t-6">Please send a check to Store Name, Store Street, Store Town, Store State / County, Store Postcode.</span>
@@ -541,6 +555,29 @@ const handlePaymentChange=(event)=>{
             {/*====== End - Section 3 ======*/}
             </div>
             {/*====== End - App Content ======*/}
+
+
+            {/*====== modal start ======*/}
+
+            <div>
+            
+            <Modal id='mymodal' isOpen={modal} toggle={toggle} fullscreen>
+              <ModalHeader toggle={toggle}>Payment </ModalHeader>
+              <ModalBody>
+                <QRCodeGenerator />
+              </ModalBody>
+              <ModalFooter>
+                <Button color="success" id='pay' onClick={toggle}>
+                  Pay
+                </Button>{' '}
+                <Button color="danger" id='cancel' onClick={()=>{toggle();handleCancel()}}>
+                  Cancel
+                </Button>
+              </ModalFooter>
+            </Modal>
+          </div>
+            {/*====== modal end ======*/}
+
 
 
 

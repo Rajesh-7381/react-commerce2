@@ -19,6 +19,7 @@ const Banners = () => {
     const BannerData=async()=>{
         try {
             const response=await axios.get("http://localhost:8081/api/getAllBanners");
+            // console.log(response.data)
             setbannerData(response.data);
             // console.log(bannerData)
             

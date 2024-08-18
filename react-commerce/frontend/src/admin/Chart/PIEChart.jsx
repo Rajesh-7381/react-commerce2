@@ -16,7 +16,7 @@ const PIEChart = () => {
 useEffect(() => {
     const getCounts = async () => {
         const data = await fetchDataEntity();
-        console.log(data)
+        // console.log(data)
         if (data) setCounts(data);
     };
 

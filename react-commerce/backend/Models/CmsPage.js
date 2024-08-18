@@ -16,6 +16,7 @@ const CmsPage = {
 
   // Update the status of a CMS page by ID
   updateStatus: async (id, status) => {
+    // console.log(id)
     const query = "UPDATE cmspages SET status=? WHERE id=? AND deleted_at IS NULL";
     try {
       const [result] = await db.promise().query(query, [status, id]);
