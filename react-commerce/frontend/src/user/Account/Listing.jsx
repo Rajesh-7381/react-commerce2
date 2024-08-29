@@ -97,7 +97,7 @@ const Listing = () => {
   const uniqueSizes = getUniqueSizes(listProduct);
 
   const handleProductClick=async(id)=>{
-    alert(id)
+    // alert(id)
     navigate("/productDetails", { state: { id: id } });
   }
 

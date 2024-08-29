@@ -6,28 +6,31 @@ const initialState = {
   sortedProducts: [],
   currentPage: 1,
   productsPerPage: 9,
+  finalPrice:0,
 };
 
 const productSlice = createSlice({
   name: 'product',
   initialState,
   reducers: {
-    incrementQuantity(state) {
+    incrementQuantity(state,action) {
       
       if(state.quantity < 5){
         
-        state.quantity = Math.min(state.quantity + 1, 5); // here 100 means allowed 100 not above
+        state.quantity = Math.min(state.quantity + 1, 5); // here 5 means allowed 5 not above
+        state.finalPrice=action.payload * state.quantity;
         
       }else{
         alert("no more quantity allowed")
       }
 
     },
-    decrementQuantity(state) {
+    decrementQuantity(state,action) {
       if(state.quantity === 1){
         alert("minium 1 quantity will be added")
       }else{
         state.quantity = Math.max(state.quantity - 1);
+        state.finalPrice=action.payload * state.quantity;
       }
       
     },

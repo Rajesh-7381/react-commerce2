@@ -391,7 +391,7 @@ const brandController=require("../Controller/brandController")
 
 router.get("/getAllBrands",brandController.getAllBrands)
 router.get("/GetSingleBrandDetails/:id",brandController.getBrandById)
-router.put("/UpdateBrand/:id",brandController.updateBrand)
+router.put("/UpdateBrand/:id",upload.fields([{ name: "brand_image", maxCount: 1 },{ name: "brand_logo", maxCount: 1 },]),brandController.updateBrand)
 router.post("/AddBrand",upload.fields([{ name: "brand_image", maxCount: 1 },{ name: "brand_logo", maxCount: 1 },]),brandController.addBrand)
 router.get("/AllBrandCount",brandController.brandCount)
 router.delete("/branddelete/:id",brandController.deleteBrand)

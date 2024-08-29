@@ -296,6 +296,13 @@ const DeliVeryAddressSchema = Joi.object({
   secondaryMobile: Joi.number().required().label("secondmobile"),
 });
 
+const CardAdressSchema=Joi.object({
+  card_holder_name:Joi.string().trim().required().label("Card Holder Name"),
+  card_number:Joi.number().required().label("card_number"),
+  card_expire:Joi.number().required().label("card_expire"),
+  card_cvv:Joi.number().required().label("card cvv"),
+})
+
 module.exports = {
   registerSchema,
   passwordForgotSchema,
@@ -305,4 +312,5 @@ module.exports = {
   BrandSchema,
   BannerSchema,
   DeliVeryAddressSchema,
+  CardAdressSchema,
 };

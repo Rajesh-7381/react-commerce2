@@ -444,6 +444,7 @@ const Dashboard1 = () => {
                           <input type="date" className="form-control" id="todate" value={todate} onChange={(e) => setToDate(e.target.value)} />
                         </div>
                         <button className="btn btn-primary mt-2" disabled={fromdate === '' && todate === ''} onClick={UserQuery2}>Search</button>
+                       
                         <p><span className="bg-warning">{registeruserdata3}</span> User(s) registered from <span className="bg-warning">{fromdate}</span> to <span className="bg-warning">{todate}</span></p>
                       </div>
                       <hr />

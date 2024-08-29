@@ -11,8 +11,11 @@ exports.getAllBanners=async(req,res)=>{
 };
 
 exports.updateBannerStatus=async(req,res)=>{
+
     const id=req.params.id;
     const {status}=req.body;
+    console.log(1)
+    console.log(id)
     try {
         await Banner.updateStatus(id,status);
         res.status(200).json({ message: "Status updated successfully!" });

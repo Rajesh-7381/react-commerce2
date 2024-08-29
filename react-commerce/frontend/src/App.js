@@ -17,6 +17,8 @@ import ProductDetails from './user/Account/ProductDetails';
 import Listing from './user/Account/Listing';
 import Checkout from './user/Account/Checkout';
 import Cart from './user/Account/Cart';
+import CreditOrDebit from './user/Account/Payment/CreditOrDebit';
+import DomTable from './Pratice/DomTable';
 
 const stripePromise = loadStripe('pk_test_51Ph8kgFnMqw8LC18U63JgNUhD8F5wAKZfjQAyrnfgoKNwI5fbZtwBYZfXwkVE7VdsxMmKziLUOKi6AXbI7XJN9Oe00iO9DHFpM');
 function withDelay(promise, delay = 1000) {
@@ -95,6 +97,11 @@ function App() {
           <Route path='/cart' element={<Suspense fallback={<div className='loader-container'></div>}><Cart /></Suspense>}></Route>
           <Route path='/success' element={< Success/>} ></Route>
           <Route path='/cancel' element={< Cancel/>} ></Route>
+          <Route path='/card' element={< CreditOrDebit/>} ></Route>
+
+
+          
+          <Route path='/DomTable' element={< DomTable/>} ></Route>
         </Routes>
       </BrowserRouter>
      

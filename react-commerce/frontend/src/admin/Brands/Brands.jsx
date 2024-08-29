@@ -12,7 +12,12 @@ const BrandTable=lazy(()=>import("./BrandTable"))
 
 
 const Brands = () => {
-    
+  const navigate=useNavigate();
+    // edit brands
+    const BrandsAddEdit=async(id)=>{
+      // alert(id)
+      navigate("/addeditbrands",{state :{id:id}});
+  }
   
   
   
@@ -51,7 +56,7 @@ const Brands = () => {
                       <input className="form-control mr-2" type="search" placeholder="Search using Brand Name" aria-label="Search"  />
                       <div className="input-group-append">
                           <NotificationContainer />
-                          <button className='btn btn-primary ' >Add</button>
+                          <button className='btn btn-primary ' onClick={()=>BrandsAddEdit()}>Add</button>
                           
                       </div>
                      </div>

@@ -121,6 +121,9 @@ const callApi=async(e)=>{
       ];
       tablerows.push(rowdata);
     });
+    const backgroundImage=new Image();
+    backgroundImage.src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTcvIcikyjgYcDZuKPzsq8xAZIilsBxUm10g&s"
+    doc.addImage(backgroundImage, 0, 0, 210, 297)
     doc.autoTable(tablecolumn, tablerows, { startY: 20 }); //sets the vertical position (the Y-coordinate) on the PDF document where the table should start being drawn. The value 20 means that the table starts 20 units down from the top of the page
     doc.text("RegisteredUsers", 14, 15); //specific cordinates
     doc.save("RegisteredUsers.pdf");
@@ -136,11 +139,14 @@ const callApi=async(e)=>{
   // for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
-  const lastIndex = currentPage * recordsPerPage; //1st time 10
-  const firstIndex = lastIndex - recordsPerPage; //1st time 0
+  const pageNumbersToShow = 5;
+  const totalPages = Math.ceil(filterData.length / recordsPerPage);
+  
+  const firstIndex = Math.floor((currentPage - 1) / pageNumbersToShow) * pageNumbersToShow + 1;//1st time 0
+  const lastIndex = Math.min(firstIndex + pageNumbersToShow - 1, totalPages); //1st time 10
   // const records = filterData.slice(firstIndex, lastIndex); (1st index inclusive and last index not inclusive)
-  const totalPages = Math.ceil(filterData.length / recordsPerPage); //50/10=5
-  const numbers = [...Array(totalPages + 1).keys()].slice(1);
+  // const totalPages = Math.ceil(filterData.length / recordsPerPage); //50/10=5
+  const pageNumbers = [...Array(lastIndex + 1).keys()].slice(firstIndex);
   //here Array(totalPages + 1) this creates new array . let totalPages is 5 +1 =6
   // .keys() this returns iterator over array keys. since the array is created with  totalpages+1 elements, this iterator will return keys from 0 to totalpages
   // the spread(...) operator is used spread the iterator keys into an array.
@@ -359,20 +365,25 @@ const callApi=async(e)=>{
                   </table>
                   <br></br>
                   <nav className='float-right'>
-                    <ul className='pagination paginationRightTab'>
-                      <li className='page-item'>
-                        <button onClick={prePage} className='page-link'>Prev</button>
+                  <ul className='pagination paginationRightTab'>
+                    <li className='page-item'>
+                      <button onClick={prePage} className='page-link'>Prev</button>
+                    </li>
+                    {pageNumbers.map((n) => (
+                      <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={n}>
+                        <button onClick={() => pageChange(n)} className='page-link'>{n}</button>
                       </li>
-                      {numbers.map((n, i) => (
-                        <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={i}>
-                          <button onClick={() => pageChange(n)} className='page-link'>{n}</button>
-                        </li>
-                      ))}
+                    ))}
+                    {lastIndex < totalPages && (
                       <li className='page-item'>
-                        <button onClick={nextPage} className='page-link'>Next</button>
+                        <span className='page-link'>...</span>
                       </li>
-                    </ul>
-                  </nav>
+                    )}
+                    <li className='page-item'>
+                      <button onClick={nextPage} className='page-link'>Next</button>
+                    </li>
+                  </ul>
+                </nav>
                 </div>
               </div>
             </div>

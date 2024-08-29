@@ -19,14 +19,17 @@ const AddEditBrands = () => {
     useEffect(() => {
         document.title="AddEditBrands"
         if (id) {
+            // alert(id)
             GetSingleBrands(id);
         }
     }, [id]);
 
     const GetSingleBrands = async (id) => {
         try {
-            const response = await axios.get(`http://localhost:8081/api/GetSingleBrandDetals/${id}`);
-            const brandData = response.data.data[0];
+            const response = await axios.get(`http://localhost:8081/api/GetSingleBrandDetails/${id}`);
+            // console.log(response.data.data)
+            const brandData = response.data.data;
+            // console.log(brandData)
             setBrandData(brandData);
             // Set form values
             setValue('brand_name', brandData.brand_name);
@@ -59,68 +62,43 @@ const AddEditBrands = () => {
             }
             if (formData.brand_logo[0]) {
                 form.append('brand_logo', formData.brand_logo[0]);
-            }
+            }  
+            
+            var url= id ? `http://localhost:8081/api/UpdateBrand/${id}` : 'http://localhost:8081/api/AddBrand';
+            const method=id ? 'put' : 'post';
+            await axios[method](url,form,{
+                headers:{
+                    'Content-Type':'multipart/form-data'
+                }
+            })
 
-            if (id) {
-                // Update brand
-                await axios.put(`http://localhost:8081/api/UpdateBrand/${id}`, form, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-            } else {
-                // Add new brand
-                await axios.post('http://localhost:8081/api/AddBrand', form, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                setTimeout(() => {
-                    NotificationManager.success("Created successfully!");
-                    navigate("/brands");
+            // navigate
+            setTimeout(() => {
+                NotificationManager.success("Created successfully!");
+                navigate("/brands");
 
-                }, 2000);
-            }
+            }, 2000);
         } catch (error) {
             console.log(error);
         }
     };
 
+    const zoom=(ref,pixel)=>{
+        if(ref.current){
+            const currentwidth=ref.current.clientWidth;
+            const newtwidth=currentwidth+pixel;
+            if(newtwidth > 50){
+                ref.current.style.width=`${newtwidth}px`
+                ref.current.style.height=`${newtwidth}px`
+            }
+        }
+    }
+
     // zoom effect 
-    const zoomIn = () => {
-        if (imageRef.current) {
-            const currentWidth = imageRef.current.clientWidth;
-            imageRef.current.style.width = `${currentWidth + 50}px`;
-            imageRef.current.style.height = `${currentWidth + 50}px`;
-        }
-    };
-    
-    const zoomOut = () => {
-        if (imageRef.current) {
-            const currentWidth = imageRef.current.clientWidth;
-            if (currentWidth > 50) {
-                imageRef.current.style.width = `${currentWidth - 50}px`;  
-                imageRef.current.style.height = `${currentWidth - 50}px`; 
-            }
-        }
-    };
-    const zoomIn2 = () => {
-        if (imageRef2.current) {
-            const currentWidth = imageRef2.current.clientWidth;
-            imageRef2.current.style.width = `${currentWidth + 50}px`;
-            imageRef2.current.style.height = `${currentWidth + 50}px`;
-        }
-    };
-    
-    const zoomOut2 = () => {
-        if (imageRef2.current) {
-            const currentWidth = imageRef2.current.clientWidth;
-            if (currentWidth > 50) {
-                imageRef2.current.style.width = `${currentWidth - 50}px`;  
-                imageRef2.current.style.height = `${currentWidth - 50}px`; 
-            }
-        }
-    };
+    const zoomIn=()=>zoom(imageRef,50);
+    const zoomOut=()=>zoom(imageRef,-50);
+    const zoomIn2=()=>zoom(imageRef2,50);
+    const zoomOut2=()=>zoom(imageRef2,-50);
 
     return (
         <div>
@@ -195,8 +173,8 @@ const AddEditBrands = () => {
                                                 alt="" 
                                                 style={{ transition: 'width 0.5s, height 0.5s' }} 
                                               />
-                                              <button className='btn btn-success mr-1' onClick={zoomIn}>+</button>
-                                              <button className='btn btn-danger' onClick={zoomOut}>-</button>
+                                              <p className='btn btn-success mr-1' onClick={zoomIn}>+</p>
+                                              <p className='btn btn-danger' onClick={zoomOut}>-</p>
                                             </div>
                                           )}
                                           {errors.brand_image && <span className="text-danger">This field is required</span>}
@@ -281,8 +259,8 @@ const AddEditBrands = () => {
                                                           alt="" 
                                                           style={{ transition: 'width 0.5s, height 0.5s' }} 
                                                         />
-                                                        <button className='btn btn-success mr-1' onClick={zoomIn2}>+</button>
-                                                        <button className='btn btn-danger' onClick={zoomOut2}>-</button>
+                                                        <p className='btn btn-success mr-1' onClick={zoomIn2}>+</p>
+                                                        <p className='btn btn-danger' onClick={zoomOut2}>-</p>
                                                       </div>
                                                     )}
                                                   {errors.brand_logo && <span className="text-danger">This field is required</span>}

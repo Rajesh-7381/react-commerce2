@@ -1,8 +1,11 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from "react-router-dom";
+import { DeleteEntity } from "../CRUDENTITY/DeleteEntity";
+import { StatusEntity } from "../CRUDENTITY/StatusEntity";
 
 const BrandTable = () => {
+  const navigate=useNavigate();
     const [brandData,setbrandData]=useState([]);
     
     useEffect(()=>{
@@ -18,6 +21,35 @@ const BrandTable = () => {
             console.log(error)
         }
     }
+
+      // edit brands
+      const BrandsAddEdit=async(id)=>{
+        // alert(id)
+        navigate("/addeditbrands",{state :{id:id}});
+    }
+    const DeleteBrand=async(id)=>{
+      // alert(id)
+      const data=await DeleteEntity('Brand',id);
+      // Fetch the updated data from the server and update the local state
+      const response = await axios.get("http://localhost:8081/api/getAllBrands");
+      setbrandData(response.data);
+    }
+    // for status change
+    const BrandStatusChange = async (id, status) => {
+      await StatusEntity('BrandStatus',id,status,setbrandData,brandData)
+   }
+
+   const searchfunction = (event) => {
+    const searchdata = event.target.value.toLowerCase().trim();
+    if (searchdata === "") {
+      setbrandData(brandData);
+    } else {
+      const filteredData = brandData.filter(item =>
+        item && item.brand_name && item.brand_name.toLowerCase().includes(searchdata)
+      );
+      setbrandData(filteredData);
+    }
+  }
   return (
     <div>
     <table className="table table-bordered table-striped">
@@ -54,9 +86,9 @@ const BrandTable = () => {
         <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span> </td>
         <td>
        
-        <button className='btn btn-success btn-sm  mr-1' ><i className='fas  fa-pencil-alt'></i></button>
-        <button className='btn btn-dark btn-sm  mr-1' ><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
-        <button className='btn btn-danger btn-sm ' ><i className='fas fa-trash'></i></button>
+        <button className='btn btn-success btn-sm  mr-1' onClick={()=>BrandsAddEdit(item.id)}><i className='fas  fa-pencil-alt'></i></button>
+        <button className='btn btn-dark btn-sm  mr-1' onClick={()=>BrandStatusChange(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
+        <button className='btn btn-danger btn-sm ' onClick={()=>DeleteBrand(item.id)} ><i className='fas fa-trash'></i></button>
         </td>
       </tr>
     ))

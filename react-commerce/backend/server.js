@@ -13,13 +13,10 @@ require("dotenv").config(); //note.txt
 const bodyParser = require("body-parser"); //note.txt
 const path = require("path");
 // image process
-const sharp = require("sharp"); //The sharp library is a popular JavaScript library for image processing in Node.js. It provides a simple and efficient API for resizing, cropping, and transforming images in a variety of formats, including JPEG, PNG, WebP, and TIFF.
 const morgan = require("morgan"); //note.txt
 // const checkauth=require("./Auth/RouteCheckAuth");
 const stripe=require('stripe')(process.env.STRIPE_SECRET_KEY)
 const swaggerUi = require('swagger-ui-express');
-const fs = require("fs");
-const { v4: uuidv4 } = require("uuid");
 const ejs=require("ejs")
 
 const checkAuth = require("./Auth/RouteCheckAuth");
@@ -36,7 +33,7 @@ const categoryRoutes=require("./Routes/categoryRoutes")
 const productRoutes=require("./Routes/productRoutes")
 const bannerRoutes=require("./Routes/bannerRoutes")
 const brandRoutes=require("./Routes/brandRoute")
-const frontRoutes=require("./Routes/frontRoutes")
+const frontRoutes=require("./Routes/frontRoutes");
 
 
 const app = express(); //create express.js(framework) instance
@@ -546,33 +543,6 @@ app.post('/create-payment-intent', async (req, res) => {
   }
 });
 
-// DeliveryAddress
-app.post("/DeliveryAddress",(req,res)=>{
-  const combinedData = {
-    ...req.body,
-    
-  };
-  const { error } = DeliVeryAddressSchema.validate(combinedData);
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: "🚫 Invalid request body", error: error.details });
-  }
-  console.log(error)
-  const { name,address,city,state,country,pincode ,mobile,secondaryMobile }=req.body;
-  console.log(req.body)
-  const uuid=uuidv4();
-  const query="insert into DELIVERY_ADDRESS (name,UUID,address,city,state,country,pincode ,mobile,secondaryMobile) values(?,?,?,?,?,?,?,?,?)";
-  db.query(query,[name,uuid,address,city,state,country,pincode,mobile,secondaryMobile],(err,data)=>{
-    if(err){
-      console.log(err)
-    
-    }
-    return res.json({data})
-    
-  })
-  return res.status(200).json({ message: "✅ Delivery Address Added successfully!" });
-})
 
 app.listen(process.env.SERVERPORT, () => {
   console.log(`server listening at port http://localhost:${process.env.SERVERPORT}`);

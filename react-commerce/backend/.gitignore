@@ -4,6 +4,7 @@ uploads
 backup.txt
 Reactcommerce.sql
 server2.js
+server3.js
 multerConfig2.js
 
 # FAQ:: when we try to write .env file why we write process.env

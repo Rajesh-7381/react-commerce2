@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Footer from '../Component/Footer'
 import Header from '../Component/Header'
 import  { useState } from 'react';
@@ -26,6 +26,7 @@ const Checkout = () => {
   const paymentMethod=useSelector((state)=>state.payment.paymentMethod);
   const [dis,setdis]=useState(null)
   const [modal, setModal] = useState(false);
+  const navigate=useNavigate();
 
   const toggle = () => setModal(!modal);
   async function handleCancel(){
@@ -34,6 +35,10 @@ const Checkout = () => {
         title: "Oops...",
         text: "You Cancelled!"
       });
+  }
+
+  async function handlepay(){
+    navigate("/success")
   }
   
   useEffect(()=>{
@@ -151,8 +156,10 @@ const handlePaymentChange=(event)=>{
             setModal(true)
             
             break;
-        case 'pay-pal':
+        case 'CreditORDebit':
+            navigate("/card")
             alert(paymentMethod)
+            
             break;
         default:
             break;    
@@ -521,9 +528,9 @@ const handlePaymentChange=(event)=>{
                                     <div className="u-s-m-b-10 text-start">
                                         {/*====== Radio Box ======*/}
                                         <div className="radio-box">
-                                        <input type="radio" id="pay-pal" name="payment" value="pay-pal" onChange={handlePaymentChange}/>
+                                        <input type="radio" id="CreditORDebit" name="payment" value="CreditORDebit" onChange={handlePaymentChange}/>
                                         <div className="radio-box__state radio-box__state--primary">
-                                            <label className="radio-box__label" htmlFor="pay-pal">PayPal (Pay With Credit / Debit Card / Paypal Credit)</label></div>
+                                            <label className="radio-box__label" htmlFor="CreditORDebit">Credit/Debit Through</label></div>
                                         </div>
                                         {/*====== End - Radio Box ======*/}
                                         <span className="gl-text u-s-m-t-6">When you click "Place Order" below we'll take you to Paypal's site to make Payment with your Credit / Debit Card or Paypal Credit.</span>
@@ -567,7 +574,7 @@ const handlePaymentChange=(event)=>{
                 <QRCodeGenerator />
               </ModalBody>
               <ModalFooter>
-                <Button color="success" id='pay' onClick={toggle}>
+                <Button color="success" id='pay' onClick={()=>{toggle();handlepay()}}>
                   Pay
                 </Button>{' '}
                 <Button color="danger" id='cancel' onClick={()=>{toggle();handleCancel()}}>

@@ -233,12 +233,17 @@ const frontController=require("../Controller/frontController")
  *       '500':
  *         description: Internal server error
  */
+
+// write swagger for card
 router.post("/ContactUS",upload.none(),frontController.contactUs)
-router.get("/AllProductDetailsShown")
-router.get("/listingproduct")
-router.get("/productDetails/:id")
-router.get("/productdetailscount")
+router.get("/AllProductDetailsShown",frontController.AllProductDetails)
+router.get("/listingproduct",frontController.listingproduct)
+router.get("/productDetails/:id",frontController.productDetails)
+router.get("/productdetailscount",frontController.productdetailscount)
 router.post("/create-payment-intent")
 router.post("/DeliveryAddress")
+router.post("/cardData",upload.none(),frontController.Card);
+router.post("/DeliveryAddress",upload.none(),frontController.DeliveryAddress);
+router.get("/getAllCards",frontController.getAll);
 
 module.exports=router

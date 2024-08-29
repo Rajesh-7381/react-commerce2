@@ -22,14 +22,15 @@ const ProductDetails = () => {
   const [listproduct, setlistProduct] = useState([]);
   const dispatch=useDispatch();
   const quantity=useSelector(state=>state.product.quantity);
+  const finalPrice=useSelector(state=>state.product.finalPrice)
 
   // increment or decrement product quantity
   const handleIncrement=()=>{
-    dispatch(incrementQuantity());
+    dispatch(incrementQuantity(listproduct.final_price));
     
   }
   const handleDecrement=()=>{
-    dispatch(decrementQuantity());
+    dispatch(decrementQuantity(listproduct.final_price));
   }
 
   useEffect(() => {
@@ -103,27 +104,7 @@ const ProductDetails = () => {
               </div>
               <span className="pd-text">Click for larger zoom</span>
             </div>
-            <div className="u-s-m-t-15">
-              <div className="slider-fouc">
-                <div id="pd-o-thumbnail">
-                  <div>
-                    <img className="u-img-fluid" src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg" alt="" />
-                  </div>
-                  <div>
-                    <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-2.png" alt />
-                  </div>
-                  <div>
-                    <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-3.png" alt />
-                  </div>
-                  <div>
-                    <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-4.png" alt />
-                  </div>
-                  <div>
-                    <img className="u-img-fluid" src="images/product/sitemakers-tshirt-large-5.png" alt />
-                  </div>
-                </div>
-              </div>
-            </div>
+            
           </div>
           {/*====== End - Product Detail Zoom ======*/}
         </div>
@@ -134,7 +115,7 @@ const ProductDetails = () => {
               <span className="pd-detail__name">{listproduct.product_name}</span></div>
             <div>
               <div className="pd-detail__inline">
-                <span className="pd-detail__price">₹{listproduct.final_price}.00</span>
+                <span className="pd-detail__price">₹{quantity === 1 ? listproduct.final_price : finalPrice}.00</span>
                 <span className="pd-detail__discount">({listproduct.product_discount}% OFF)</span><del className="pd-detail__del">₹{listproduct.product_price}.00</del></div>
             </div>
             <div className="u-s-m-b-15">

@@ -4,8 +4,6 @@ module.exports = (req, res, next) => {
      // Get the token from the Authorization header
     const authHeader = req.headers.authorization;
     
-    // if (!token) return res.status(401).json({ message: 'Access denied' });
-
     // Check if the Authorization header exists and starts with 'Bearer '
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ message: 'Access denied. No token provided.' });
@@ -13,10 +11,6 @@ module.exports = (req, res, next) => {
 
     // Extract the token from the header
     const token = authHeader.split(' ')[1]; //remove the Bearer and shown only token
-    
-    // Log the extracted token for debugging
-    // console.log('token::', token);
-
     try {
         // const verified = jwt.verify(token, 'dummy text');
         const verified = jwt.verify(token, process.env.JWT_SECRET);
