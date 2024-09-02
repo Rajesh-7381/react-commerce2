@@ -41,13 +41,13 @@ exports.deleteBrand = async (req, res) => {
   exports.updateBrand = async (req, res) => {
     const id = req.params.id;
     // console.log(id)
-    const { brand_name, brand_discount, description,url, meta_title, meta_keyword, meta_description } = req.body;
+    const { brand_name, brand_discount, description,url, meta_title, meta_keywords, meta_description } = req.body;
     const brand_image = req.files?.brand_image ? path.basename(req.files.brand_image[0].path) : null; //[ath.basename extracts only image name not full path]
     const brand_logo = req.files?.brand_logo ? path.basename(req.files.brand_logo[0].path) : null;
     // console.log(req.body)
     // console.log(brand_image)
     // console.log(brand_logo)
-    const updatedBrand = {  brand_name, brand_discount, description,url, meta_title, meta_keyword, meta_description,brand_image,brand_logo };
+    const updatedBrand = {  brand_name, brand_discount, description,url, meta_title, meta_keywords, meta_description,brand_image,brand_logo };
   
     try {
       await Brand.update(id, updatedBrand);

@@ -41,24 +41,12 @@ const Brand = {
 
   // Update brand details by ID
   update: async (id, page) => {
-    const { brand_name, brand_discount, description,url, meta_title, meta_keyword, meta_description,brand_image, brand_logo } = page;
-    // console.log(page)
-    const query = `
-      UPDATE Brands 
-      SET 
-        brand_name = ?, 
-        brand_discount = ?, 
-        description = ?, 
-        url = ?, 
-        meta_title = ?, 
-        meta_keywords = ?, 
-        meta_descriptions = ? ,
-        brand_image = ? ,
-        brand_logo = ? 
-      WHERE id = ? AND deleted_at IS NULL`;
+    const { brand_name, brand_discount, description,url, meta_title, meta_keywords, meta_description,brand_image, brand_logo } = page;
+    console.log(page)
+    const query = ` UPDATE Brands  SET    brand_name = ?,    brand_discount = ?,    description = ?,    url = ?,    meta_title = ?,    meta_keywords = ?,    meta_descriptions = ? ,   brand_image = ? ,   brand_logo = ?  WHERE id = ? AND deleted_at IS NULL`;
 
     try {
-      const [result] = await db.promise().query(query, [ brand_name, brand_discount, description,url, meta_title, meta_keyword, meta_description,brand_image,brand_logo,  id]);
+      const [result] = await db.promise().query(query, [ brand_name, brand_discount, description,url, meta_title, meta_keywords, meta_description,brand_image,brand_logo,  id]);
       return result;
     } catch (error) {
       console.error(`Error updating brand with ID ${id}:`, error);

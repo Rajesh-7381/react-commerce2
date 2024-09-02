@@ -22,7 +22,7 @@ module.exports = (req, res, next) => {
             next();
         }else if(role === 'user'){
             return res.json({message:"Acess denied!"})
-            next();
+            // next();
         }else {
             
             return res.status(403).json({ message: 'Access denied. You do not have permission to access this resource.' });

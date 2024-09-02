@@ -30,77 +30,15 @@ const Product = {
 
   // Update a product by ID
   updateById: async (id, product) => {
-    const {
-      category_id,
-      product_name,
-      product_code,
-      product_color,
-      family_color,
-      group_code,
-      product_price,
-      product_weight,
-      product_discount,
-      discount_type,
-      final_price,
-      product_video,
-      description,
-      washcare,
-      keywords,
-      fabric,
-      pattern,
-      sleeve,
-      fit,
-      meta_keywords,
-      meta_description,
-      meta_title,
-      occassion,
-      is_featured,
-    } = product;
-
-    const query = `
-      UPDATE products SET 
-        category_id=?, product_name=?, product_code=?, product_color=?, family_color=?, 
-        group_code=?, product_price=?, product_weight=?, product_discount=?, discount_type=?, 
-        final_price=?, product_video=?, description=?, washcare=?, keywords=?, fabric=?, 
-        pattern=?, sleeve=?, fit=?, meta_keywords=?, meta_description=?, meta_title=?, 
-        occassion=?, is_featured=? 
-      WHERE id=? AND deleted_at IS NULL
-    `;
+    const { category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare,keywords,  fabric,  pattern,  sleeve,  fit,  meta_keywords,  meta_description,  meta_title,  occassion,  is_featured} = product;
+     const query = `UPDATE products SET category_id=?, product_name=?, product_code=?, product_color=?, family_color=?,  group_code=?, product_price=?, product_weight=?, product_discount=?, discount_type=?, final_price=?, product_video=?, description=?, washcare=?, keywords=?, fabric=?, pattern=?, sleeve=?, fit=?, meta_keywords=?, meta_description=?, meta_title=?, occassion=?, is_featured=? WHERE id=? AND deleted_at IS NULL `;
 
     try {
-      const [result] = await db
-        .promise()
-        .query(query, [
-          category_id,
-          product_name,
-          product_code,
-          product_color,
-          family_color,
-          group_code,
-          product_price,
-          product_weight,
-          product_discount,
-          discount_type,
-          final_price,
-          product_video,
-          description,
-          washcare,
-          keywords,
-          fabric,
-          pattern,
-          sleeve,
-          fit,
-          meta_keywords,
-          meta_description,
-          meta_title,
-          occassion,
-          is_featured,
-          id,
-        ]);
+      const [result] = await db.promise().query(query, [ category_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, product_video, description, washcare, keywords,  fabric,  pattern,  sleeve,  fit,  meta_keywords,  meta_description,  meta_title,  occassion,  is_featured,  id,]);
       return result;
     } catch (error) {
-      console.error(`Error updating product with ID ${id}:`, error);
-      throw error;
+        console.error(`Error updating product with ID ${id}:`, error);
+        throw error;
     }
   },
 
@@ -165,8 +103,6 @@ const Product = {
       throw error;
     }
   },
-
-
 
   // Get all product images
   getImages: async () => {

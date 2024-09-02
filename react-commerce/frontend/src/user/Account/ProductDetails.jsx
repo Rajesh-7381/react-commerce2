@@ -12,6 +12,7 @@ const ProductDetails = () => {
   const { id } = location.state || {};
 
   useEffect(() => {
+    document.title="ProductDetails"
     if (id) {
       // Fetch product details using the id
       // console.log('Received id:', id);
@@ -38,7 +39,7 @@ const ProductDetails = () => {
   }, []);
 
   const fetchProduct = async () => {
-    const response = await axios.get(`http://localhost:8081/productDetails/49`);
+    const response = await axios.get(`http://localhost:8081/api/productDetails/49`);
     // const response = await axios.get(`http://localhost:8081/listingproduct/${id}`);
     setlistProduct(response.data[0]);
     // console.log(listproduct)

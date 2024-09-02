@@ -241,9 +241,9 @@ router.get("/listingproduct",frontController.listingproduct)
 router.get("/productDetails/:id",frontController.productDetails)
 router.get("/productdetailscount",frontController.productdetailscount)
 router.post("/create-payment-intent")
-router.post("/DeliveryAddress")
 router.post("/cardData",upload.none(),frontController.Card);
 router.post("/DeliveryAddress",upload.none(),frontController.DeliveryAddress);
 router.get("/getAllCards",frontController.getAll);
+router.post("/create-payment-intent",frontController.StripePayment);
 
 module.exports=router

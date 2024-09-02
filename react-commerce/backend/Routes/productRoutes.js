@@ -44,35 +44,165 @@ const productController=require("../Controller/productController");
  * /api/updateproducts/{id}:
  *   put:
  *     summary: Update a product by ID
- *     description: Update a specific product by its ID
+ *     description: Update a specific product by its ID.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID of the product to update
  *         schema:
  *           type: integer
- *           example: 1
+ *         description: The ID of the product to update.
  *     requestBody:
  *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
  *             type: object
+ *             required:
+ *               - category_id
+ *               - brand_id
+ *               - product_video
+ *               - product_image
+ *               - product_name
+ *               - product_code
+ *               - group_code
+ *               - product_color
+ *               - family_color
+ *               - product_price
+ *               - product_discount
+ *               - product_weight
+ *               - final_price
+ *               - discount_type
+ *               - description
+ *               - attribute
+ *               - washcare
+ *               - fabric
+ *               - keywords
+ *               - pattern
+ *               - sleeve
+ *               - fit
+ *               - occassion
+ *               - meta_title
+ *               - meta_description
+ *               - meta_keywords
+ *               - is_featured
  *             properties:
+ *               category_id:
+ *                 type: integer
+ *                 example: 11
+ *                 description: ID of the category to which the product belongs.
+ *               brand_id:
+ *                 type: integer
+ *                 example: 14
+ *                 description: ID of the brand to which the product belongs.
  *               product_video:
  *                 type: string
  *                 format: binary
- *                 description: Product video
+ *                 description: Video file of the product.
+ *               product_image:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Images of the product.
+ *               product_name:
+ *                 type: string
+ *                 description: Name of the product.
+ *               product_code:
+ *                 type: string
+ *                 description: Code of the product.
+ *               group_code:
+ *                 type: string
+ *                 description: Group code of the product.
+ *               product_color:
+ *                 type: string
+ *                 description: Color of the product.
+ *               family_color:
+ *                 type: string
+ *                 description: Color family of the product.
+ *               product_price:
+ *                 type: number
+ *                 example: 1000
+ *                 description: Price of the product.
+ *               product_discount:
+ *                 type: number
+ *                 example: 10
+ *                 format: float
+ *                 description: Discount on the product.
+ *               product_weight:
+ *                 type: string
+ *                 format: float
+ *                 description: Weight of the product.
+ *               final_price:
+ *                 type: number
+ *                 format: float
+ *                 description: Final price after discount.
+ *               discount_type:
+ *                 type: string
+ *                 description: Type of discount applied.
+ *               description:
+ *                 type: string
+ *                 description: Detailed description of the product.
+ *               attribute:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     size:
+ *                       type: string
+ *                       description: Size of the product.
+ *                     sku:
+ *                       type: string
+ *                       description: SKU of the product.
+ *                     price:
+ *                       type: number
+ *                       format: float
+ *                       description: Price of the attribute.
+ *                     stock:
+ *                       type: integer
+ *                       description: Stock available for the attribute.
+ *               washcare:
+ *                 type: string
+ *                 description: Wash care instructions for the product.
+ *               fabric:
+ *                 type: string
+ *                 description: Fabric details of the product.
+ *               keywords:
+ *                 type: string
+ *                 description: Keywords associated with the product.
+ *               pattern:
+ *                 type: string
+ *                 description: Pattern of the product.
+ *               sleeve:
+ *                 type: string
+ *                 description: Sleeve details of the product.
+ *               fit:
+ *                 type: string
+ *                 description: Fit of the product.
+ *               occassion:
+ *                 type: string
+ *                 description: Suitable occasion for the product.
+ *               meta_title:
+ *                 type: string
+ *                 description: SEO meta title of the product.
+ *               meta_description:
+ *                 type: string
+ *                 description: SEO meta description of the product.
+ *               meta_keywords:
+ *                 type: string
+ *                 description: SEO meta keywords for the product.
+ *               is_featured:
+ *                 type: boolean
+ *                 description: Indicates if the product is featured.
  *     responses:
  *       '200':
- *         description: ✅ Product updated successfully
+ *         description: ✅ Product updated successfully.
  *       '400':
- *         description: 👎 Bad request
+ *         description: 👎 Bad request.
  *       '404':
- *         description: ❌ Product not found
+ *         description: ❌ Product not found.
  *       '500':
- *         description: 🚫 Internal server error
+ *         description: 🚫 Internal server error.
  */
 
 /**
@@ -666,10 +796,9 @@ const productController=require("../Controller/productController");
  */
 
 router.get("/getAllProducts", productController.getAllProducts);
-router.put("/updateproducts/:id", upload.single("product_video"), productController.updateProduct);
 router.get("/productedit/:id", productController.getProductById);
 router.delete("/productdelete/:id", productController.deleteProduct);
-router.put("/updateproducts/:id", productController.updateProductStatus);
+router.put("/updateproducts/:id", upload.fields([{ name: 'product_video', maxCount: 1 }, { name: 'product_image', maxCount: 20 }]) ,productController.updateProduct);
 router.get("/productcolor", productController.getProductColors);
 router.get("/allproductcount", productController.getProductCount);
 router.post('/addproducts', upload.fields([{ name: 'product_video', maxCount: 1 }, { name: 'product_image', maxCount: 20 }]), productController.addProduct);

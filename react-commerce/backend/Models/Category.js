@@ -42,39 +42,11 @@ const Category = {
 
   // Update category details by ID
   update: async (id, category) => {
-    const {
-      category_name,
-      parent_id,
-      category_image,
-      category_discount,
-      description,
-      url,
-      meta_title,
-      meta_description,
-      meta_keyword,
-    } = category;
-
-    const query = `
-      UPDATE categories SET 
-        category_name = ?, parent_id = ?, category_image = ?, 
-        category_discount = ?, description = ?, url = ?, 
-        meta_title = ?, meta_description = ?, meta_keyword = ? 
-      WHERE id = ? AND deleted_at IS NULL
-    `;
+    const {category_name, parent_id, category_image, category_discount, description, url, meta_title, meta_description, meta_keyword } = category;
+    const query = ` UPDATE categories SET   category_name = ?, parent_id = ?, category_image = ?, category_discount = ?, description = ?, url = ?, meta_title = ?, meta_description = ?, meta_keyword = ? WHERE id = ? AND deleted_at IS NULL `;
 
     try {
-      const [result] = await db.promise().query(query, [
-        category_name,
-        parent_id,
-        category_image,
-        category_discount,
-        description,
-        url,
-        meta_title,
-        meta_description,
-        meta_keyword,
-        id,
-      ]);
+      const [result] = await db.promise().query(query, [ category_name, parent_id,  category_image,  category_discount,  description,  url,  meta_title,  meta_description,  meta_keyword,  id,]);
       return result;
     } catch (error) {
       console.error(`Error updating category with ID ${id}:`, error);

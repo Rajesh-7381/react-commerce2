@@ -17,11 +17,19 @@ exports.getAllProducts = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   const id = req.params.id;
-  const product_video = req.file ? req.file.filename : null;
-  const productData = { ...req.body, product_video };
+  console.log(id)
 
+  const { category_id,brand_id, product_name, product_code,group_code, product_color, family_color, product_price,  product_discount,product_weight,final_price, discount_type, description, washcare,  fabric,keywords,  pattern,  sleeve,  fit,occassion,meta_title,    meta_description,meta_keywords,    is_featured }=req.body;
+
+  const product_video = req.files['product_video'] ? req.files['product_video'][0].filename : null;
+  const product_images = req.files['product_image'] ? req.files['product_image'] : [];
+  const is_featured_val = is_featured === 'true' ? 'Yes' : 'No';
+
+  const productData={category_id,brand_id, product_name,product_video,product_images, product_code,group_code, product_color, family_color, product_price,  product_discount,product_weight,final_price, discount_type, description, washcare,  fabric,keywords,  pattern,  sleeve,  fit,occassion,meta_title,    meta_description,meta_keywords,    is_featured_val}
+  
   try {
     await Product.Product.updateById(id, productData);
+    // console.log(1)
     res.status(200).json({ message: "Updated successfully!" });
   } catch (err) {
     console.error(err);

@@ -214,48 +214,43 @@ const categoryController=require("../Controller/categoryController");
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID of the category to update
  *         schema:
  *           type: integer
- *           example: 1
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               parent_id:
+ *                 type: integer
+ *                 example: 12
+ *               category_name:
  *                 type: string
- *                 description: Updated category name
- *                 example: "Updated Electronics"
- *               category_image:    
+ *                 example: "furniture"
+ *               category_image:
  *                 type: string
  *                 format: binary
- *                 description: Updated category image
  *                 example: "furniture.jpg"
- *               category_discount:    
+ *               category_discount:
  *                 type: float
- *                 description: Updated category discount
- *                 example: 10
- *               description:    
+ *                 maxLength: 10
+ *                 example: 10.50
+ *               description:
  *                 type: string
  *                 example: "good category"
- *               url:    
+ *               url:
  *                 type: string
- *                 description: Updated category url
  *                 example: "https://github.com/Rajesh-7381/react-commerce2"
- *               meta_title:    
+ *               meta_title:
  *                 type: string
- *                 description: Updated category meta_title
  *                 example: "meta title"
- *               meta_description:    
+ *               meta_description:
  *                 type: string
- *                 description: Updated category meta_description
  *                 example: "meta description"
- *               meta_keyword:    
+ *               meta_keyword:
  *                 type: string
- *                 description: Updated category meta_keyword
  *                 example: "meta keyword"
  *     responses:
  *       '200':
@@ -424,7 +419,7 @@ const categoryController=require("../Controller/categoryController");
 router.get("/getAllCategorys",categoryController.getAll);
 router.post("/addcategory",upload.single("category_image"),categoryController.create);
 router.get("/categoryeditdata/:id",categoryController.categoryEditData);
-router.put("/updatecategory/:id",categoryController.updateCategory);
+router.put("/updatecategory/:id",upload.single("category_image"),categoryController.updateCategory);
 router.delete("/categorydelete/:id",categoryController.categoryDelete);
 router.put("/handlecategorystatus/:id",categoryController.updateCategoryStatus);
 router.get("/uniquecategories",categoryController.uniqueCategories);

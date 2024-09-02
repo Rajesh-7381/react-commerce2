@@ -24,8 +24,11 @@ const Dashboard2 = () => {
   },[]);
 
   const fetchProducts=async()=>{
-    const response=await axios.get("http://localhost:8081/AllProductDetailsShown");
-    setproducts(response.data);
+    const response=await axios.get("http://localhost:8081/api/AllProductDetailsShown");
+    console.log(response)
+    console.log(response.data.result)
+    setproducts(response.data.result);
+    console.log(products)
   }
   const items = [
     {
@@ -256,8 +259,8 @@ const Dashboard2 = () => {
                   <div className="row">
                    
                     {
-                      products.map((product)=>(
-                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item newarrivals">
+                      products.map((product,index)=>(
+                        <div key={index} className="col-xl-3 col-lg-4 col-md-6 col-sm-6 u-s-m-b-30 filter__item newarrivals">
                         <div className="product-o product-o--hover-on product-o--radius">
                           <div className="product-o__wrap">
                             <Link className="aspect aspect--bg-grey aspect--square u-d-block" to={'/listproduct'}>

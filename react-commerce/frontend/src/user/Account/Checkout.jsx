@@ -11,7 +11,7 @@ import {loadStripe} from '@stripe/stripe-js';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { NotificationManager } from 'react-notifications';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
 import QRCodeGenerator from './QRCodeGenerator';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Swal from "sweetalert2";
@@ -67,7 +67,7 @@ const Checkout = () => {
   const onSubmitForm=async(values,action)=>{
     // alert(1)
     console.log(values)
-    const user_id=localStorage.getItem('id')
+    const user_id=sessionStorage.getItem('id') || localStorage.getItem('id')
     // console.log(user_id)
     try {
         const formdata=new FormData();
@@ -76,17 +76,40 @@ const Checkout = () => {
         formdata.append("city",values.city)
         formdata.append("state",values.state)
         formdata.append("country",values.country)
+        formdata.append("pincode",values.pincode)
         formdata.append("mobile",values.mobile)
         formdata.append("secondaryMobile",values.secondaryMobile)
         formdata.append("user_id",user_id)
 
-        const response=await axios.post("http://localhost:8081/DeliveryAddress",formdata)
-        console.log(response.data)
+        const response=await axios.post("http://localhost:8081/api/DeliveryAddress",formdata)
+        // console.log(response.data.serverStatus===2)
         setTimeout(() => {
             
-            NotificationManager.success("Your Address Saved Successfully!")
-            // action.resetForm()
-        }, 3000);
+            // NotificationManager.success("Your new Address Saved Successfully!")
+            let timerInterval;
+            Swal.fire({
+            title: "Your new Address Saved Successfully!",
+            html: "I will close in <b></b> milliseconds.",
+            timer: 4000,
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading();
+                const timer = Swal.getPopup().querySelector("b");
+                timerInterval = setInterval(() => {
+                timer.textContent = `${Swal.getTimerLeft()}`;
+                }, 100);
+            },
+            willClose: () => {
+                clearInterval(timerInterval);
+            }
+            }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === Swal.DismissReason.timer) {
+                // console.log("I was closed by the timer");
+            }
+            });
+            action.resetForm()
+        }, 2000);
     } catch (error) {
         
     }
@@ -130,7 +153,7 @@ const handlePaymentChange=(event)=>{
             const stripe = await loadStripe("pk_test_51Ph8kgFnMqw8LC18U63JgNUhD8F5wAKZfjQAyrnfgoKNwI5fbZtwBYZfXwkVE7VdsxMmKziLUOKi6AXbI7XJN9Oe00iO9DHFpM");
   
     try {
-      const response = await fetch('http://localhost:8081/create-payment-intent', {
+      const response = await fetch('http://localhost:8081/api/create-payment-intent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -141,13 +164,13 @@ const handlePaymentChange=(event)=>{
           
         }),
       });
-    //   console.log(response)
-      const session = await response.json();
-    //   console.log(session)
-      window.location.href=session.url;
-    } catch (error) {
-      console.log(error.message);
-    }
+        //   console.log(response)
+        const session = await response.json();
+        //   console.log(session)
+        window.location.href=session.url;
+        } catch (error) {
+        console.log(error.message);
+        }
             break;
         case 'cash-on-delivery':
             alert(paymentMethod)
@@ -401,6 +424,7 @@ const handlePaymentChange=(event)=>{
                                 {/*====== End - Check Box ======*/}
                             </div>
                             <div>
+                            <NotificationContainer />
                                 <button className="btn btn--e-transparent-brand-b-2  btn-success" type="submit">SAVE</button>
                             </div>
                             </div>

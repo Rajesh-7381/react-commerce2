@@ -59,20 +59,26 @@ exports.getAll=async(req,res)=>{
 };
 
 exports.DeliveryAddress=async(req,res)=>{
+  // console.log(1)
   try {
     const combinedData = {
       ...req.body,
       
     };
+    // console.log(2)
     const { error } = DeliVeryAddressSchema.validate(combinedData);
+    // console.log(error)
     if (error) {
       return res
         .status(400)
         .json({ message: "🚫 Invalid request body", error: error.details });
     }
-  
-    const { name,address,city,state,country,pincode ,mobile,secondaryMobile }=req.body;
-    const result=await front.DeliveryAddress(name,address,city,state,country,pincode ,mobile,secondaryMobile);
+    // console.log(3)
+    const { name,address,city,state,country,pincode ,mobile,secondaryMobile,user_id }=req.body;
+    // console.log(req.body)
+    const result=await front.DeliveryAddress(name,address,city,state,country,pincode ,mobile,secondaryMobile,user_id);
+    // console.log(4)
+    // console.log(result)
     res.json(result);
   } catch (error) {
       console.error(error)
@@ -81,8 +87,10 @@ exports.DeliveryAddress=async(req,res)=>{
 };
 
 exports.AllProductDetails=async(req,res)=>{
+  // console.log(1)
   try {
     const result=await front.AllProductDetails();
+    // console.log(1)
     res.json({result})
   } catch (error) {
       console.error(error);
@@ -119,6 +127,20 @@ exports.productdetailscount=async(req,res)=>{
       console.error(error);
       res.json({message:"internal server error"}) 
   }
-}
+};
+exports.StripePayment=async(req,res)=>{
+  // console.log("s")
+  try {
+    const { amount, id } = req.body;
+    // console.log(amount,id)
+
+    const data=await front.StripePayment(amount);
+    return res.json(data)
+  } catch (error) {
+      console.error(error);
+      res.json({message:"internal server error"}) 
+  }
+};
+
 
   

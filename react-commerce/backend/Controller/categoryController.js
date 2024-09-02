@@ -56,14 +56,10 @@ exports.categoryEditData = async (req, res) => {
 
 // Update category
 exports.updateCategory = async (req, res) => {
-    upload.single("category_image")(req, res, async(err) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: "Error uploading file" });
-        }
-
-        const id = req.params.id;
-        const category_image = req.file.filename;
+        const id  = req.params.id;
+        console.log(id)
+        const category_image = req.file ? req.file.filename : null;
+        // console.log(category_image)
         const { category_name, parent_id, category_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
         const updatedCategory={category_name, parent_id,category_image, category_discount, description, url, meta_title, meta_description, meta_keyword};
         try {
@@ -72,8 +68,7 @@ exports.updateCategory = async (req, res) => {
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" });
-        }
-    });
+        }  
 };
 
 // update status category

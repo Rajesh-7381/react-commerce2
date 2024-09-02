@@ -2,11 +2,7 @@ const express = require("express");
 const router = express.Router();
 const upload = require("../utils/multerConfig");
 
-const {
-  Login,
-  RegisterUser,
-  AdminUserController,
-} = require("../Controller/userController");
+const { Login, RegisterUser, AdminUserController,} = require("../Controller/userController");
 
 //   =====================START api/register=======================================
 const registerusercontroller = new RegisterUser();

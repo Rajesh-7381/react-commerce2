@@ -40,7 +40,7 @@
         Welcome To Our e-Commerce Documentation! <%= username %>
         
       </h1>
-      <button>Explore<img height="20" src="https://e7.pngegg.com/pngimages/748/748/png-clipart-arrow-computer-icons-font-awesome-symbol-double-11-presale-angle-hand.png" alt=""></button>
+      <button >Explore<img height="20" src="https://e7.pngegg.com/pngimages/748/748/png-clipart-arrow-computer-icons-font-awesome-symbol-double-11-presale-angle-hand.png" alt=""></button>
       <p class="title" id="date">Today is:<%= date %></p>
 
       <br>
@@ -49,10 +49,26 @@
     <div>
       <button>Explore Swagger: <a href="http://localhost:8081/api-docs"><%= Swagger %></a></button>
     </div>
+
+    <div>
+      <section class="d-flex">
+        <div class="col-lg-12">
+          <div class="col-lg-6">
+            <button>a</button>
+          </div>
+          <div class="col-lg-6">
+            <button>a</button>
+          </div>
+        </div>
+      </section>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"></script>
     <script>
+      
       var tl = gsap.timeline({ repeat: -1 });
       tl.to("h1", 30, { backgroundPosition: "-960px 0" });
+
+      
     </script>
   </body>
 </html>

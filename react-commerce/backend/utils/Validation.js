@@ -287,13 +287,14 @@ const BannerSchema = Joi.object({
 
 const DeliVeryAddressSchema = Joi.object({
   name: Joi.string().trim().required().label("Name"),
-  address: Joi.string().trim().required().label("address"),
-  city: Joi.string().trim().required().label("city"),
-  state: Joi.string().trim().required().label("state"),
-  country: Joi.string().trim().required().label("country"),
-  pincode: Joi.number().required().label("pincode"),
-  mobile: Joi.number().required().label("mobile"),
-  secondaryMobile: Joi.number().required().label("secondmobile"),
+  address: Joi.string().trim().required().label("Address"),
+  city: Joi.string().trim().required().label("City"),
+  state: Joi.string().trim().required().label("State"),
+  country: Joi.string().trim().required().label("Country"),
+  pincode: Joi.string().trim().required().pattern(/^[0-9]{6}$/).label("Pincode"),
+  mobile: Joi.string().trim().required().pattern(/^[0-9]{10}$/).label("Mobile"),
+  secondaryMobile: Joi.string().trim().allow('').pattern(/^[0-9]{10}$/).label("Secondary Mobile"),
+  user_id: Joi.number().integer().required().label("user_id"),
 });
 
 const CardAdressSchema=Joi.object({

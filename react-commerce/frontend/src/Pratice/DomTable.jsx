@@ -4,6 +4,7 @@ import Pratice1 from './Pratice1';
 import Pratice2 from './Pratice2';
 import Main from './Main';
 import Pratice3 from './Pratice3';
+import Chat from './Chat';
 
 const DomTable = () => {
     const [formdata,setformdata]=useState({name:'',email:'',age:''});
@@ -73,6 +74,9 @@ const DomTable = () => {
                 <hr />
                 <hr />
       <Pratice3 />
+      <hr />
+                <hr />
+               
     </div>
   )
 }

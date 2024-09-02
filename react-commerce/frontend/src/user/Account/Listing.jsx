@@ -29,9 +29,11 @@ const Listing = () => {
   useEffect(() => {
     const fetchProductDetailsCount = async () => {
       try {
-        const res = await axios.get("http://localhost:8081/productdetailscount");
-        if (res.data && typeof res.data.count === 'number') {
-          setProductCount(res.data.count);
+        const res = await axios.get("http://localhost:8081/api/productdetailscount");
+        console.log(res.data[0].total)
+        if (res.data[0] && typeof res.data[0].total === 'number') {
+          setProductCount(res.data[0].total);
+          // console.log(productCount) // This line may not log the updated productCount
         } else {
           console.log("No count data available");
         }
@@ -42,8 +44,10 @@ const Listing = () => {
 
     
     const fetchProduct = async () => {
-      const response = await axios.get(`http://localhost:8081/listingproduct`);
+      const response = await axios.get(`http://localhost:8081/api/listingproduct`);
+      // console.log(response.data)
       setListProduct(response.data);
+      console.log(listProduct)
     };
 
     fetchProductDetailsCount();

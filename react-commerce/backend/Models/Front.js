@@ -1,6 +1,8 @@
 const { db } = require("../config/dbconfig");
 const { v4: uuidv4 } = require("uuid");
 const UUID = uuidv4();
+const stripe=require('stripe')(process.env.STRIPE_SECRET_KEY)
+
 
 const Front = {
   contactForm: (name, email, subject, message) => {
@@ -48,33 +50,11 @@ const Front = {
       });
     });
   },
-  DeliveryAddress: (
-    name,
-    address,
-    city,
-    state,
-    country,
-    pincode,
-    mobile,
-    secondaryMobile
-  ) => {
+  DeliveryAddress: ( name, address,  city,  state,  country,  pincode,  mobile,  secondaryMobile,user_id) => {
     const query =
-      "insert into DELIVERY_ADDRESS (name,UUID,address,city,state,country,pincode ,mobile,secondaryMobile) values(?,?,?,?,?,?,?,?,?)";
+      "insert into DELIVERY_ADDRESS (name,UUID,address,city,state,country,pincode ,mobile,secondaryMobile,user_id) values(?,?,?,?,?,?,?,?,?,?)";
     return new Promise((resolve, reject) => {
-      db.query(
-        query,
-        [
-          name,
-          UUID,
-          address,
-          city,
-          state,
-          country,
-          pincode,
-          mobile,
-          secondaryMobile,
-        ],
-        (err, data) => {
+      db.query(query,[  name,  UUID,  address,  city,  state,  country,  pincode,  mobile,  secondaryMobile,user_id],(err, data) => {
           if (err) {
             reject(err);
           } else {
@@ -85,13 +65,14 @@ const Front = {
     });
   },
   AllProductDetails: () => {
-    const query =
-      "select b.brand_name,p.*,pi.image from products as p join products_image as pi on p.id=pi.product_id join brands as b on p.brand_id=b.id";
+    const query = "select b.brand_name,p.*,pi.image from products as p join products_image as pi on p.id=pi.product_id join brands as b on p.brand_id=b.id";
+    // console.log(1)
     return new Promise((resolve, reject) => {
       db.query(query, (err, data) => {
         if (err) {
           reject(err);
         } else {
+          // console.log(data)
           resolve(data);
         }
       });
@@ -134,6 +115,30 @@ const Front = {
         }
       })
     })
+  },
+  StripePayment: async (amount) => {
+    // console.log("f")
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [{
+          price_data: {
+            currency: 'usd', //inr
+            product_data: {
+              name: 'Sample Product',
+            },
+            unit_amount: amount * 100,
+          },
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: 'http://localhost:3000/success',
+        cancel_url: 'http://localhost:3000/cancel',
+      });
+      return { url: session.url };
+    } catch (error) {
+      return { error: error.message, };
+    }
   }
 };
 module.exports = Front;
