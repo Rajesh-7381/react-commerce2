@@ -70,6 +70,7 @@ const Login=async(req,res)=>{
 // for registering new one
 class RegisterUser{
    async CreateRegisterAdminUser(req,res){
+    // console.log(1)
     try {
       const combinedData={
         ...req.body,
@@ -83,6 +84,7 @@ class RegisterUser{
       }
 
       const {name,mobile,email,password}=req.body;
+      // console.log(req.body)
       const uuid=await UUID();
       // console.log(uuid)
       // here 1st user is import user and 2nd is user class
@@ -90,8 +92,10 @@ class RegisterUser{
         return res.status(400).json({message:"⚠️ Email or mobile number already exists"})
       }
       // console.log(uuid)
-      const user=new User.User(name,mobile,email,password,req.file ? await cloudinary.uploader.upload(req.file.path) :null,uuid)
-      // console.log(1)
+      const image=req.file ? await cloudinary.uploader.upload(req.file.path,{ folder:'User'}) : null; //to check cloudinary folder
+      // console.log(image)
+      const user=new User.User(name,mobile,email,password,image ,uuid)
+      console.log(user)
       await user.Save();
       // console.log(1)
       await sendMail(email, "Welcome to E-commerce", `Hi ${name}, thank you for registering.`)
@@ -203,7 +207,12 @@ class AdminUserController{
     }
   }
   static async getAllAdminSubadminUsers(req,res){
+    // console.log(1)
     try {
+      // if(!req.user){
+        
+      //   return res.status(401).json({ message: 'Unauthorized' });
+      // }
       const result=await User.getAllAdminSubadminUsers.TotalAdminSubAdminUser();
       // console.log(result)
       res.json(result)
@@ -259,11 +268,12 @@ class AdminUserController{
 
   static async SearchAdminSubAdminUser(req,res){
     const searchTerm = req.params.searchTerm;
-    // console.log(searchTerm)
+    console.log(searchTerm)
     const results=await User.SearchAdminSubAdminUser.SearchDetails(searchTerm)
     // console.log(results)
     res.json(results)
   }
+  
   static async registerUserParticularDate(req,res){
     const date = req.params.date;
     // console.log(date)
@@ -291,6 +301,18 @@ class AdminUserController{
     const results=await User.getAllSubAdminData.getAll()
     // console.log(results)
     res.json(results)
+  }
+
+  // for read documentation
+  static async documents(req,res){
+    try {
+      const result=await User.DOCX.docx()
+      // console.log(result)
+      res.json(result)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"internal server error"})
+    }
   }
 }
 

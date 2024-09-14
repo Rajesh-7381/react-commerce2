@@ -1,11 +1,8 @@
-import axios from "axios";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import { NotificationContainer } from "react-notifications";
 import { Link, useNavigate } from "react-router-dom";
-import { DeleteEntity } from "../CRUDENTITY/DeleteEntity";
-import { StatusEntity } from "../CRUDENTITY/StatusEntity";
-import Header from "../Component/Header";
-import Footer from "../Component/Footer";
+import Header from "../Components/Header";
+import Footer from "../Components/Footer";
 import Delay from 'react-delay'
 import { SpinnerCircular } from 'spinners-react';
 const BrandTable=lazy(()=>import("./BrandTable"))

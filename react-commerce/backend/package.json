@@ -11,9 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.17.1",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.3.1",
     "cors": "^2.8.5",
+    "docx": "^8.5.0",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
@@ -24,13 +26,16 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.9.7",
+    "nodejs-pptx": "^1.2.4",
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
     "oors": "^3.3.0",
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
     "paypal-rest-sdk": "^1.8.1",
+    "read-excel-file": "^5.8.5",
     "sharp": "^0.32.0",
     "socket.io": "^4.7.5",
     "stripe": "^16.4.0",
@@ -38,6 +43,8 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^10.0.0",
-    "ws": "^8.18.0"
+    "write-excel-file": "^2.0.9",
+    "ws": "^8.18.0",
+    "xlsx": "^0.18.5"
   }
 }

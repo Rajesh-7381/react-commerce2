@@ -1,7 +1,5 @@
 const Product = require("../Models/Product");
-const fs = require("fs");
-const path = require("path");
-const sharp = require("sharp");
+const { cloudinary }=require("../helper/cloudinaryConfig")
 
 exports.getAllProducts = async (req, res) => {
   // console.log(1)
@@ -206,33 +204,25 @@ exports.SearchProduct = async (req, res) => {
 
 exports.addProduct = async (req, res) => {
   try {
-    const {
-      category_id, brand_id, product_name, product_code, product_color, family_color, group_code,
-      product_price, product_weight, product_discount, discount_type, final_price, description,
-      washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured
-    } = req.body;
-
+    const { category_id, brand_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured} = req.body;
     let attributes = req.body.attribute;
-
     if (typeof attributes === 'string') {
       attributes = JSON.parse(attributes);
     }
-    console.log(req.body)
+    // console.log(req.body)
 
      const product_price_number = parseFloat(product_price);
-     console.log(product_price_number)
+    //  console.log(product_price_number)
      if (isNaN(product_price_number)) {
        return res.status(400).json({ message: "Invalid product price" });
      }
-    const product_video = req.files['product_video'] ? req.files['product_video'][0].filename : null;
-    const product_images = req.files['product_image'] ? req.files['product_image'] : [];
+    // const product_video = req.files['product_video'] ? req.files['product_video'][0].filename : null;
+    // const product_images = req.files['product_image'] ? req.files['product_image'] : [];
+    const product_video = req.files['product_video'] ? await cloudinary.uploader.upload(req.files['product_video'][0].path,{folder:'ProductVIDEO'}): null;
+    const product_images = req.files['product_image'] ? Array.isArray(req.files['product_image'].map(image=> cloudinary.uploader.upload(image.path,{folder:'ProductsIMAGE'}))) : []; 
     const is_featured_val = is_featured === 'true' ? 'Yes' : 'No';
 
-    const product = {
-      category_id, brand_id, product_name, product_code, product_color, family_color, group_code,
-      product_price_number, product_weight, product_discount, discount_type, final_price, description,
-      washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured: is_featured_val
-    };
+    const product = { category_id, brand_id, product_name, product_code, product_color, family_color, group_code,  product_price_number, product_weight, product_discount, discount_type, final_price, description,  washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured: is_featured_val  };
 
     if (Array.isArray(attributes) && attributes.length > 0) {
       await Product.Products.addProduct(product, product_video, product_images,attributes);

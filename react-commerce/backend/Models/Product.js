@@ -6,13 +6,7 @@ const sharp = require("sharp"); //The sharp library is a popular JavaScript libr
 const Product = {
   // Get all products with category and parent category information
   getAll: async () => {
-    const query = `
-      SELECT p.*, c.category_name AS category_name, pc.category_name AS parent_category_name
-      FROM products p
-      LEFT JOIN categories c ON p.category_id = c.id
-      LEFT JOIN categories pc ON c.parent_id = pc.id
-      WHERE p.deleted_at IS NULL
-    `;
+    const query = " SELECT p.*, c.category_name AS category_name, pc.category_name AS parent_category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id LEFT JOIN categories pc ON c.parent_id = pc.id WHERE p.deleted_at IS NULL ";
 
     try {
       const [products] = await db.promise().query(query);
@@ -68,8 +62,7 @@ const Product = {
 
   // Toggle the status of a product by its ID
   toggleStatusById: async (id, status) => {
-    const query =
-      "UPDATE products SET status=? WHERE id=? AND deleted_at IS NULL";
+    const query =  "UPDATE products SET status=? WHERE id=? AND deleted_at IS NULL";
     try {
       const [result] = await db.promise().query(query, [status, id]);
       return result;
@@ -141,6 +134,48 @@ const Product = {
       throw error;
     }
   },
+
+    //locally delete from file
+  // deleteImageById:async(id)=>{
+  //   const imagegettingquery="select * from brands where id=?";
+  //   const deletequery="delete from brnds where id=?"
+   
+  //     db.query(imagegettingquery,[id],(err,result)=>{
+  //       if(err){
+  //         return err;
+  //       }
+  //       const imageurl=result[0].image;
+  //       const localydeletepath=path.join(__dirname,`../uploads/Brands/${imageurl}`)
+  //       try {
+  //         fs.promises.access(localydeletepath)
+  //         fs.promises.unlink(localydeletepath)
+  //       } catch (error) {
+  //           if(error.code ==='ENOENT'){
+  //             console.log("file does not exists!")
+  //           }else if(error.code ==='EPERM'){
+  //             console.log("operation not permited")
+  //           }else{
+  //             console.log("error deleting file")
+  //           }
+  //       }
+  //     })
+
+  //     try {
+  //       const deletedata=await new Promise((resolve,reject)=>{
+  //         db.query(deletequery,[id],(err,result)=>{
+  //           if(err){
+  //             reject(err)
+  //           }else{
+  //             resolve(result)
+  //           }
+  //         })
+  //       })
+  //       return deletedata;
+  //     } catch (error) {
+  //         throw error
+  //     }
+      
+  // },
 
   // Toggle the status of a product image by its ID
   imageStatus: async (id, status) => {
@@ -230,31 +265,14 @@ const Product = {
   }
 };
 
-
-
 const Products = {
   addProduct: async (product, product_video, product_images, attributes) => {
-    const {
-      category_id, brand_id, product_name, product_code, product_color, family_color, group_code,
-      product_price, product_weight, product_discount, discount_type, final_price, description,
-      washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured
-    } = product;
+    const {  category_id, brand_id, product_name, product_code, product_color, family_color, group_code,  product_price, product_weight, product_discount, discount_type, final_price, description,  washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured} = product;
 
-    const query = `
-      INSERT INTO products (category_id, brand_id, product_name, product_code, product_color, family_color,
-      group_code, product_price, product_weight, product_discount, discount_type, final_price,
-      product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords,
-      meta_description, meta_title, occassion, is_featured) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+    const query = `   INSERT INTO products (category_id, brand_id, product_name, product_code, product_color, family_color,   group_code, product_price, product_weight, product_discount, discount_type, final_price,   product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords,   meta_description, meta_title, occassion, is_featured)    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) `;
 
     try {
-      const [result] = await db.promise().query(query, [
-        category_id, brand_id, product_name, product_code, product_color, family_color, group_code,
-        product_price, product_weight, product_discount, discount_type, final_price, product_video,
-        description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description,
-        meta_title, occassion, is_featured
-      ]);
+      const [result] = await db.promise().query(query, [   category_id, brand_id, product_name, product_code, product_color, family_color, group_code,   product_price, product_weight, product_discount, discount_type, final_price, product_video,   description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description,   meta_title, occassion, is_featured ]);
 
       const productId = result.insertId;
 
@@ -285,19 +303,15 @@ const Products = {
             await Promise.all(
               Object.entries(resolutions).map(
                 async ([key, { width, height }]) => {
-                  const outputPath = path.join(
-                    outputDirs[key],
-                    file.filename
-                  );
+                  const outputPath = path.join(outputDirs[key],file.filename );
                   // console.log(`Processing image: ${outputPath}`);//path check
 
                   try {
-                    await sharp(file.path)
-                      .resize(width, height)
-                      .toFile(outputPath);
+                    // the faster image is webp according google
+                    await sharp(file.path).webp({quality:80}).resize(width, height).toFile(outputPath);
                   } catch (error) {
-                    console.error(`Failed to process image: ${outputPath}`, error);
-                    throw error;
+                        console.error(`Failed to process image: ${outputPath}`, error);
+                        throw error;
                   }
                 }
               )
@@ -311,16 +325,13 @@ const Products = {
       await Products.addProductAttributes(productId, attributes);
       return productId;
     } catch (error) {
-      console.error("Error adding new product:", error);
-      throw error;
+        console.error("Error adding new product:", error);
+        throw error;
     }
   },
 
   addProductImages: async (productId, product_images) => {
-    const imageQuery = `
-      INSERT INTO products_image (product_id, image, image_sort) 
-      VALUES ?
-    `;
+    const imageQuery = ` INSERT INTO products_image (product_id, image, image_sort)  VALUES ? `;
 
     const imageValues = product_images.map((file, index) => [
       productId, file.filename, index + 1,
@@ -330,11 +341,7 @@ const Products = {
   },
 
   addProductAttributes: async (productId, attributes) => {
-    const attributesQuery = `
-      INSERT INTO product_attributes (product_id, size, sku, price, stock) 
-      VALUES ?
-    `;
-
+    const attributesQuery = ` INSERT INTO product_attributes (product_id, size, sku, price, stock)  VALUES ? `;
     const attributeValues = attributes.map(attribute => [
       productId, attribute.size, attribute.sku, attribute.price, attribute.stock,
     ]);
@@ -342,7 +349,5 @@ const Products = {
     await db.promise().query(attributesQuery, [attributeValues]);
   },
 };
-
-
 
 module.exports = {Product,Products};

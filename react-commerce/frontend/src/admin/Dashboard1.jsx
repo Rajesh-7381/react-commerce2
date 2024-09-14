@@ -10,8 +10,8 @@ import DOUNGHTChart from './Chart/DOUNGHTChart';
 import LINEChart from './Chart/LINEChart';
 import STACKEDChart from './Chart/STACKEDChart';
 import PIEChart from './Chart/PIEChart';
-import Header from './Component/Header';
-import Footer from './Component/Footer';
+import Header from './Components/Header';
+import Footer from './Components/Footer';
 import { CSVLink } from 'react-csv';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 
@@ -25,7 +25,6 @@ const Dashboard1 = () => {
   const [categoriescount, setcategoriesCount] = useState(0);
   const [allproductcount,setallproductcount]=useState(0);
   const [allbrandcount,setallbrandcount]=useState(0);
-  // console.log(userData)
   const [pdate, setPdate] = useState('');
   const [registeruserdata2, setregisteruserdata] = useState(0);
   const [registeruserdata3, setregisteruserdata3] = useState(0);
@@ -33,7 +32,51 @@ const Dashboard1 = () => {
   const [todate, setToDate] = useState('');
   const [selectedChart, setSelectedChart] = useState('pie');
   const [userDetails,setuserDetails]=useState([]);
-  
+  const [cards, setCards] = useState([
+    { count: admincount, label: 'Admin Registrations', bgColor: 'bg-warning', icon: 'ion ion-person-add', link: '/registeruser' },
+    { count: subadmincount, label: 'Subadmin Registrations', bgColor: 'bg-info', icon: 'ion ion-person-add', link: '/subadmins' },
+    { count: usercount, label: 'User Registrations', bgColor: 'bg-primary', icon: 'ion ion-person-add', link: '/registeruser' },
+    { count: categoriescount, label: 'Unique Categories', bgColor: 'bg-danger', icon: 'fas fa-shopping-cart', link: '/categories' },
+    { count: allproductcount, label: 'All Products', bgColor: 'mediumpurple', icon: 'ion ion-bag', link: '#' },
+    { count: allbrandcount, label: 'All Brands', bgColor: 'teal', icon: 'ion ion-stats-bars', link: '/brands' },
+    { count: 45, label: 'User Registrations', bgColor: 'bg-success', icon: 'ion ion-person-add', link: '#' },
+    { count: 65, label: 'Unique Visitors', bgColor: 'bg-secondary', icon: 'ion ion-pie-graph', link: '#' },
+  ]);
+  const [dragAndDropPerformed, setDragAndDropPerformed] = useState(0);
+
+  // to check value set in localstorage if draganddrop performed or not
+  localStorage.setItem("draganddrop",dragAndDropPerformed);
+  var getloc=localStorage.getItem('draganddrop')
+
+  // drag and drop cards  
+  const handleDragStart = (e, index) => {
+    // console.log(e + ";"+index)
+    e.dataTransfer.setData('text', index);
+  };
+
+  const handleDragOver = (e) => {
+    // console.log(e )
+    e.preventDefault();
+  };
+
+  const handleDrop = (e, index) => {
+    // console.log(e + ";"+index)
+    e.preventDefault();
+    const draggedIndex = e.dataTransfer.getData('text');
+    // console.log(draggedIndex)
+    const draggedCard = cards[draggedIndex];
+    // console.log(draggedCard)
+    const targetCard = cards[index];
+    // console.log(targetCard)
+    const newCards = [...cards];
+    // console.log(newCards)
+    newCards[draggedIndex] = targetCard;
+    // console.log(newCards[draggedIndex])
+    newCards[index] = draggedCard;
+    // console.log(newCards[index])
+    setCards(newCards);
+    setDragAndDropPerformed(1)
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,6 +87,18 @@ const Dashboard1 = () => {
         const uniquecategoriesResponse =await axios.get("http://localhost:8081/api/uniquecategories");
         const productcountResponse=await axios.get("http://localhost:8081/api/allproductcount");
         const BrandcountResponse=await axios.get("http://localhost:8081/api/AllBrandCount");
+        const newCards = [
+          { count: userResponse.data.userCount, label: 'User Registrations', bgColor: 'bg-primary', icon: 'ion ion-person-add', link: '/registeruser' },
+          { count: adminResponse.data.adminCount, label: 'Admin Registrations', bgColor: 'bg-warning', icon: 'ion ion-person-add', link: '/registeruser' },
+          { count: subadminResponse.data.subAdminCount, label: 'Subadmin Registrations', bgColor: 'bg-info', icon: 'ion ion-person-add', link: '/subadmins' },
+          { count: uniquecategoriesResponse.data.catcount, label: 'Unique Categories', bgColor: 'bg-danger', icon: 'fas fa-shopping-cart', link: '/categories' },
+          { count: productcountResponse.data.productcount, label: 'All Products', bgColor: 'mediumpurple', icon: 'ion ion-bag', link: '#' },
+          { count: BrandcountResponse.data.allBrandCount, label: 'All Brands', bgColor: 'teal', icon: 'ion ion-stats-bars', link: '/brands' },
+          { count: 45, label: 'User Registrations', bgColor: 'bg-success', icon: 'ion ion-person-add', link: '#' },
+          { count: 65, label: 'Unique Visitors', bgColor: 'bg-secondary', icon: 'ion ion-pie-graph', link: '#' },
+        ];
+  
+        setCards(newCards);
         // console.log(userResponse)
         setUserCount(userResponse.data.userCount);
         setAdminCount(adminResponse.data.adminCount);
@@ -162,6 +217,7 @@ const Dashboard1 = () => {
     validationSchema:validationSchema,
     onSubmit:onSubmitForm
   })
+// alert(JSON.stringify(cards))
 
   return (
     
@@ -181,7 +237,7 @@ const Dashboard1 = () => {
       <div className="container-fluid">
         <div className="row mb-2">
           <div className="col-sm-6">
-            <h1 className="m-0 float-left">Dashboard</h1>
+            <h1 className="m-0 float-left">Dashboard {getloc === '1' ? '' : <img src="https://i.pinimg.com/originals/fb/11/55/fb1155591460c455edf3ced130b127b9.gif" height={40} width={40} alt="" title='Drag and Drop below card' /> }</h1>
             
           </div>{/* /.col */}
           <div className="col-sm-6">
@@ -196,130 +252,31 @@ const Dashboard1 = () => {
     {/* /.content-header */}
     {/* Main content */}
     <section className="content">
-      <div className="container-fluid">
-        {/* Small boxes (Stat box) */}
-        <div className="row">
-          <div className="col-lg-3 col-6">
+    <div className="container-fluid" id='left'>
+      {/* Small boxes (Stat box) */}
+      <div className="row">
+        {cards.map((card, index) => (
+          <div key={index}   className="col-lg-3 col-6 dragAbleList"   draggable="true"   onDragStart={(e) => handleDragStart(e, index)}   onDragOver={(e) => handleDragOver(e)}   onDrop={(e) => handleDrop(e, index)} >
             {/* small box */}
-            <div className="small-box bg-warning">
+            <div  className={`small-box ${card.bgColor}`}  style={{ backgroundColor: card.bgColor }}   >
               <div className="inner">
-                <h3>{admincount}</h3>
-                <p>Admin Registrations</p>
-                 
+                <h3>{card.count}</h3>
+                <p>{card.label}</p>
               </div>
               <div className="icon">
-                <i className="ion ion-person-add " />
+                <i className={card.icon} />
               </div>
-              <Link to={"/registeruser"} className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
+              <Link to={card.link} className="small-box-footer">
+                More info <i className="fas fa-arrow-circle-right" />
+              </Link>
             </div>
           </div>
-          {/* ./col */}
-          <div className="col-lg-3 col-6">
-            {/* small box */}
-            <div className="small-box bg-info">
-              <div className="inner">
-                <h3>{subadmincount}</h3>
-                <p>Subadmin Registrations</p>
-              </div>
-              <div className="icon">
-                <i className="ion ion-person-add" />
-              </div>
-              <Link to={"/subadmins"} className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
-            </div>
-          </div>
-          {/* ./col */}
-          <div className="col-lg-3 col-6">
-            {/* small box */}
-            <div className="small-box bg-primary">
-              <div className="inner">
-                <h3>{usercount}</h3>
-                <p>User Registrations</p>
-              </div>
-              <div className="icon">
-                <i className="ion ion-person-add" />
-              </div>
-              <Link to={"/registeruser"} className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
-            </div>
-          </div>
-          {/* ./col */}
-          <div className="col-lg-3 col-6">
-            {/* small box */}
-            <div className="small-box bg-danger">
-              <div className="inner">
-                <h3>{categoriescount}</h3>
-                <p>Unique Categories</p>
-              </div>
-              <div className="icon">
-                <i className="fas fa-shopping-cart" />
-              </div>
-              <Link to={"/categories"} className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
-            </div>
-          </div>
-          {/* ./col */}
-        </div>
-        <div className="row">
-          <div className="col-lg-3 col-6">
-            {/* small box */}
-            <div className="small-box" style={{backgroundColor:"mediumpurple"}}>
-              <div className="inner">
-                <h3>{allproductcount}</h3>
-                <p>All Products</p>
-                 
-              </div>
-              <div className="icon">
-                <i className="ion ion-bag" />
-              </div>
-              <a href="#" className="small-box-footer"><span style={{color:"black"}}>More info <i className="fas fa-arrow-circle-right" /></span> </a>
-            </div>
-          </div>
-          {/* ./col */}
-          <div className="col-lg-3 col-6">
-            {/* small box */}
-            <div className="small-box" style={{backgroundColor:"teal"}}>
-              <div className="inner">
-                <h3>{allbrandcount}</h3>
-                <p>All Brands</p>
-              </div>
-              <div className="icon">
-                <i className="ion ion-stats-bars" />
-              </div>
-              <Link to={"/brands"} className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></Link>
-            </div>
-          </div>
-          {/* ./col */}
-          <div className="col-lg-3 col-6">
-            {/* small box */}
-            <div className="small-box bg-success">
-              <div className="inner">
-                <h3>45</h3>
-                <p>User Registrations</p>
-              </div>
-              <div className="icon">
-                <i className="ion ion-person-add" />
-              </div>
-              <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
-            </div>
-          </div>
-          {/* ./col */}
-          <div className="col-lg-3 col-6">
-            {/* small box */}
-            <div className="small-box bg-secondary" >
-              <div className="inner">
-                <h3>65</h3>
-                <p>Unique Visitors</p>
-              </div>
-              <div className="icon">
-                <i className="ion ion-pie-graph" />
-              </div>
-              <a href="#" className="small-box-footer">More info <i className="fas fa-arrow-circle-right" /></a>
-            </div>
-          </div>
-          {/* ./col */}
-        </div>
-        {/* /.row */}
-        {/* Main row */}
-        
-      </div>{/* /.container-fluid */}
+        ))}
+      </div>
+      {/* /.row */}
+      {/* Main row */}
+    </div>
+    {/* /.container-fluid */}
     </section>
     {/* /.content */}
 

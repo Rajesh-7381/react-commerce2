@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom'
 import {  NotificationContainer } from 'react-notifications';
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
-import Footer from '../Component/Footer';
-import Header from '../Component/Header';
+import Footer from '../Components/Footer';
+import Header from '../Components/Header';
 
 
 const ProductImages = () => {
@@ -45,13 +45,7 @@ const ProductImages = () => {
         <div className="wrapper">
         {/* Preloader */}
             <div className="preloader flex-column justify-content-center align-items-center">
-                <img
-                className="animation__shake"
-                src="dist/img/AdminLTELogo.png"
-                alt="AdminLTELogo"
-                height={60}
-                width={60}
-                />
+                <img className="animation__shake" src="dist/img/AdminLTELogo.png" alt="AdminLTELogo" height={60} width={60} />
             </div>
         {/* Navbar */}
             <Header></Header>
@@ -62,19 +56,14 @@ const ProductImages = () => {
                     <div className="row mb-2">
                     <div className="col-sm-12">
                         <h1 className="m-0 float-start">ProductsImage Table</h1>
-                        <Link  className="breadcrumb-item float-right" to={"/admindashboard1"}>
-                            Home
-                        </Link>
+                        <Link  className="breadcrumb-item float-right" to={"/admindashboard1"}>  Home </Link>
                         <br />
                         
                     </div>
                     
                     {/* /.col */}
                     <div className="col-sm-6">
-                        <ol className="breadcrumb float-sm-right">
-                        
-                        
-                        </ol>
+                        <ol className="breadcrumb float-sm-right"> </ol>
                     </div>
                     {/* /.col */}
                     </div>
@@ -108,29 +97,33 @@ const ProductImages = () => {
                                                     <th className='bg-dark text-light'>PRODUCTID</th>
                                                     <th className='bg-dark text-light'>Image_SORT</th>
                                                     <th className='bg-dark text-light'>STATUS</th>
-                                                    
                                                     <th className='bg-dark text-light'>ACTIONS</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {
-                                                    filterdata && filterdata.length > 0 ?
-                                                    filterdata.map((item,index)=>(
+                                                    filterdata && filterdata.length > 0 ?  filterdata.map((item,index)=>(
                                                         <tr  key={item.id}>
                                                             <td > {index+1}</td>
-
                                                             <td >
-                                                                <Link to={`http://localhost:8081/api/productsimage/`+  item.image} target="_blank" id='image-constrained'>
-                                                                    <img src={`http://localhost:8081/api/productsimage/` + item.image} width={50} height={50} alt="" />
+                                                                <Link to={item.image} target="_blank" id='image-constrained'>
+                                                                    {item.image && item.image.trim() !=='' ? (
+                                                                        <img src={item.image} alt="" height={50} width={50} loading='lazy' onError={(e)=>{
+                                                                            if(e.target.src !== 'https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'){
+                                                                                e.target.src='https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'
+                                                                            }
+                                                                        }}/>
+                                                                    ):(
+                                                                        <img src={'https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'} alt="" loading='lazy' height={50} width={50} />
+                                                                    )}
                                                                 </Link>
                                                             </td>
 
                                                             <td > {item.product_id}</td>
                                                             <td > {item.image_sort}</td>
-                                                            
                                                             <td > <span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
                                                             <td >
-                                                            <NotificationContainer />
+                                                                <NotificationContainer />
                                                                 <button className='btn btn-sm btn-danger mr-1' title='delete' onClick={()=>HandleProductsImageDelete(item.id)}><i className='fas fa-trash'></i></button>
                                                                 <button className='btn btn-sm btn-dark' title='toggle off/on' onClick={()=>handleProductsToggleStatus(item.id,item.status)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
                                                             </td>

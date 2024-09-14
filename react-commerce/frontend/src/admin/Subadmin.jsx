@@ -7,23 +7,32 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { DeleteEntity } from './CRUDENTITY/DeleteEntity';
-import Footer from './Component/Footer';
-import Header from './Component/Header';
+import Footer from './Components/Footer';
+import Header from './Components/Header';
 
 
 const Subadmin = (args) => {
     const navigate=useNavigate();
     const [data, setData] = useState([]);
     const [filterData, setFilterData] = useState([]);
-
     const [modal, setModal] = useState(false);
-
   // inside modal data shown(eye)
     const [modaldata, setmodaldata] = useState({});
     const [currentPage,setCurrentPage]=useState(1);
+    const [columns,setColumns]=useState([
+      {key :'name',label: 'NAME'},
+      {key :'mobile',label: 'MOBILE'},
+      {key :'email',label: 'EMAIL'},
+      {key :'role',label: 'Role'},
+      {key :'created_at',label: 'Created At'},
+      {key :'actions',label : 'ACTIONS' }
+    ]);
+    const [sortConfig, setSortConfig] = useState({ key: '', direction: '' }); // Sorting configuration
+  
+
     const recordsPerPage=10;
-    const lastIndex=currentPage * recordsPerPage;
-    const firstIndex=lastIndex - recordsPerPage;
+    // const lastIndex=currentPage * recordsPerPage;
+    // const firstIndex=lastIndex - recordsPerPage;
     const totalPages=Math.ceil(filterData.length / recordsPerPage);
     const numbers=[...Array(totalPages + 1).keys()].slice(1);
     
@@ -135,6 +144,72 @@ const Subadmin = (args) => {
         setCurrentPage(n);
     }
 
+    // for row swapping
+    const handleDragStart = (e, id) => {
+      // console.log(typeof id)
+      e.dataTransfer.setData('text', id.toString()); 
+      e.target.style.color = "green";
+    };
+    
+    const handleDragOver = (e) => {
+      e.target.style.color = "red";
+      e.preventDefault();
+    };
+    
+    const handleDrop = (e, id) => {
+      // console.log(e)// return synthesisbaseevent
+      e.preventDefault();
+      // e.target.style.color = "green";
+      const draggedId = e.dataTransfer.getData('text');  //return dragged id
+      e.target.style.color = "green";
+      const newFilteredData = [...filterData];
+      const draggedIndex = newFilteredData.findIndex((item) => item.id.toString() === draggedId); // if filterdata.item.id === draggedid equal then return draggeddata index
+      const targetIndex = newFilteredData.findIndex((item) => item.id === id); //same as it return targeted index means where dropped index
+      if (draggedIndex === -1 || targetIndex === -1) {
+        alert("Invalid places");
+        return;
+      }
+    
+      // Swap dragged and target items
+      const draggedItem = newFilteredData[draggedIndex]; //suppose draggedIndex return 0 it means draggeditem store their data
+      newFilteredData.splice(draggedIndex, 1); //splice(0,1) removes 1 element from newfilterdata and starting from draggedindex
+      newFilteredData.splice(targetIndex, 0, draggedItem); //inserts draggeditem at the position of targetedindex and 0 means no removed
+      setFilterData(newFilteredData);
+    };
+
+    // for column swapping
+    const handleColumnDragStart=(e,index)=>{
+      e.dataTransfer.setData("columnIndex",index);
+    }
+
+    const handleColumnDrop=(e,index)=>{
+      const dragColumnIndex=e.dataTransfer.getData("columnIndex");
+      const newColumns=[...columns];
+      const draggedColumn=newColumns[dragColumnIndex];
+      newColumns.splice(draggedColumn,1);
+      newColumns.splice(index,0,draggedColumn)
+      setColumns(newColumns)
+    }
+
+     // Sorting handler
+  const handleSort = (key) => {
+    // console.log(key)
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    const sortedData = [...filterData].sort((a, b) => {
+      if (a[key] < b[key]) {
+        return direction === 'asc' ? -1 : 1;
+      }
+      if (a[key] > b[key]) {
+        return direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+    setFilterData(sortedData);
+    setSortConfig({ key, direction });
+  };
     return (
         <div>
         <div>
@@ -158,36 +233,15 @@ const Subadmin = (args) => {
                 <div className="row mb-2">
                   <div className="col-sm-12">
                     <h1 className="m-0 float-start">Subadmin Table</h1>
-                    <Link  className="breadcrumb-item float-right" to={"/admindashboard1"}>
-                        Home
-                    </Link>
+                    <Link  className="breadcrumb-item float-right" to={"/admindashboard1"}> Home </Link>
                     <br />
-                    
                   </div>
-                  
-                  {/* /.col */}
-                  <div className="col-sm-6">
-                    <ol className="breadcrumb float-sm-right">
-                      
-                     
-                    </ol>
-                  </div>
-                  {/* /.col */}
                 </div>
                 {/* /.row */}
               </div>
               {/* /.container-fluid */}
             </div>
             {/* /.content-header */}
-            {/* Main content */}
-            <section className="content">
-              <div className="container-fluid">
-                <div className="row">
-                  <div className="col-lg-3 col-6"></div>
-                </div>
-              </div>
-            </section>
-            {/* /.content */}
     
             <section className="content">
                 <div className="container-fluid">
@@ -198,7 +252,7 @@ const Subadmin = (args) => {
                                 <div className="card-body ">
                                     <form className='d-flex align-items-center justify-content-end'>
                                         <div className="input-group col-9">
-                                            <input className="mr-2" type="search" placeholder="Search" aria-label="Search" onKeyUp={searchFunction} />
+                                            <input className="mr-2" type="search" style={{marginLeft:"-312px"}} placeholder="Search here....." aria-label="Search" onKeyUp={searchFunction} />
                                             <div className="input-group-append">
                                                 <button className="btn btn-outline-success mr-5 searchbtn" type="button" >Search</button>
                                                 <NotificationContainer />
@@ -214,20 +268,23 @@ const Subadmin = (args) => {
                                     <table id="Table" className="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th className='bg-dark text-light'>SL NO</th>
-                                                <th className='bg-dark text-light'>NAME</th>
-                                                <th className='bg-dark text-light'>MOBILE</th>
-                                                <th className='bg-dark text-light'>EMAIL</th>
-                                                <th className='bg-dark text-light'>ROLE</th>
-                                                <th className='bg-dark text-light'>Created At</th>
-                                                <th className='bg-dark text-light'>ACTIONS</th>
+                                            <th key="slno" style={{ background: "black", color: "white" }}>Sl No</th>
+
+                                                {columns.map((item,index)=>(
+                                                  <th key={index} style={{background:"black", color:"white"}} draggable="true" onDragStart={(e)=>handleColumnDragStart(e,index)} onDragOver={(e)=>e.preventDefault()} onDrop={(e)=>handleColumnDrop(e,index)}>{item.label}
+                                                      <span className="ml-2">
+                                                        <button style={{ border: 'none', background: 'transparent', color: 'white' }} onClick={() => handleSort(item.key)} ><img src="https://cdn-icons-png.flaticon.com/128/5610/5610930.png" height={20} alt="" /></button>
+                                                        <button  style={{ border: 'none', background: 'transparent', color: 'white' }}  onClick={() => handleSort(item.key)} ><img src="https://cdn-icons-png.flaticon.com/128/5612/5612000.png" alt="" height={20} /> </button>
+                                                    </span>
+                                                  </th>
+                                                ))}
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {
                                               filterData && filterData.length > 0 ? 
                                               filterData.slice((currentPage -1) * recordsPerPage ,currentPage * recordsPerPage).map((item, index) => (
-                                                <tr key={item.id}>
+                                                <tr key={item.id} draggable="true" onDragStart={(e)=>{handleDragStart(e,item.id)}} onDragOver={handleDragOver} onDrop={(e)=>handleDrop(e,item.id)}>
                                                     <td>{index + 1 +(currentPage -1) * recordsPerPage}</td>
                                                     <td>{item.name}</td>
                                                     <td>{item.mobile}</td>
@@ -240,11 +297,11 @@ const Subadmin = (args) => {
                                                         <button className='btn btn-danger btn-sm' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
                                                     </td>
                                                </tr>
-                                            ))
-                                            : 
-                                            <tr>
-                                              <td colSpan={6}>No data found</td>
-                                            </tr>
+                                              ))
+                                              : 
+                                              <tr>
+                                                <td colSpan={6}>No data found</td>
+                                              </tr>
                                             }
                                         </tbody>
                                     </table>
@@ -273,67 +330,67 @@ const Subadmin = (args) => {
             </section>
             {/* for show singledata modal*/}
             <Modal isOpen={modal} toggle={toggle} {...args}>
-        <ModalHeader toggle={toggle} className="bg-primary text-white">
-          Hi {modaldata?.name ? <span className='bg-warning'>{modaldata.name}</span> : <span>No name</span>}
-        </ModalHeader>
-        <div className="text-center">
-          {modaldata?.image ? (
-            <img src={modaldata.image} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
-          ) : (
-            <p>No image</p>
-          )}
-        </div>
-        <ModalBody>
-          <div className="container">
-            <div className="row">
-              <div className="col-md-12">
-                <h5 className="text-primary">Personal Information </h5>
-                <hr />
+              <ModalHeader toggle={toggle} className="bg-primary text-white">
+                Hi {modaldata?.name ? <span className='bg-warning'>{modaldata.name}</span> : <span>No name</span>}
+              </ModalHeader>
+              <div className="text-center">
+                {modaldata?.image ? (
+                  <img src={modaldata.image} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
+                ) : (
+                  <img src={'https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} loading="lazy" alt="" />
+                )}
               </div>
-            </div>
-            <div className="row">
-              <div className="col-md-4">
-                <p style={{ fontWeight: "bolder" }}>ID:</p>
-              </div>
-              <div className="col-md-4">
-                <p>{modaldata?.id ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span> : <span>No ID</span>}</p>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-4">
-                <p style={{ fontWeight: "bolder" }}>Name:</p>
-              </div>
-              <div className="col-md-4">
-                <p>{modaldata?.name ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span> : <span>No name</span>}</p>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-4">
-                <p style={{ fontWeight: "bolder" }}>Email:</p>
-              </div>
-              <div className="col-md-4">
-                <p>{modaldata?.email ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span> : <span>No email</span>}</p>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-4">
-                <p style={{ fontWeight: "bolder" }}>Role:</p>
-              </div>
-              <div className="col-md-4">
-                <p>{modaldata?.role ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span> : <span>No role</span>}</p>
-              </div>
-            </div>
-          </div>
-        </ModalBody>
-        <ModalFooter className="bg-light">
-          <Button color="primary" onClick={toggle}>
-            Ok
-          </Button>{' '}
-          <Button color="danger" onClick={toggle}>
-            Cancel
-          </Button>
-        </ModalFooter>
-      </Modal>
+              <ModalBody>
+                <div className="container">
+                  <div className="row">
+                    <div className="col-md-12">
+                      <h5 className="text-primary">Personal Information </h5>
+                      <hr />
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-4">
+                      <p style={{ fontWeight: "bolder" }}>ID:</p>
+                    </div>
+                    <div className="col-md-4">
+                      <p>{modaldata?.id ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span> : <span>No ID</span>}</p>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-4">
+                      <p style={{ fontWeight: "bolder" }}>Name:</p>
+                    </div>
+                    <div className="col-md-4">
+                      <p>{modaldata?.name ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span> : <span>No name</span>}</p>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-4">
+                      <p style={{ fontWeight: "bolder" }}>Email:</p>
+                    </div>
+                    <div className="col-md-4">
+                      <p>{modaldata?.email ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span> : <span>No email</span>}</p>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-4">
+                      <p style={{ fontWeight: "bolder" }}>Role:</p>
+                    </div>
+                    <div className="col-md-4">
+                      <p>{modaldata?.role ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span> : <span>No role</span>}</p>
+                    </div>
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter className="bg-light">
+                <Button color="primary" onClick={toggle}>
+                  Ok
+                </Button>{' '}
+                <Button color="danger" onClick={toggle}>
+                  Cancel
+                </Button>
+              </ModalFooter>
+            </Modal>
           </div>
     
           {/* /.content-wrapper */}

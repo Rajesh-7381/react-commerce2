@@ -5,8 +5,8 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
-import Footer from '../Component/Footer';
-import Header from '../Component/Header';
+import Footer from '../Components/Footer';
+import Header from '../Components/Header';
 
 const Products = () => {
     const navigate=useNavigate();

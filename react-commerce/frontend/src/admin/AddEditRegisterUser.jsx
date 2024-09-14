@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { jsPDF } from "jspdf";
 import 'jspdf-autotable';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -11,24 +11,26 @@ import { NotificationContainer, NotificationManager } from 'react-notifications'
 import 'react-notifications/lib/notifications.css';
 import zxcvbn from 'zxcvbn';
 import { DeleteEntity } from './CRUDENTITY/DeleteEntity';
-import Footer from './Component/Footer';
-import Header from './Component/Header';
+import Footer from './Components/Footer';
+import Header from './Components/Header';
 
 const AddEditRegisterUser = (args) => {
    
   const [pass,setpass]=useState(false);
   const [data, setData] = useState([]);
   const [filterData, setFilterData] = useState([]);
-
   const [modal, setModal] = useState(false);
   const [modal2, setModal2] = useState(false);
-
   // inside modal data shown(eye)
   const [modaldata, setmodaldata] = useState({});
-  // console.log(modaldata)
-
   const [id, setId] = useState(""); // Define id state
   const [passwordstrength,setPasswordStrength]=useState(0);
+  // const [checked,setnewchecked]=useState(new Array(data.length).fill(false))
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedRows, setSelectedRows] = useState({});
+  const navigate=useNavigate();
+  let sRow=false;
+
   useEffect(()=>{
     document.title='AddEditRegister';
   })
@@ -166,6 +168,7 @@ const callApi=async(e)=>{
 
   const pageChange = (page) => {
     setCurrentPage(page);
+    navigate(`/registeruser?page=${page}&limit=${recordsPerPage}`,{replace:true})
   };
 
   const validationSchema = Yup.object().shape({
@@ -240,6 +243,30 @@ const callApi=async(e)=>{
     setPasswordStrength(result.score);
     formik.handleChange(event); // Update formik values
   };
+
+  const handleselectAll=(e)=>{
+    setSelectAll(e.target.checked)
+    console.log(e.target.checked)
+    if(e.target.checked){
+      const selobj={};
+      data.forEach((row)=>{
+        setSelectedRows[row.id]=true;
+      })
+      setSelectedRows(selobj)
+    }else{
+      setSelectedRows({})
+    }
+  }
+  const handleRowSelect=(e,id)=>{
+    // alert(e)
+    // alert(id)
+    const c=e.target.checked
+    alert(c)
+    sRow=data.id === id ? true : false
+  }
+
+  // for sorting
+  
   return (
     <div>
     <div>
@@ -332,12 +359,12 @@ const callApi=async(e)=>{
                   <table id="example1" className="table table-bordered table-striped">
                     <thead>
                       <tr>
+                        <th className='bg-dark text-light' title='check box through delete'><input type='checkbox'  name='allSelect' checked={selectAll} onChange={ handleselectAll } />SELECT</th>
                         <th className='bg-dark text-light'>SL NO</th>
                         <th className='bg-dark text-light'>NAME</th>
                         <th className='bg-dark text-light'>MOBILE</th>
                         <th className='bg-dark text-light'>EMAIL</th>
                         <th className='bg-dark text-light'>ROLE</th>
-                        <th className='bg-dark text-light'>Created At</th>
                         <th className='bg-dark text-light'>ACTIONS</th>
                       </tr>
                     </thead>
@@ -346,18 +373,20 @@ const callApi=async(e)=>{
 
                         <tr key={dt.id}>
 
+                          <td>
+                            <input type="checkbox"  id=""  onChange={(e)=>handleRowSelect(e,dt.id)}  />
+                          </td>
                           <td>{(currentPage - 1) * recordsPerPage + index + 1}</td>
                           <td>{dt.name}</td>
                           <td>{dt.mobile}</td>
                           <td>{dt.email}</td>
                           <td><span className={`badge badge-${dt.role === 'user' ? 'primary' : dt.role === 'subadmin' ? 'warning' : 'success'}`}>{dt.role === 'admin' ? 'ADMIN' : dt.role === 'subadmin' ? 'SUBADMIN' : 'USER'}</span></td>
-                          <td>{dt.created_at}</td>
                           <td>
                             <button className='btn btn-dark btn-sm mr-2' onClick={() => toggle(dt.id)}><i className='fas fa-eye'></i></button>
                             <NotificationContainer />
                             <button className='btn btn-success btn-sm mr-2' onClick={() => toggle2(dt.id)}><i className='fas fa-pencil-alt'></i></button>
                             <NotificationContainer />
-                            <button  className='btn btn-danger btn-sm' onClick={() => handledelete(dt.id)}><i className='fas fa-trash'></i></button>
+                            <button  className='btn btn-danger btn-sm' onClick={() => handledelete(dt.id)} ><i className='fas fa-trash'></i></button>
                           </td>
                         </tr>
                       ))}
@@ -400,7 +429,7 @@ const callApi=async(e)=>{
           {modaldata?.image ? (
             <img src={modaldata.image} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
           ) : (
-            <p>No image</p>
+            <img src={'https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} loading="lazy" alt="" />
           )}
         </div>
         <ModalBody>

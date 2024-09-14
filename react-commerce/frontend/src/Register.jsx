@@ -10,10 +10,10 @@ import zxcvbn from 'zxcvbn';
 import ReCAPTCHA from 'react-google-recaptcha';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { SpinnerCircular } from 'spinners-react';
-
-
+// require('dotenv').config({ path: '../.env' });
 
 const Register = () => {
+    
     // const { user ,loginWithRedirect}=useAuth0();
     // console.log(user)
     const navigate = useNavigate();
@@ -103,7 +103,7 @@ const Register = () => {
             setloading(false)
         }
       };
-
+      
     const formik = useFormik({
         initialValues: initialValues,
         validationSchema: validationSchema,
@@ -206,6 +206,7 @@ const Register = () => {
                                             <div  className="u-s-m-b-15">
                                                 <ReCAPTCHA
                                                     ref={recaptchaRef}
+                                                    // sitekey={process.env.API_ReCAPTCHA_SITEKEY} //r........2@gm....com
                                                     sitekey="6Lf0AcopAAAAABiOyhyphLfETW8tsx8KW9Xxs5ah" //r........2@gm....com
                                                     onChange={(val)=>setcap(val)}
                                                 />

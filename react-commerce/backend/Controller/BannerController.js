@@ -1,4 +1,5 @@
 const Banner = require("../Models/Banner");
+const { cloudinary } =require("../helper/cloudinaryConfig");
 
 exports.getAllBanners=async(req,res)=>{
     try {
@@ -14,8 +15,8 @@ exports.updateBannerStatus=async(req,res)=>{
 
     const id=req.params.id;
     const {status}=req.body;
-    console.log(1)
-    console.log(id)
+    // console.log(1)
+    // console.log(id)
     try {
         await Banner.updateStatus(id,status);
         res.status(200).json({ message: "Status updated successfully!" });
@@ -27,10 +28,10 @@ exports.updateBannerStatus=async(req,res)=>{
 
 exports.deleteBanner = async (req, res) => {
     const id = req.params.id;
-    console.log(id)
+    // console.log(id)
     try {
       await Banner.delete(id);
-      console.log(id)
+      // console.log(id)
       res.status(200).json({ message: "Deleted successfully!" });
     } catch (err) {
       console.error(err);
@@ -41,16 +42,7 @@ exports.deleteBanner = async (req, res) => {
   exports.updateBanner = async (req, res) => {
     const id = req.params.id;
     const { title, url, description, meta_title, meta_keywords, meta_description } = req.body;
-    
-    const updatedBanner = {
-      title,
-      url,
-      description,
-      meta_title,
-      meta_keywords,
-      meta_description
-    };
-  
+    const updatedBanner = {  title,  url,  description,  meta_title,  meta_keywords,  meta_description};
     try {
       await Banner.update(id, updatedBanner);
       res.status(200).json({ message: "Update successful" });
@@ -62,11 +54,11 @@ exports.deleteBanner = async (req, res) => {
   
   exports.addBanner = async (req, res) => {
     // console.log("banner")
-  const {  type, link, alt}=req.body;
-  const image = req.file ? req.file.filename : null;
-  // console.log(req.body)
-    const newBanner = {image,  type, link, alt };
-  
+    const {  type, link, alt}=req.body;
+    // const image = req.file ? req.file.filename : null;
+    const image=req.file ? await cloudinary.uploader.upload(req.file.path,{folder:'Banners'}) : null
+  // console.log(image)
+    const newBanner = {image, type, link, alt };
     try {
       const result=await Banner.add(newBanner);
       // console.log(result)

@@ -29,6 +29,7 @@ export const DeleteEntity = async (entity, id) => {
             break;
 
           case 'Banner':
+            // alert(id)
             await axios.delete(`http://localhost:8081/api/DeleteBanners/${id}`);
             break;
 

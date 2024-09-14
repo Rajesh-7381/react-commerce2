@@ -20,9 +20,9 @@ exports.create = async (req, res) => {
        
         const {  parent_id,category_name, category_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
         // console.log(req.body)
-        // const category_image = req.file ? req.file.filename : null;
+        const category_image = req.file ? await cloudinary.uploader.upload(req.file.path,{folder:'Category'}) : null;
         // console.log(category_image)
-        const newCategory={parent_id,category_name, category_image:req.file ? await cloudinary.uploader.upload(req.file.path) : null,category_discount,description,url,meta_title,meta_description,meta_keyword};
+        const newCategory={parent_id,category_name, category_image,category_discount,description,url,meta_title,meta_description,meta_keyword};
         try {
             await Category.add(newCategory);
             // console.log(1)

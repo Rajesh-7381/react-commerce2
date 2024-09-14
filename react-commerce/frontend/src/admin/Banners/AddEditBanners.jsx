@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { NotificationManager } from 'react-notifications';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import Header from '../Component/Header';
-import Footer from '../Component/Footer';
+import Header from '../Components/Header';
+import Footer from '../Components/Footer';
 
 const AddEditBanners = () => {
   const location = useLocation(); 

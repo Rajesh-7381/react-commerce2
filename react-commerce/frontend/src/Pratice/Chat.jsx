@@ -11,7 +11,7 @@ const Chat = () => {
     setWs(ws);
 
     ws.onmessage = (event) => {
-      // Convert the received message to a string before rendering it
+      console.log('Received message:', event.data);
       const messageString = event.data.toString();
       setMessages((prevMessages) => [...prevMessages, messageString]);
     };
@@ -23,28 +23,35 @@ const Chat = () => {
     ws.onerror = (error) => {
       console.log('WebSocket error:', error);
     };
+
+    ws.onopen = () => {
+      console.log('WebSocket connection established');
+    };
   }, []);
 
   const handleSendMessage = () => {
     if (ws) {
       ws.send(inputValue);
       setInputValue('');
+    } else {
+      console.log('WebSocket connection not established');
     }
   };
 
   return (
     <div>
+    <ul>
+        {messages.map((message, index) => (
+          <li key={index}>{message}</li>
+        ))}
+      </ul>
       <input
         type="text"
         value={inputValue}
         onChange={(event) => setInputValue(event.target.value)}
       />
       <button onClick={handleSendMessage}>Send</button>
-      <ul>
-        {messages.map((message, index) => (
-          <li key={index}>{message}</li>
-        ))}
-      </ul>
+      
     </div>
   );
 };

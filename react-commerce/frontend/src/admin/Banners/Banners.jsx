@@ -4,8 +4,8 @@ import { NotificationContainer } from 'react-notifications'
 import { Link, useNavigate } from 'react-router-dom'
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
-import Header from '../Component/Header';
-import Footer from '../Component/Footer';
+import Header from '../Components/Header';
+import Footer from '../Components/Footer';
 
 const Banners = () => {
     const [bannerData,setbannerData]=useState([]);
@@ -41,6 +41,7 @@ const Banners = () => {
     // banner delete
     const BannerDelete=async(id)=>{
       const data=await DeleteEntity('Banner',id);
+      // alert(id)
       const response=await axios.get("http://localhost:8081/api/getAllBanners");
       setbannerData(response.data);
       
@@ -139,9 +140,17 @@ const Banners = () => {
                           <td>{item.type}</td>
                           
                           <td>
-                                <Link to={`http://localhost:8081/api/bannerImage/`+  item.image} target="_blank" id='image-constrained'>
-                                    <img src={`http://localhost:8081/api/bannerImage/` + item.image} width={50} height={50} alt="" />
-                                </Link>
+                              <Link to={item.image} target="_blank" id='image-constrained'>
+                                {item.image && item.image.trim() !== '' ? (
+                                  <img src={item.image} width={50} height={50} alt='' loading='lazy' onError={(e)=>{
+                                      if(e.target.src !=="https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg"){
+                                        e.target.src="https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg"
+                                      }
+                                  }} />
+                                ) : (
+                                  <img src="https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg" width={50} height={50} alt='' loading='lazy'/>
+                                )}
+                              </Link>
                           </td>
                           
                           <td><Link to={item.link} target='_blank'>{item.link}</Link> </td>

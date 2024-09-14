@@ -3,8 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { NotificationManager } from 'react-notifications';
-import Footer from '../Component/Footer';
-import Header from '../Component/Header';
+import Footer from '../Components/Footer';
+import Header from '../Components/Header';
 
 const CmspageAddEdit = () => {
     const location = useLocation();

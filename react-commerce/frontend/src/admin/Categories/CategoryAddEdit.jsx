@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
-import Footer from '../Component/Footer';
-import Header from '../Component/Header';
+import Footer from '../Components/Footer';
+import Header from '../Components/Header';
 
 const CategoryAddEdit = () => {
     const location = useLocation();
@@ -45,14 +45,14 @@ const CategoryAddEdit = () => {
             setValue('meta_title', categoryData.meta_title);
             setValue('meta_description', categoryData.meta_description);
             setValue('meta_keyword', categoryData.meta_keyword);
-            setValue('parent_id', categoryData.parent_id); // Set the parent category value
+            setValue('parent_id', categoryData.parent_id); 
         } catch (error) {
             console.log(error);
         }
     };
     const renderCategories = (categories, selectedParentId, level = 0) => {
         return categories.map(category => {
-            const paddingLeft = level * 20; // Adjust the padding based on the level
+            const paddingLeft = level * 20; 
             return (
                 <React.Fragment key={category.id}>
                     <option value={category.id} selected={category.id === selectedParentId} style={{ paddingLeft: `${paddingLeft}px` }}>
@@ -221,13 +221,7 @@ const CategoryAddEdit = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputCategoryselectid">Parent Category <span className='text-danger'>*</span></label>
-                                                        <select
-                                                            className="form-control"
-                                                            name="parent_id"
-                                                            style={{ width: '100%' }}
-                                                            {...register("parent_id", { required: true })}
-                                                            defaultValue={data.parent_id ? data.parent_id : ""}
-                                                        >
+                                                        <select className="form-control"    name="parent_id"    style={{ width: '100%' }}    {...register("parent_id", { required: true })}    defaultValue={data.parent_id ? data.parent_id : ""} >
                                                             <option value="">Main Category</option>
                                                             {renderCategories(categories, data.parent_id)}
                                                         </select>

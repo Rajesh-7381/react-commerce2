@@ -76,7 +76,7 @@ const DomTable = () => {
       <Pratice3 />
       <hr />
                 <hr />
-               
+               <Chat />
     </div>
   )
 }

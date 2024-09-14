@@ -1,6 +1,7 @@
 const { db }= require("../config/dbconfig");
 const bcrypt=require("bcrypt")
 const SALT=parseInt(process.env.GEN_SALT);
+const fs=require("fs").promises;
 // console.log(SALT)
 
 const CheckAdminUserLogin=async(email,callback)=>{
@@ -174,7 +175,7 @@ class TotalSubAdmin{
 class getAllAdminSubadminUsers{
   static async TotalAdminSubAdminUser(){
     try {
-      const query = "SELECT * FROM AdminUser where deleted_at is null"; // Alias 'count(id)' as 'total'
+      const query = "SELECT * FROM AdminUser where deleted_at is null";
       const result=await new Promise((resolve,reject)=>{
         db.query(query,(err,results)=>{
           if(err){
@@ -225,6 +226,7 @@ class UpdateDetails{
     }
   }
 }
+
 class Delete {
   static async deleteData(id) {
     const query = "UPDATE AdminUser SET deleted_at = CURRENT_TIMESTAMP WHERE id=?";
@@ -240,12 +242,63 @@ class Delete {
       });
       return result;
     } catch (error) {
-      throw error;
+        throw error;
     }
   }
 }
+
+
+// class Delete {
+//   static async deleteData(id) {
+//      //locally delete from file
+//   // delete:async(id)=>{
+//   //   const imagegettingquery="select * from brands where id=?";
+//   //   const deletequery="delete from brnds where id=?"
+   
+//   //     db.query(imagegettingquery,[id],(err,result)=>{
+//   //       if(err){
+//   //         return err;
+//   //       }
+//   //       const imageurl=result[0].image;
+//   //       const localydeletepath=path.join(__dirname,`../uploads/Brands/${imageurl}`)
+//   //       try {
+//   //         fs.promises.access(localydeletepath)
+//   //         fs.promises.unlink(localydeletepath)
+//   //       } catch (error) {
+//   //           if(error.code ==='ENOENT'){
+//   //             console.log("file does not exists!")
+//   //           }else if(error.code ==='EPERM'){
+//   //             console.log("operation not permited")
+//   //           }else{
+//   //             console.log("error deleting file")
+//   //           }
+//   //       }
+//   //     })
+
+//   //     try {
+//   //       const deletedata=await new Promise((resolve,reject)=>{
+//   //         db.query(deletequery,[id],(err,result)=>{
+//   //           if(err){
+//   //             reject(err)
+//   //           }else{
+//   //             resolve(result)
+//   //           }
+//   //         })
+//   //       })
+//   //       return deletedata;
+//   //     } catch (error) {
+//   //         throw error
+//   //     }
+      
+//   // },
+//   }
+// }
+
+
+
 class SearchAdminSubAdminUser{
   static async SearchDetails(searchTerm){
+    console.log(searchTerm)
     try {
       const query = "SELECT * FROM AdminUser WHERE role = 'user' AND DATE(created_at) = ?";
       const result = await new Promise((resolve, reject) => {
@@ -258,8 +311,8 @@ class SearchAdminSubAdminUser{
       });
       return result;
     } catch (error) {
-      console.error("Error fetching users by date:", error);
-      throw error;
+      console.error("Error fetching users by date:", error); 
+        throw error;
     }
   }
 }
@@ -329,10 +382,22 @@ class getAllSubAdminData{
   }
 }
 
+class DOCX{
+  static async docx(){
+    try {
+      const data=await fs.readFile('./backup.txt','utf8');
+        return data;
+      
+    } catch (error) {
+        console.log("unable to read")
+        throw error
+    }
+  }
+}
+
 module.exports={ AdminUserModel,CheckAdminUserLogin,
   User,EmailCheck,MobileCheck,forgotPassword,TotalUser,
   TotalAdmin,TotalSubAdmin,getAllAdminSubadminUsers,
   indvidualDetails,EditDetails,UpdateDetails,Delete,
   SearchAdminSubAdminUser,registerUserParticularDate,
-  registerUserfromrDateTotodate,getAllSubAdminData }
-
+  registerUserfromrDateTotodate,getAllSubAdminData,DOCX }

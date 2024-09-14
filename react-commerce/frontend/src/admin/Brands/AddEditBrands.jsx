@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {  NotificationManager } from 'react-notifications';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import Footer from '../Component/Footer';
-import Header from '../Component/Header';
+import Footer from '../Components/Footer';
+import Header from '../Components/Header';
 
 const AddEditBrands = () => {
     const location = useLocation();
@@ -141,7 +141,7 @@ const AddEditBrands = () => {
                                       {id ? "Update Brand Form" : "Add Brand Form"}
                                   </h3>
                               </div>
-                              <form onSubmit={handleSubmit(onSubmit)}>
+                              <form onSubmit={handleSubmit(onSubmit)}> {/* 1st submit means  HTML FORM EVENT HANDLER  and 2nd onsubmit means  that processes the form data after validation by react-hook-form(when PUT OR POST OPERATION PERFORMED)*/}
                                   <div className="row">
                                       <div className="col-md-6">
                                           <div className="card-body">

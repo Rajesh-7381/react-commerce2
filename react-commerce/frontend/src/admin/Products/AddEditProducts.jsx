@@ -2,35 +2,24 @@ import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import {
-  NotificationManager,
-  NotificationContainer,
-} from "react-notifications";
+import { NotificationManager, NotificationContainer,} from "react-notifications";
 import ReactImageMagnify from "@blacklab/react-image-magnify";
 import Swal from "sweetalert2";
-import Header from "../Component/Header";
-import Footer from "../Component/Footer";
+import Header from "../Components/Header";
+import Footer from "../Components/Footer";
 
 const AddEditProducts = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const id = location.state ? location.state.id : null;
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm();
-
+  const {register, handleSubmit,setValue, formState: { errors },} = useForm();
   const [data, setData] = useState({});
   const [productattributedata, setproductattributedata] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setbrands] = useState([]);
-
   const [productPrice, setProductPrice] = useState(0);
   const [productDiscount, setProductDiscount] = useState(0);
   const [finalPrice, setFinalPrice] = useState(0);
-
   const [isFeatured, setIsFeatured] = useState(false); // New state for checkbox
   const [colorname, setcolorname] = useState([]);
   const [imageSrc, setImageSrc] = useState(null);
@@ -234,23 +223,14 @@ const AddEditProducts = () => {
   };
 
   const handleImageChange = (e) => {
-    // Access the first file selected by the user from the file input element
-    const file = e.target.files[0];
-
-    // Handle the case where no file is selected (e.g., user cancels the file selection)
-    if (!file) {
+    const file = e.target.files[0];// Access the first file selected by the user from the file input element
+    if (!file) {  // Handle the case where no file is selected (e.g., user cancels the file selection)
       setImageSrc(null);
       return;
     }
 
     // Define the list of valid file types
-    const validateFiles = [
-      "image/png",
-      "image/jpeg",
-      "image/gif",
-      "image/webp",
-    ];
-
+    const validateFiles = [  "image/png",  "image/jpeg",  "image/gif",  "image/webp"];
     // Check if the selected file type is valid
     if (!validateFiles.includes(file.type)) {
       alert("Please provide only JPEG, PNG, GIF, or WebP images.");
@@ -259,7 +239,6 @@ const AddEditProducts = () => {
 
     // Create a new FileReader instance to read the file
     const reader = new FileReader();
-
     // Define an event handler to be executed when the file reading operation is complete
     reader.onload = () => {
       // Update the state with the file's data URL
@@ -288,10 +267,7 @@ const AddEditProducts = () => {
 
   const handleAddField = () => {
     if (dynamicfields.length < 10) {
-      setDynamicFields([
-        ...dynamicfields,
-        { size: "", sku: "", price: "", stock: "" },
-      ]);
+      setDynamicFields([ ...dynamicfields, { size: "", sku: "", price: "", stock: "" }, ]);
     } else {
       Swal.fire({
         title: "Maxium limit  Reached",
@@ -447,7 +423,7 @@ const AddEditProducts = () => {
                               </select>
                               {errors.id && (
                                 <span className="text-danger">
-                                  Category is required
+                                  Brand is required
                                 </span>
                               )}
                             </div>

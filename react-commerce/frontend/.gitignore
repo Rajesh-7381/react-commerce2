@@ -22,6 +22,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-note.txt
-.env
-./user/Account/Payment/card.json
+note.tx
+*.env

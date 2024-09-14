@@ -1,6 +1,7 @@
 
 const Brand = require("../Models/Brand");
 const path=require("path")
+const { cloudinary }=require("../helper/cloudinaryConfig")
 
 exports.getAllBrands=async(req,res)=>{
     try {
@@ -59,11 +60,14 @@ exports.deleteBrand = async (req, res) => {
   };
   
   exports.addBrand = async (req, res) => {
-    const { brand_name, brand_discount,description,url, meta_title, meta_descriptions,meta_keywords } = req.body;
-    const brand_image = req.files?.brand_image ? path.basename(req.files.brand_image[0].path) : null; //[ath.basename extracts only image name not full path]
-    const brand_logo = req.files?.brand_logo ? path.basename(req.files.brand_logo[0].path) : null;
+    const { brand_name, brand_discount,description,url, meta_title, meta_description,meta_keyword } = req.body;
     // console.log(req.body)
-    const newBrand = { brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_descriptions,meta_keywords  };
+    // const brand_image = req.files?.brand_image ? path.basename(req.files.brand_image[0].path) : null; //[ath.basename extracts only image name not full path]
+    // const brand_logo = req.files?.brand_logo ? path.basename(req.files.brand_logo[0].path) : null;
+    const brand_image = req.files?.brand_image ? await cloudinary.uploader.upload(req.files.brand_image[0].path,{folder:'BrandIMAGE'}) : null; //[ath.basename extracts only image name not full path]
+    const brand_logo = req.files?.brand_logo ? await cloudinary.uploader.upload(req.files.brand_logo[0].path,{folder:'BrandLogo'}) : null;
+    // console.log(req.body)
+    const newBrand = { brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_description,meta_keyword  };
     try {
       await Brand.add(newBrand);
       res.status(200).json({ message: "new Brand adding successful" });

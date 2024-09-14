@@ -72,13 +72,29 @@ const BrandTable = () => {
         <td>{index+1}</td>
         <td>{item.brand_name}  </td>
         <td>
-              <Link to={`http://localhost:8081/api/brandimage/`+  item.brand_image} target="_blank" id='image-constrained'>
-                  <img src={`http://localhost:8081/api/brandimage/` + item.brand_image} width={50} height={50} alt="" />
+              <Link to={item.brand_image} target="_blank" id='image-constrained'>
+                 {item.brand_image && item.brand_image.trim() !== '' ? (
+                    <img src={item.brand_image} width={50} height={50} alt="" loading="lazy" onError={(e)=>{
+                      if(e.target.src !=='https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'){
+                        e.target.src='https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'
+                      }
+                    }} />
+                 ):(
+                  <img src={'https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'} width={50} height={50} alt="" loading="lazy" />
+                 )}
               </Link>
         </td>
         <td>
-            <Link to={`http://localhost:8081/api/brandlogo/`+  item.brand_logo} target="_blank" id='image-constrained'>
-                <img src={`http://localhost:8081/api/brandlogo/` + item.brand_logo} width={50} height={50} alt="" />
+            <Link to={item.brand_logo} target="_blank" id='image-constrained'>
+            {item.brand_logo && item.brand_logo.trim() !== '' ? (
+              <img src={item.brand_logo} width={50} height={50} alt="" loading="lazy" onError={(e)=>{
+                if(e.target.src !== 'https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'){
+                  e.target.src='https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'
+                }
+              }} />
+            ):(
+              <img src={'https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'} width={50} height={50} alt="" loading="lazy"/>
+            )}
             </Link>
         </td>
         <td>{item.brand_discount} </td>

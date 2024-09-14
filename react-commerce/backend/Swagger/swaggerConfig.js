@@ -1,37 +1,18 @@
+const swaggerAutogen = require('swagger-autogen')();
 
-const swaggerJSdoc=require("swagger-jsdoc")
-// const swaggerAutogen=require("swagger-autogen")()
-
-const swaggerDefinition={
-    openapi:'3.0.0',
-    info:{
-        title: 'E-commerce API Documentation',
-        version:'1.0.0',
-        description:'API documentation for an E-commerce platform',
-        contact:{
-            name:'support team',
-            url:'http://www.example.com/support',
-            email: 'support@example.com',
-        },
+const doc = {
+    info: {
+        title: 'E-commerce API',
+        description: 'API documentation for an E-commerce platform',
     },
-    server:[
-        {
-            url: 'http://localhost:8081',
-        },
-    ],
+    host: 'localhost:8081',
+    schemes: ['http'],
 };
 
-const options={
-    swaggerDefinition,
-    apis:["./Routes/*.js"]
-}
+const outputFile = './Swagger/swagger_output.json';
+const endpointsFiles = ['./Routes/*.js']; 
 
-const swaggerSpec=swaggerJSdoc(options)
-
-// const outputFile="./Swagger/swagger_output.json";
-// const endpointsFiles=["./Routes/*.js"]
-// swaggerAutogen(outputFile,endpointsFiles).then(()=>{
-//   require("../server")
-// })
-
-module.exports={ swaggerSpec } 
+// swaggerAutogen(outputFile, endpointsFiles).then(() => {
+//     require('../server');  
+// });
+swaggerAutogen(outputFile, endpointsFiles,doc);

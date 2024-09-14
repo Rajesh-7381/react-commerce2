@@ -8,9 +8,20 @@ const Header = () => {
     const [CurrentPosition, setCurrentPosition] = useState(null);
 
     useEffect(() => {
-      if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(showPosition)
-      }
+      // Get the user's current location
+          navigator.geolocation.getCurrentPosition(position => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          // Use LocationIQ API to reverse geocode the coordinates
+          const apiUrl = `https://us1.locationiq.com/v1/reverse.php?key=pk.9af8fc17b5bd73b33cbdd1e279d0ac9d&lat=${lat}&lon=${lng}&format=json`;
+            fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {      
+              // console.log(data)      
+              setCurrentPosition(data.address.city)
+            });
+        });
         document.title = 'Dashboard';
           // navigate("/"); 
           const id=sessionStorage.getItem("id");
@@ -23,9 +34,7 @@ const Header = () => {
         
       }, [ navigate]); 
       // const x=document.getElementById("position");
-      function showPosition(position){
-        setCurrentPosition(position.coords.latitude +" "+position.coords.longitude)
-      }
+      
       const fetchuserdata=async(id)=>{
         try {
           const reponse=await axios.get(`http://localhost:8081/api/singledata/${id}`);
@@ -269,6 +278,12 @@ const Header = () => {
                 <NavLink to={"/banners"} className={({isActive})=>isActive ? "nav-link active" :"nav-link"}>
                   <i className="far fa-circle nav-icon" />
                   <p>Banners</p>
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink to={"/documents"} className={({isActive})=>isActive ? "nav-link active" :"nav-link"}>
+                  <i className="far fa-circle nav-icon" />
+                  <p>Documentation</p>
                 </NavLink>
               </li>
               

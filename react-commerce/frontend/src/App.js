@@ -19,6 +19,7 @@ import Checkout from './user/Account/Checkout';
 import Cart from './user/Account/Cart';
 import CreditOrDebit from './user/Account/Payment/CreditOrDebit';
 import DomTable from './Pratice/DomTable';
+import Doc from './admin/Document/Doc';
 
 const stripePromise = loadStripe('pk_test_51Ph8kgFnMqw8LC18U63JgNUhD8F5wAKZfjQAyrnfgoKNwI5fbZtwBYZfXwkVE7VdsxMmKziLUOKi6AXbI7XJN9Oe00iO9DHFpM');
 function withDelay(promise, delay = 1000) {
@@ -102,6 +103,7 @@ function App() {
 
           
           <Route path='/DomTable' element={< DomTable/>} ></Route>
+          <Route path='/documents' element={<Doc />}></Route>
         </Routes>
       </BrowserRouter>
      

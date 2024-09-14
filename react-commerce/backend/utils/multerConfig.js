@@ -33,7 +33,7 @@ const storage = multer.diskStorage({
     // filename function determines the name of the file to be saved
     const ext = path.extname(file.originalname); // extracts original file extension
     // cb(null, Date.now() + ext); // constructs the new filename by appending the current timestamp to the file extension, ensuring a unique filename
-    cb(null, `image-${Date.now()}.${ext}`); // constructs the new filename by appending the current timestamp to the file extension, ensuring a unique filename
+    cb(null, `image-${Date.now()}${ext}`); // constructs the new filename by appending the current timestamp to the file extension, ensuring a unique filename
 
     // using moment (timestamp)
     // const timestamp=moment().format('YYYYMMDDHHmmss');
@@ -56,6 +56,7 @@ const upload = multer({
     files: 10, // maximum 10 files
     fields: Infinity, //  infinity non-file fields (default infinity)
   },
-}); // The upload constant is created using multer({storage: storage}), which initializes Multer with the defined storage configuration.
+});
+ // The upload constant is created using multer({storage: storage}), which initializes Multer with the defined storage configuration.
 
 module.exports = upload;

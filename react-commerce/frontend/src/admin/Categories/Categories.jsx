@@ -5,8 +5,8 @@ import { DeleteEntity } from "../CRUDENTITY/DeleteEntity";
 import { NotificationContainer } from "react-notifications";
 import "react-notifications/lib/notifications.css";
 import { StatusEntity } from "../CRUDENTITY/StatusEntity";
-import Footer from "../Component/Footer";
-import Header from "../Component/Header";
+import Footer from "../Components/Footer";
+import Header from "../Components/Header";
 
 const Categories = () => {
   const navigate = useNavigate();
@@ -163,26 +163,10 @@ const Categories = () => {
                       <div className="card-body">
                         <form className="d-flex align-items-center justify-content-end">
                           <div className="input-group">
-                            <input
-                              className="form-control mr-2"
-                              type="search"
-                              placeholder="Search using name, url, title etc..."
-                              aria-label="Search"
-                              onKeyUp={searchfunction}
-                            />
+                            <input   className="form-control mr-2"   type="search"   placeholder="Search using name, url, title etc..."   aria-label="Search"   onKeyUp={searchfunction} />
                             <div className="input-group-append">
-                              <button
-                                className="btn btn-outline-success mr-2"
-                                type="button"
-                              >
-                                Search
-                              </button>
-                              <button
-                                className="btn btn-primary "
-                                onClick={() => handladdedit()}
-                              >
-                                Add
-                              </button>
+                              <button  className="btn btn-outline-success mr-2"  type="button">  Search  </button>
+                              <button   className="btn btn-primary "   onClick={() => handladdedit()} > Add </button>
                             </div>
                           </div>
                         </form>
@@ -192,113 +176,50 @@ const Categories = () => {
                             <thead>
                               <tr>
                                 <th className="bg-dark text-light">SL NO.</th>
-                                <th className="bg-dark text-light">
-                                  CATEGORY NAME
-                                </th>
-                                <th className="bg-dark text-light">
-                                  PARENT CATEGORY{" "}
-                                </th>
-                                <th className="bg-dark text-light">
-                                  CATEGORY IMAGE
-                                </th>
-                                <th className="bg-dark text-light">
-                                  CATEGORY DISCOUNT
-                                </th>
+                                <th className="bg-dark text-light">  CATEGORY NAME</th>
+                                <th className="bg-dark text-light">  PARENT CATEGORY{" "}</th>
+                                <th className="bg-dark text-light">  CATEGORY IMAGE</th>
+                                <th className="bg-dark text-light">  CATEGORY DISCOUNT</th>
                                 <th className="bg-dark text-light">URL</th>
                                 <th className="bg-dark text-light">STATUS</th>
                                 <th className="bg-dark text-light">ACTIONS</th>
                               </tr>
                             </thead>
                             <tbody>
-                              { filterData && filterData.length > 0 ?
-                                filterData
-                                .slice(
-                                  (currentpage - 1) * recordsPerPage,
-                                  currentpage * recordsPerPage
-                                )
-                                .map((item, index) => (
-                                  <tr
-                                    key={item.id}
-                                    className={
-                                      item.status === 1 ? "bg-primary" : ""
-                                    }
-                                  >
-                                    <td style={{ width: "1px" }}>
-                                      {index +
-                                        1 +
-                                        (currentpage - 1) * recordsPerPage}
-                                    </td>
+                              { filterData && filterData.length > 0 ?  filterData.slice(  (currentpage - 1) * recordsPerPage,  currentpage * recordsPerPage).map((item, index) => (
+                                  <tr key={item.id} className={   item.status === 1 ? "bg-primary" : "" } >
+                                   <td style={{ width: "1px" }}>{index + 1 +    (currentpage - 1) * recordsPerPage}</td>
                                     <td>{item.category_name}</td>
                                     <td>
                                       {/* Check if the category has a parent */}
-                                      {item.parent_id ? (
-                                        // If the category has a parent, find the parent category in the categorydata array
-                                        categorydata.find(
-                                          (cat) => cat.id === item.parent_id
-                                        )?.category_name || "No Parent"
+                                      {item.parent_id ? ( // If the category has a parent, find the parent category in the categorydata array
+                                        categorydata.find((cat) => cat.id === item.parent_id  )?.category_name || "No Parent"
                                       ) : (
                                         // If the category does not have a parent, display "No Parent"
-                                        <span className="badge badge-pill badge-secondary">
-                                          No Parent
-                                        </span>
+                                        <span className="badge badge-pill badge-secondary"> No Parent  </span>
                                       )}
                                     </td>
 
                                     <td>
-                                      <Link to={`http://localhost:8081/api/CategoryImage/`+item.category_image}target="_blank" >
-                                        <img
-                                          src={
-                                            `http://localhost:8081/api/CategoryImage/` +
-                                            item.category_image
-                                          }
-                                          alt={item.category_name}
-                                          width={50}
-                                          height={50}
-                                        />
+                                      <Link to={item.category_image}target="_blank" >
+                                        {item.category_image && item.category_image.trim() !=='' ? (
+                                              <img src={item.category_image} height={50} width={50} loading="lazy" alt="" onError={(e)=>{
+                                                if(e.target.src !=='https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'){
+                                                  e.target.src='https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'
+                                                }
+                                        }} />
+                                        ):(
+                                              <img src={'https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'} height={50} width={50} loading="lazy" alt="" />
+                                        )}
                                       </Link>
                                     </td>
                                     <td>{item.category_discount}</td>
                                     <td>{item.url}</td>
+                                    <td><span className={`badge badge-${ item.status === 1     ? "success"     : "danger" }`} >  {item.status === 1    ? "Active"    : "Inactive"}</span></td>
                                     <td>
-                                      <span
-                                        className={`badge badge-${
-                                          item.status === 1
-                                            ? "success"
-                                            : "danger"
-                                        }`}
-                                      >
-                                        {item.status === 1
-                                          ? "Active"
-                                          : "Inactive"}
-                                      </span>
-                                    </td>
-                                    <td>
-                                      <button
-                                        className="btn btn-success btn-sm mr-1"
-                                        onClick={() => handladdedit(item.id)}
-                                      >
-                                        <i className="fas fa-pencil-alt"></i>
-                                      </button>
-                                      <button
-                                        className="btn btn-danger btn-sm mr-1"
-                                        onClick={() => handledelete(item.id)}
-                                      >
-                                        <i className="fas fa-trash"></i>
-                                      </button>
-                                      <button
-                                        className="btn btn-dark btn-sm"
-                                        onClick={() =>
-                                          toggleclick(item.id, item.status)
-                                        }
-                                      >
-                                        <i
-                                          className={
-                                            item.status === 1
-                                              ? "fas fa-toggle-on"
-                                              : "fas fa-toggle-off"
-                                          }
-                                        ></i>
-                                      </button>
+                                        <button  className="btn btn-success btn-sm mr-1"  onClick={() => handladdedit(item.id)}><i className="fas fa-pencil-alt"></i></button>
+                                        <button  className="btn btn-danger btn-sm mr-1"  onClick={() => handledelete(item.id)}><i className="fas fa-trash"></i></button>
+                                        <button className="btn btn-dark btn-sm" onClick={() =>   toggleclick(item.id, item.status) }><i  className={    item.status === 1      ? "fas fa-toggle-on"  : "fas fa-toggle-off"  } ></i> </button>
                                     </td>
                                   </tr>
                                 ))
@@ -318,27 +239,12 @@ const Categories = () => {
                                 </button>
                               </li>
                               {numbers.map((n, i) => (
-                                <li
-                                  className={`page-item ${
-                                    currentpage === n ? "active" : ""
-                                  }`}
-                                  key={i}
-                                >
-                                  <button
-                                    onClick={() => pagechange(n)}
-                                    className="page-link"
-                                  >
-                                    {n}
-                                  </button>
+                                <li  className={`page-item ${    currentpage === n ? "active" : ""  }`} key={i}  >
+                                  <button onClick={() => pagechange(n)} className="page-link" >{n}</button>
                                 </li>
                               ))}
                               <li className="page-item">
-                                <button
-                                  onClick={nextpage}
-                                  className="page-link"
-                                >
-                                  next
-                                </button>
+                                <button  onClick={nextpage}  className="page-link"> next</button>
                               </li>
                             </ul>
                           </nav>

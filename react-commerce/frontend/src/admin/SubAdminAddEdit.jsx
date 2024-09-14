@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
-import Header from './Component/Header';
-import Footer from './Component/Footer';
+import Header from './Components/Header';
+import Footer from './Components/Footer';
 
 const SubAdminAddEdit = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [editdata, setEditdata] = useState(null);
+    // const [editdata, setEditdata] = useState(null);
     const [visible, setVisible] = useState(false);
     const { register, handleSubmit, setValue, formState: { errors } } = useForm();
     const [role, setRole] = useState('');
@@ -28,7 +28,8 @@ const SubAdminAddEdit = () => {
             const response = await axios.get(`http://localhost:8081/api/editdata/${id}`);
             // console.log(response.data.result[0])
             const userData = response.data.result[0];
-            setEditdata(userData);
+            // setEditdata(userData);
+            // console.log(editdata)
             setRole(userData.role);
 
             // Set form values
@@ -49,8 +50,8 @@ const SubAdminAddEdit = () => {
 
     const handlesubmit = async (formData) => {
         try {
-            const response = await axios.put(`http://localhost:8081/api/update/${id}`, formData);
-            console.log(response.data.message); // Log success message
+             await axios.put(`http://localhost:8081/api/update/${id}`, formData);
+            // console.log(response.data.message); // Log success message
             NotificationManager.success("form updated successfully!")
             setTimeout(()=>navigate("/subadmins"),2000);
             // navigate("/subadmins");
@@ -94,7 +95,7 @@ const SubAdminAddEdit = () => {
                                 <Link to={"/admindashboard1"}>Home</Link>
                               </li>
                               <li className="breadcrumb-item">
-                                <Link to={"/categories"}>Back</Link>
+                                <Link to={"/subadmins"}>Back</Link>
                               </li>
                             </ol>
                           </div>

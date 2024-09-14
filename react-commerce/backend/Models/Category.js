@@ -66,6 +66,49 @@ const Category = {
     }
   },
 
+    //locally delete from file
+    
+  // delete:async(id)=>{
+  //   const imagegettingquery="select * from brands where id=?";
+  //   const deletequery="delete from brnds where id=?"
+   
+  //     db.query(imagegettingquery,[id],(err,result)=>{
+  //       if(err){
+  //         return err;
+  //       }
+  //       const imageurl=result[0].image;
+  //       const localydeletepath=path.join(__dirname,`../uploads/Brands/${imageurl}`)
+  //       try {
+  //         fs.promises.access(localydeletepath)
+  //         fs.promises.unlink(localydeletepath)
+  //       } catch (error) {
+  //           if(error.code ==='ENOENT'){
+  //             console.log("file does not exists!")
+  //           }else if(error.code ==='EPERM'){
+  //             console.log("operation not permited")
+  //           }else{
+  //             console.log("error deleting file")
+  //           }
+  //       }
+  //     })
+
+  //     try {
+  //       const deletedata=await new Promise((resolve,reject)=>{
+  //         db.query(deletequery,[id],(err,result)=>{
+  //           if(err){
+  //             reject(err)
+  //           }else{
+  //             resolve(result)
+  //           }
+  //         })
+  //       })
+  //       return deletedata;
+  //     } catch (error) {
+  //         throw error
+  //     }
+      
+  // },
+
   // Update the status of a category by ID
   updateStatus: async (id, status) => {
     const query = "UPDATE categories SET status = ? WHERE id = ? AND deleted_at IS NULL";
