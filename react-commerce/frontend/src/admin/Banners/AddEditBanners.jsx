@@ -7,6 +7,7 @@ import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 
 const AddEditBanners = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const location = useLocation(); 
   const id = location.state ? location.state.id : null;
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
@@ -22,7 +23,7 @@ const AddEditBanners = () => {
 
   const GetBannerDetails = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8081/api/EditBannerDetails/${id}`);
+      const response = await axios.get(`${BASE_URL}/api/EditBannerDetails/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       const data = response.data.data[0];
       setBannerData(data);
       setValue("type", data.type);
@@ -45,15 +46,17 @@ const AddEditBanners = () => {
       }
 
       if (id) {
-        await axios.put(`http://localhost:8081/api/UpdateBanners/${id}`, form, {
+        await axios.put(`${BASE_URL}/api/UpdateBanners/${id}`, form, {
           headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data'
           }
         });
         NotificationManager.success("Banner updated successfully!");
       } else {
-        await axios.post("http://localhost:8081/api/AddBanners", form, {
+        await axios.post(`${BASE_URL}/api/AddBanners`, form, {
           headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data'
           }
         });

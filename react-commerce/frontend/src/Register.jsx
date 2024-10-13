@@ -10,12 +10,11 @@ import zxcvbn from 'zxcvbn';
 import ReCAPTCHA from 'react-google-recaptcha';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { SpinnerCircular } from 'spinners-react';
-// require('dotenv').config({ path: '../.env' });
+
 
 const Register = () => {
     
-    // const { user ,loginWithRedirect}=useAuth0();
-    // console.log(user)
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const navigate = useNavigate();
     const [passwordVisibility, setPasswordVisibility] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
@@ -68,8 +67,8 @@ const Register = () => {
             setloading(true)
           const { email, mobile } = values; // Destructuring values
       
-          const Emailresponse = await axios.get(`http://localhost:8081/api/checkemail/${email}`);
-          const Mobileresponse = await axios.get(`http://localhost:8081/api/checkmobile/${mobile}`);
+          const Emailresponse = await axios.get(`${BASE_URL}/api/checkemail/${email}`);
+          const Mobileresponse = await axios.get(`${BASE_URL}/api/checkmobile/${mobile}`);
       
           if (Emailresponse.data.emailExists) { 
             NotificationManager.error("This email is already registered!");
@@ -83,7 +82,7 @@ const Register = () => {
             formData.append('password', values.password);
             formData.append('image', values.image);
       
-            await axios.post("http://localhost:8081/api/register", formData, {
+            await axios.post(`${BASE_URL}/api/register`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
@@ -206,8 +205,7 @@ const Register = () => {
                                             <div  className="u-s-m-b-15">
                                                 <ReCAPTCHA
                                                     ref={recaptchaRef}
-                                                    // sitekey={process.env.API_ReCAPTCHA_SITEKEY} //r........2@gm....com
-                                                    sitekey="6Lf0AcopAAAAABiOyhyphLfETW8tsx8KW9Xxs5ah" //r........2@gm....com
+                                                    sitekey={process.env.REACT_APP_API_ReCAPTCHA_SITEKEY} //r........2@gm....com
                                                     onChange={(val)=>setcap(val)}
                                                 />
                                                 <NotificationContainer />

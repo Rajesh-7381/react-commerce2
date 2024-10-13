@@ -1,8 +1,12 @@
 const CmsPage = require("../Models/CmsPage");
 
 exports.getAllPages = async (req, res) => {
+  const page=parseInt(req.query.page);
+  const limit=parseInt(req.query.limit);
+  // console.log(page)
+  // console.log(limit)
   try {
-    const data = await CmsPage.getAll();
+    const data = await CmsPage.getAll(limit,page);
     res.json(data);
   } catch (error) {
     console.error(error);

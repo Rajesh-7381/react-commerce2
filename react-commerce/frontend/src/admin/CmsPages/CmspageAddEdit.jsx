@@ -5,13 +5,16 @@ import axios from 'axios';
 import { NotificationManager } from 'react-notifications';
 import Footer from '../Components/Footer';
 import Header from '../Components/Header';
+import Loader from '../../Loader';
 
 const CmspageAddEdit = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const location = useLocation();
     const navigate=useNavigate();
     const { register, handleSubmit, setValue } = useForm();
     const id = location.state ? location.state.id : null;
     const [cmspagedata, setcmspagedata] = useState([]);
+    const [loading,setloading]=useState(true)
 
     useEffect(() => {
         document.title='AddEditCmsPages';
@@ -21,10 +24,10 @@ const CmspageAddEdit = () => {
     }, [id])
 
     const handleupdatecmspage = async (id) => {
+        setloading(true)
         try {
-            const response = await axios.get(`http://localhost:8081/api/cmspageeditdata/${id}`);
+            const response = await axios.get(`${BASE_URL}/api/cmspageeditdata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             const cmsdata = response.data.data;
-
             setcmspagedata(cmsdata);
             setValue("title", cmsdata.title);
             setValue("description", cmsdata.description);
@@ -32,27 +35,32 @@ const CmspageAddEdit = () => {
             setValue("meta_title", cmsdata.meta_title);
             setValue("meta_description", cmsdata.meta_description);
             setValue("meta_keywords", cmsdata.meta_keywords);
+            setloading(false)
         } catch (error) {
+            setloading(false)
             console.error(error)
         }
     }
 
     const onsubmit = async (formData) => {
+        setloading(true)
         try {
             if (id) {
-                const response = await axios.put(`http://localhost:8081/api/cmsupdatepage/${id}`, formData);
+                const response = await axios.put(`${BASE_URL}/api/cmsupdatepage/${id}`, formData,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
                 if (response.status === 200) {
                     NotificationManager.success("Form updated successfully!");
                 }
-                navigate("/cmspages");
+                
             } else {
-                const response = await axios.post("http://localhost:8081/api/cmsaddpage", formData);
+                const response = await axios.post(`${BASE_URL}/api/cmsaddpage`, formData,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
                 if (response.status === 200) {
                     NotificationManager.success("Form submitted successfully!");
                 }
-                navigate("/cmspages");
-            }
+             }
+             setloading(false)
+             navigate("/cmspages");
         } catch (error) {
+            setloading(false)
             console.error(error);
         }
     }
@@ -130,7 +138,11 @@ const CmspageAddEdit = () => {
                                                 {id ? 'Update Form' : 'Add Form'}
                                             </h3>
                                         </div>
-                                        <form onSubmit={handleSubmit(onsubmit)}>
+                                        {
+                                            loading ? (
+                                                <Loader />
+                                            ):(
+                                                <form onSubmit={handleSubmit(onsubmit)}>
                                             <div className="row">
                                                 <div className="col-md-6">
                                                     <div className="card-body">
@@ -190,6 +202,8 @@ const CmspageAddEdit = () => {
                                                 <button type="submit" className='btn btn-primary'>{id ? 'Update' : 'Submit'}</button>
                                             </div>
                                         </form>
+                                        )
+                                        }
                                     </div>
                                 </div>
                             </div>

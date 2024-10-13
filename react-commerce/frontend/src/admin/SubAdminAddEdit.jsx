@@ -7,6 +7,7 @@ import Header from './Components/Header';
 import Footer from './Components/Footer';
 
 const SubAdminAddEdit = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
     const navigate = useNavigate();
     const location = useLocation();
     // const [editdata, setEditdata] = useState(null);
@@ -25,7 +26,7 @@ const SubAdminAddEdit = () => {
 
     const handledit = async (id) => {
         try {
-            const response = await axios.get(`http://localhost:8081/api/editdata/${id}`);
+            const response = await axios.get(`${BASE_URL}/api/editdata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             // console.log(response.data.result[0])
             const userData = response.data.result[0];
             // setEditdata(userData);
@@ -50,7 +51,7 @@ const SubAdminAddEdit = () => {
 
     const handlesubmit = async (formData) => {
         try {
-             await axios.put(`http://localhost:8081/api/update/${id}`, formData);
+             await axios.put(`${BASE_URL}/api/update/${id}`, formData,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             // console.log(response.data.message); // Log success message
             NotificationManager.success("form updated successfully!")
             setTimeout(()=>navigate("/subadmins"),2000);

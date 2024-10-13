@@ -9,6 +9,7 @@ import Header from '../Components/Header';
 
 
 const ProductImages = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     // const navigate=useNavigate();
     const [productsimage,setproductsimage]=useState([]);
     const [filterdata,setfilterdata]=useState([]);
@@ -18,7 +19,7 @@ const ProductImages = () => {
     },[]);
 
     const productsimagetabledata=async()=>{
-        const response=await axios.get("http://localhost:8081/api/getAllproductsImages");
+        const response=await axios.get(`${BASE_URL}/api/getAllproductsImages`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
         // console.log(response.data)
         setproductsimage(response.data);
         setfilterdata(response.data);

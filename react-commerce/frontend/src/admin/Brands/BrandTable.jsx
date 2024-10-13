@@ -5,6 +5,7 @@ import { DeleteEntity } from "../CRUDENTITY/DeleteEntity";
 import { StatusEntity } from "../CRUDENTITY/StatusEntity";
 
 const BrandTable = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const navigate=useNavigate();
     const [brandData,setbrandData]=useState([]);
     
@@ -15,7 +16,7 @@ const BrandTable = () => {
 
     const GETALLBRANDS=async()=>{
         try {
-            const response=await axios.get("http://localhost:8081/api/getAllBrands");
+            const response=await axios.get(`${BASE_URL}/api/getAllBrands`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             setbrandData(response.data);
         } catch (error) {
             console.log(error)
@@ -31,7 +32,7 @@ const BrandTable = () => {
       // alert(id)
       const data=await DeleteEntity('Brand',id);
       // Fetch the updated data from the server and update the local state
-      const response = await axios.get("http://localhost:8081/api/getAllBrands");
+      const response = await axios.get(`${BASE_URL}/api/getAllBrands`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       setbrandData(response.data);
     }
     // for status change

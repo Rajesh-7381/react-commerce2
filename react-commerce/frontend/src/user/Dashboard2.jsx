@@ -3,16 +3,11 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Header from './Component/Header';
 import Footer from './Component/Footer';
-import {
-  Carousel,
-  CarouselItem,
-  CarouselControl,
-  CarouselIndicators,
-  CarouselCaption,
-} from 'reactstrap';
+import {  Carousel,  CarouselItem,  CarouselControl,  CarouselIndicators,  CarouselCaption,} from 'reactstrap';
 
 
 const Dashboard2 = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const navigate=useNavigate();
   const [products,setproducts]=useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -24,7 +19,7 @@ const Dashboard2 = () => {
   },[]);
 
   const fetchProducts=async()=>{
-    const response=await axios.get("http://localhost:8081/api/AllProductDetailsShown");
+    const response=await axios.get(`${BASE_URL}/api/AllProductDetailsShown`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
     console.log(response)
     console.log(response.data.result)
     setproducts(response.data.result);
@@ -264,7 +259,7 @@ const Dashboard2 = () => {
                         <div className="product-o product-o--hover-on product-o--radius">
                           <div className="product-o__wrap">
                             <Link className="aspect aspect--bg-grey aspect--square u-d-block" to={'/listproduct'}>
-                              <img className="aspect__img" src={`http://localhost:8081/productsimage/`+product.image} alt="" /></Link>
+                              <img className="aspect__img" src={`${BASE_URL}/productsimage/`+product.image} alt="" /></Link>
                           </div>
                           <span className="product-o__category">
                             <a href="shop-side-version-2.html">{product.brand_name ? product.brand_name :'Brand Name'}</a></span>

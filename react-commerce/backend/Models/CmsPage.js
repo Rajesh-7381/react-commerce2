@@ -1,12 +1,14 @@
 const { db } = require("../config/dbconfig");
 const { v4: uuidv4 } = require("uuid");
-
+// const { faker } = require('@faker-js/faker');
 const CmsPage = {
-  // Fetch all non-deleted CMS pages
-  getAll: async () => {
-    const query = "SELECT * FROM cmspages WHERE deleted_at IS NULL";
+  getAll: async (limit,offset) => {
+    // console.log(limit)
+    // console.log(offset)
+    // const query = "SELECT * FROM cmspages WHERE deleted_at IS NULL limit 100";
+    const query = "SELECT * FROM cmspages WHERE deleted_at IS NULL limit ? offset ?";
     try {
-      const [rows] = await db.promise().query(query);
+      const [rows] = await db.promise().query(query,[limit,offset]);
       return rows;
     } catch (error) {
       console.error("Error fetching CMS pages:", error);
@@ -139,4 +141,24 @@ const CmsPage = {
   },
 };
 
+
+// async function generateAndAddPages() {
+//   for (let i = 0; i < 10000; i++) {
+//     const page = {
+//       title: faker.lorem.sentence(),
+//       url: faker.internet.url(),
+//       description: faker.lorem.paragraph(),
+//       meta_title: faker.lorem.sentence(),
+//       meta_keywords: faker.lorem.words(5),
+//       meta_description: faker.lorem.sentence(),
+//     };
+//     await CmsPage.add(page);
+//   }
+// }
+
+// generateAndAddPages().then(() => {
+//   console.log("Added 100 fake CMS pages to the database");
+// }).catch((error) => {
+//   console.error("Error generating and adding pages:", error);
+// });
 module.exports = CmsPage;

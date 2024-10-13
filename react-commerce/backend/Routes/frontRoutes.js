@@ -2,16 +2,18 @@ const express=require("express");
 const router=express.Router();
 const upload=require("../utils/multerConfig");
 const frontController=require("../Controller/frontController")
+const RouteCheckAuth = require("../Auth/RouteCheckAuth");
 
-router.post("/ContactUS",upload.none(),frontController.contactUs)
-router.get("/AllProductDetailsShown",frontController.AllProductDetails)
-router.get("/listingproduct",frontController.listingproduct)
-router.get("/productDetails/:id",frontController.productDetails)
-router.get("/productdetailscount",frontController.productdetailscount)
-router.post("/create-payment-intent")
-router.post("/cardData",upload.none(),frontController.Card);
-router.post("/DeliveryAddress",upload.none(),frontController.DeliveryAddress);
-router.get("/getAllCards",frontController.getAll);
-router.post("/create-payment-intent",frontController.StripePayment);
+router.post("/ContactUS",RouteCheckAuth ,upload.none(),frontController.contactUs)
+router.get("/AllProductDetailsShown",RouteCheckAuth ,frontController.AllProductDetails)
+router.get("/listingproduct",RouteCheckAuth ,frontController.listingproduct)
+router.get("/productDetails/:id",RouteCheckAuth ,frontController.productDetails)
+router.get("/productdetailscount",RouteCheckAuth ,frontController.productdetailscount)
+router.post("/cardData",RouteCheckAuth ,upload.none(),frontController.Card);
+router.post("/DeliveryAddress",RouteCheckAuth ,upload.none(),frontController.DeliveryAddress);
+router.get("/getAllCards",RouteCheckAuth ,frontController.getAll);
+router.post("/create-payment-intent",RouteCheckAuth ,frontController.StripePayment);
+router.get("/getDeliveryAddress/:id",RouteCheckAuth ,frontController.getAdress)
+router.delete("/deleteAddress/:id",RouteCheckAuth ,frontController.deleteAddress)
 
 module.exports=router

@@ -142,5 +142,29 @@ exports.StripePayment=async(req,res)=>{
   }
 };
 
+exports.getAdress=async(req,res)=>{
+  const id=req.params.id
+  // console.log(id)
+  try {
+      const data=await front.getAdress(id);
+      // console.log(getAdress)
+      res.json(data)
+  } catch (error) {
+      console.error(error);
+      res.json({message:"internal server error"}) 
+  }
+}
+exports.deleteAddress=async(req,res)=>{
+  const id=req.params.id
+  // console.log(id)
+  try {
+      const data=await front.deleteAddress(id);
+      // console.log(getAdress)
+      res.json("Deleted Successfully!")
+  } catch (error) {
+      console.error(error);
+      res.json({message:"internal server error"}) 
+  }
+}
 
   

@@ -15,7 +15,7 @@ import Footer from './Components/Footer';
 import Header from './Components/Header';
 
 const AddEditRegisterUser = (args) => {
-   
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const [pass,setpass]=useState(false);
   const [data, setData] = useState([]);
   const [filterData, setFilterData] = useState([]);
@@ -31,13 +31,9 @@ const AddEditRegisterUser = (args) => {
   const navigate=useNavigate();
   let sRow=false;
 
-  useEffect(()=>{
-    document.title='AddEditRegister';
-  })
-
   const toggle = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8081/api/singledata/${id}`);
+      const response = await axios.get(`${BASE_URL}/api/singledata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       // console.log(response.data)
       setmodaldata(response.data[0]);
       // console.log(modaldata)
@@ -54,9 +50,10 @@ const AddEditRegisterUser = (args) => {
   };
 
   useEffect(() => {
+    document.title='AddEditRegister';
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8081/api/getAllAdminSubadminUsers");
+        const response = await axios.get(`${BASE_URL}/api/getAllAdminSubadminUsers`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
         setData(response.data);
         setFilterData(response.data);  // Initialize filterData as well
       } catch (error) {
@@ -80,7 +77,7 @@ const debounce=(func,wait)=>{
 const callApi=async(e)=>{
   const searchTerm=e.target.value.toUpperCase().trim();
   try {
-    const response = await axios.get(`http://localhost:8081/api/SearchAdminSubAdminUser/${searchTerm}`);
+    const response = await axios.get(`${BASE_URL}/api/SearchAdminSubAdminUser/${searchTerm}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
     // console.log(response.data);
     let filteredData = response.data;
     if (searchTerm!== "") {
@@ -95,7 +92,7 @@ const callApi=async(e)=>{
     console.error(error)
   }
 }
-  const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
+const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
 
   // csv download
   const headers = [
@@ -180,7 +177,7 @@ const callApi=async(e)=>{
 
   const onSubmitForm = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8081/api/editdata/${id}`);
+      const response = await axios.get(`${BASE_URL}/api/editdata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       const  data =response.data.result[0];
       // console.log(data)
       formik.setValues({
@@ -192,7 +189,7 @@ const callApi=async(e)=>{
       });
       setId(data.id); // Set id state
     } catch (error) {
-
+        console.log(error)
     }
   };
 
@@ -203,10 +200,10 @@ const callApi=async(e)=>{
       return;
     }
     try {
-      await axios.put(`http://localhost:8081/api/update/${id}`, values);
+      await axios.put(`${BASE_URL}/api/update/${id}`, values,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       NotificationManager.success("Form updated successfully!");
       // Fetch the updated data from the server and update the local state
-      const response = await axios.get("http://localhost:8081/api/getAllAdminSubadminUsers");
+      const response = await axios.get(`${BASE_URL}/api/getAllAdminSubadminUsers`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       setData(response.data);
       setFilterData(response.data);
       setModal2(false); // Close the modal after successful submission
@@ -230,7 +227,7 @@ const callApi=async(e)=>{
   const handledelete = async (id) => {
     await DeleteEntity('Admin',id);  
     // Fetch the updated data from the server and update the local state
-    const response = await axios.get("http://localhost:8081/api/getAllAdminSubadminUsers");
+    const response = await axios.get(`${BASE_URL}/api/getAllAdminSubadminUsers`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
     setData(response.data);
     setFilterData(response.data);
       
@@ -246,7 +243,7 @@ const callApi=async(e)=>{
 
   const handleselectAll=(e)=>{
     setSelectAll(e.target.checked)
-    console.log(e.target.checked)
+    // console.log(e.target.checked)
     if(e.target.checked){
       const selobj={};
       data.forEach((row)=>{

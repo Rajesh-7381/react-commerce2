@@ -10,6 +10,7 @@ const cartSlice=createSlice({
     reducers:{
         addToCart(state,action){
             console.log(action)
+            console.log(state)
             // if(action.payload.id)
             if(state.cart.length > 4){
                 Swal.fire(`you have maxium ${state.cart.length} quantity allowed`);
@@ -19,6 +20,6 @@ const cartSlice=createSlice({
         }
     }
 })
-
+// console.log(cartSlice)
 export const { addToCart }=cartSlice.actions;
 export default cartSlice.reducer;

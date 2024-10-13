@@ -3,10 +3,11 @@ import axios from 'axios';
 import { NotificationManager } from 'react-notifications';
 
 export const StatusEntity = async (entityType, id, currentStatus, setData, data) => {
-    console.log(entityType)
-    console.log(id)
-    console.log(setData)
-    console.log(data)
+    const BASE_URL=process.env.REACT_APP_BASE_URL
+    // console.log(entityType)
+    // console.log(id)
+    // console.log(setData)
+    // console.log(data)
     try {
         const newStatus = currentStatus === 1 ? 0 : 1;
         console.log(newStatus)
@@ -15,28 +16,28 @@ export const StatusEntity = async (entityType, id, currentStatus, setData, data)
         switch (entityType) {
            
             case 'ProductsImageStatus':
-                url = `http://localhost:8081/api/handleproductImagesstatus/${id}`;
+                url = `${BASE_URL}/api/handleproductImagesstatus/${id}`;
                 break;
 
             case 'CategoryStatus':
-                url = `http://localhost:8081/api/handlecategorystatus/${id}`;
+                url = `${BASE_URL}/api/handlecategorystatus/${id}`;
                 break;
 
             case 'BrandStatus':
-                url = `http://localhost:8081/api/handlebrandstatus/${id}`;
+                url = `${BASE_URL}/api/handlebrandstatus/${id}`;
                 break;
 
             case 'BannerStatus':
-                url = `http://localhost:8081/api/handlebannerstatus/${id}`;
+                url = `${BASE_URL}/api/handlebannerstatus/${id}`;
                 break;
 
             case 'CmsStatus':
                 // console.log(id)
-                url = `http://localhost:8081/api/handlecmsstatus/${id}`;
+                url = `${BASE_URL}/api/handlecmsstatus/${id}`;
                 break;
 
             case 'ProductStatus':
-                url = `http://localhost:8081/api/handleproductstatus/${id}`;
+                url = `${BASE_URL}/api/handleproductstatus/${id}`;
                 break;
 
             default:

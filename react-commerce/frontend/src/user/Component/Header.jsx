@@ -5,6 +5,7 @@ import { addToCart } from '../Account/redux/features/cartSlice'
 import { useDispatch, useSelector } from 'react-redux';
 
 const Header = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const [categories, setcategories] = useState([]);
   const dispatch=useDispatch();
   const navigate=useNavigate();
@@ -13,7 +14,7 @@ const Header = () => {
     document.title="Dashboard2"
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:8081/api/getAllCategorys');
+        const response = await axios.get(`${BASE_URL}/api/getAllCategorys`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
         // console.log(response.data)
         setcategories(response.data);
       } catch (error) {

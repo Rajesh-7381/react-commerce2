@@ -9,10 +9,10 @@ import Footer from "../Components/Footer";
 import Header from "../Components/Header";
 
 const Categories = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const navigate = useNavigate();
   const [categorydata, setcategorydata] = useState([]);
   const [filterData, setFilterData] = useState([]);
-
   const [currentpage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
   const lastIndex = currentpage * recordsPerPage;
@@ -26,7 +26,7 @@ const Categories = () => {
   }, []);
 
   const handlecategorydata = async () => {
-    const response = await axios.get("http://localhost:8081/api/getAllCategorys");
+    const response = await axios.get(`${BASE_URL}/api/getAllCategorys`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
     setcategorydata(response.data);
     setFilterData(response.data);
   };
@@ -65,7 +65,7 @@ const Categories = () => {
   const handledelete = async (id) => {
     DeleteEntity("Category", id);
     // Fetch the updated data from the server and update the local state
-    const response = await axios.get("http://localhost:8081/api/getAllCategorys");
+    const response = await axios.get(`${BASE_URL}/api/getAllCategorys`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
 
     setcategorydata(response.data);
     setFilterData(response.data);

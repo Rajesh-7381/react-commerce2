@@ -7,6 +7,7 @@ import Footer from '../Components/Footer';
 import Header from '../Components/Header';
 
 const AddEditBrands = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const location = useLocation();
     const id = location.state ? location.state.id : null;
     const { register, handleSubmit, setValue, formState: { errors } } = useForm();
@@ -26,7 +27,7 @@ const AddEditBrands = () => {
 
     const GetSingleBrands = async (id) => {
         try {
-            const response = await axios.get(`http://localhost:8081/api/GetSingleBrandDetails/${id}`);
+            const response = await axios.get(`${BASE_URL}/api/GetSingleBrandDetails/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             // console.log(response.data.data)
             const brandData = response.data.data;
             // console.log(brandData)
@@ -64,10 +65,11 @@ const AddEditBrands = () => {
                 form.append('brand_logo', formData.brand_logo[0]);
             }  
             
-            var url= id ? `http://localhost:8081/api/UpdateBrand/${id}` : 'http://localhost:8081/api/AddBrand';
+            var url= id ? `${BASE_URL}/api/UpdateBrand/${id}` : `${BASE_URL}/api/AddBrand`;
             const method=id ? 'put' : 'post';
             await axios[method](url,form,{
                 headers:{
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type':'multipart/form-data'
                 }
             })
@@ -167,7 +169,7 @@ const AddEditBrands = () => {
                                             <div>
                                               <img 
                                                 ref={imageRef} 
-                                                src={`http://localhost:8081/api/brandimage/${brandData.brand_image}`} 
+                                                src={`${BASE_URL}/api/brandimage/${brandData.brand_image}`} 
                                                 width={50} 
                                                 height={50} 
                                                 alt="" 
@@ -253,7 +255,7 @@ const AddEditBrands = () => {
                                                       <div>
                                                         <img 
                                                           ref={imageRef2} 
-                                                          src={`http://localhost:8081/api/brandlogo/${brandData.brand_logo}`} 
+                                                          src={`${BASE_URL}/api/brandlogo/${brandData.brand_logo}`} 
                                                           width={50} 
                                                           height={50} 
                                                           alt="" 

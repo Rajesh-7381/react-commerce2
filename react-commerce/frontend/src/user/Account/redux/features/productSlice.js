@@ -54,5 +54,5 @@ export const {
   setSortedProducts,
   setCurrentPage,
 } = productSlice.actions;
-
+// console.log(productSlice)
 export default productSlice.reducer;

@@ -8,8 +8,9 @@ import { SpinnerCircular } from 'spinners-react';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 
 const Login = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const loginwithgoogle=()=>{
-    window.open("http://localhost:8081/auth/google/callback","_self")
+    window.open(`${BASE_URL}/auth/google/callback`,"_self")
   }
   const navigate = useNavigate();
   const [pass, setPass] = useState(false);
@@ -32,8 +33,14 @@ const Login = () => {
     onSubmit: async (values, action) => {
       setloading(true)
       try {
-        const response = await axios.post("http://localhost:8081/api/login", values);
+        // const response = await axios.post(`http://localhost:8081/api/login`, values,{headers:{ Authorization: `Bearer ${localStorage.getItem("token")}` }});
+        const response = await axios.post(`${BASE_URL}/api/login`, values,{headers:{ Authorization: `Bearer ${localStorage.getItem("token")}` }});
+
         const data = response.data;
+        localStorage.setItem('token',data.token)
+        localStorage.setItem('email',data.email)
+        sessionStorage.setItem('id',data.id)
+        sessionStorage.setItem('role',data.role)
         // console.log(data)
         
         // if(formik.check){
@@ -42,13 +49,16 @@ const Login = () => {
           // console.log(response.data.token)
         // }
         if (data.status === 1) {
-          sessionStorage.setItem('id',data.id);
-          localStorage.setItem('token',response.data.token);
+          // console.log(1)
+          // sessionStorage.setItem('id',data.id);
+          // localStorage.setItem('token',response.data.token);
           if (values.check) {
             sessionStorage.setItem('email', values.email);
             // sessionStorage.setItem('password', values.password);
           }
+          // console.log(data.role)
           switch (data.role) {
+            
             case 'admin':
             case 'subadmin':
               
@@ -99,6 +109,9 @@ const Login = () => {
       }
     }
   });
+  const SocialHandler=async(social)=>{
+    window.location.href=`${BASE_URL}/auth/${social}`
+  }
 
   return (
     <div>
@@ -134,6 +147,7 @@ const Login = () => {
                 <div className="col-lg-12">
                   <div className="section__text-wrap">
                     <h1 className="section__heading u-c-secondary">ALREADY REGISTERED?</h1>
+                    
                   </div>
                 </div>
               </div>
@@ -167,7 +181,7 @@ const Login = () => {
                         <div className="u-s-m-b-30">
                           <label className="gl-label text-start" htmlFor="login-password">PASSWORD <span className='text-danger'>*</span></label>
                           <input className="input-text input-text--primary-style" name="password" type={pass ? 'text' : 'password'} id="login-password" placeholder="Enter Password" autoComplete="current-password" onChange={formik.handleChange} />
-                          <p style={{ position: "absolute", top: "68%", right: "39px", transform: "translateY(-40%)", cursor: "pointer" }} onClick={() => setPass(!pass)}>{(pass) ? <i className='fas fa-solid fa-eye-slash'></i> : <i className='fas fa-eye'></i>}</p>
+                          <p style={{ position: "absolute", top: "54%", right: "39px", transform: "translateY(-40%)", cursor: "pointer" }} onClick={() => setPass(!pass)}>{(pass) ? <i className='fas fa-solid fa-eye-slash'></i> : <i className='fas fa-eye'></i>}</p>
                           {formik.touched.password && formik.errors.password ? (
                             <div className="text-danger">{formik.errors.password}</div>
                           ) : null}
@@ -192,22 +206,26 @@ const Login = () => {
                           </div>
                         </div>
                       </form>
-                        <div class = "container">
-      
-                          <div class = "circle-bg">
-                            <p class = "icon"> Social Login</p>
-                          </div>
-                        
-                          <div class = "outer-icons">
-                          <a href="http://localhost:8081/auth/facebook"><i class="one fa-brands fa-facebook-f"></i></a>
-                          <i class="two fa-brands fa-github"></i>
-                            <a href="http://localhost:8081/auth/google"><i class="three fa-brands fa-google"></i></a>
-
-                            <i class="four fa-brands fa-linkedin"></i>
-                          </div> 
-                          
-                      </div>
-
+                      <div className="social-login">
+                        <Link onClick={()=>SocialHandler("google")}  className="social-btn google-btn" style={{textDecoration:"none",   backgroundColor: 'blue',color:"white",   border: '1px solid #ddd',   padding: '10px 20px',   borderRadius: '5px',   cursor: 'pointer',   display: 'inline-block',   margin: '10px 0' }}>
+                          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6WwgH7Nl5_AW9nDCnR2Ozb_AU3rkIbSJdAg&s" alt="Google" height={20} width={20} />
+                          Sign in with Google
+                        </Link>
+                        <br />
+                        OR
+                        <br />
+                        <Link onClick={()=>{SocialHandler('facebook')}} className="social-btn facebook-btn" style={{textDecoration:"none",   backgroundColor: '#3b5998',   border: '1px solid #3b5998',   padding: '10px 20px',   borderRadius: '5px',   cursor: 'pointer',   display: 'inline-block',   margin: '10px 0',   color: '#fff' }}>
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Facebook_icon_2013.svg/120px-Facebook_icon_2013.svg.png?20161223201621" alt="facebook" height={20} width={20} />
+                          Sign in with FaceBook
+                        </Link>
+                        <br />
+                        OR
+                        <br />
+                        <Link onClick={()=>{SocialHandler('github')}} className="social-btn facebook-btn" style={{textDecoration:"none",   backgroundColor: '#3b5998',   border: '1px solid #3b5998',   padding: '10px 20px',   borderRadius: '5px',   cursor: 'pointer',   display: 'inline-block',   margin: '10px 0',   color: '#fff' }}>
+                          <img src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png" alt="facebook" height={20} width={20} />
+                          Sign in with GitHub
+                        </Link>
+                      </div>                    
                     </div>
                   </div>
                 </div>

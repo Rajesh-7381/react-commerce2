@@ -8,6 +8,7 @@ import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 
 const Banners = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const [bannerData,setbannerData]=useState([]);
     const navigate=useNavigate();
 
@@ -18,7 +19,7 @@ const Banners = () => {
 
     const BannerData=async()=>{
         try {
-            const response=await axios.get("http://localhost:8081/api/getAllBanners");
+            const response=await axios.get(`${BASE_URL}/api/getAllBanners`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             // console.log(response.data)
             setbannerData(response.data);
             // console.log(bannerData)
@@ -42,7 +43,7 @@ const Banners = () => {
     const BannerDelete=async(id)=>{
       const data=await DeleteEntity('Banner',id);
       // alert(id)
-      const response=await axios.get("http://localhost:8081/api/getAllBanners");
+      const response=await axios.get(`${BASE_URL}/api/getAllBanners`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       setbannerData(response.data);
       
     }

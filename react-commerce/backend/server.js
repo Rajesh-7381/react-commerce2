@@ -1,8 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const passport = require('passport');
 const session=require("express-session")
-const GoogleOauthStrategy = require('passport-google-oauth20').Strategy;
 // db
 const { db } = require("./config/dbconfig");
 // for multiple database
@@ -26,6 +24,7 @@ const bannerRoutes=require("./Routes/bannerRoutes")
 const brandRoutes=require("./Routes/brandRoute")
 const frontRoutes=require("./Routes/frontRoutes");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const passport=require("./utils/SocialLogin")
 const WebSocket = require('ws');
 const clients = new Set();
 const wss = new WebSocket.Server({ port: 8080 });
@@ -52,73 +51,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static('public'));
 
-  passport.use(new GoogleOauthStrategy({
-    clientID:process.env.GOOGLE_CLIENT_ID,
-    clientSecret:process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK, // Ensure this matches your Google Cloud Console
-    scope: ["profile", "email"]
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      // console.log(profile)
-      const email = profile.emails[0].value;
-      const userQuery = "SELECT * FROM AdminUser WHERE email = ?";
-      const insertQuery = `INSERT INTO AdminUser (googleId,name, email, image, mobile, password) VALUES (?, ?, ?, ?, ?, ?)`;
-
-      db.query(userQuery, [email], (err, results) => {
-        if (err) {
-          console.error('Error querying database: ', err);
-          return done(err, null);
-        }
-
-        if (results.length > 0) {
-          // User already exists
-          return done(null, results[0]); //if user exist it show with user inforamtion
-        } else {
-          // User does not exist, create new user
-          const user = {
-            GoogleId:profile.id,
-            name: profile.displayName,
-            email: email,
-            image: profile.photos[0] ? profile.photos[0].value : null,
-            mobile: null, 
-            password: null 
-          };
-
-          db.query(insertQuery, [user.GoogleId,user.name, user.email, user.image, user.mobile, user.password], (err, results) => {
-            if (err) {
-              console.error('Error inserting into database: ', err);
-              return done(err, null);
-            }
-
-            // Add the newly created user ID to the `user` object
-            user.id = results.insertId;
-            return done(null, user);
-          });
-        }
-      });
-    } catch (error) {
-      console.error('Error in passport strategy: ', error);
-      return done(error, null);
-    }
-  }
-  ));
-
-  passport.serializeUser((user, done) => {
-  done(null, user.id);
-  });
-
-  passport.deserializeUser((id, done) => {
-  const query = "SELECT * FROM AdminUser WHERE id = ?";
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      return done(err, null);
-    }
-    return done(null, results[0]);
-  });
-  });
-
-
 // Serve static files for profile images
 // express.static :: is built in middleware function in  express that serves static files. It takes a directory path as an argument and serves the files within that directory
 // path.join() is a method from Node.js's path module. It joins the provided path segments into a single path string.
@@ -126,13 +58,6 @@ app.use(express.static('public'));
 
 // app.use("/profile", express.static(path.join(__dirname, "uploads/profile")));
 
-app.get('/auth/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
-}));
-
-app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
-  res.redirect('http://localhost:3000/userdashboard2'); // Redirect to homepage or another page after successful login
-});
 
 // app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
@@ -159,6 +84,49 @@ app.get("/",(req,res)=>{
   res.render('index',data2)
 })
 
+
+// for google login (implementation code in utils/sociallogin.js)
+app.get('/auth/google', passport.authenticate('google', {
+  scope: ['profile', 'email']
+}));
+
+app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
+  res.redirect('http://localhost:3000/userdashboard2'); // Redirect to homepage or another page after successful login
+});
+
+//for facebook
+app.get("/auth/facebook",passport.authenticate("facebook",{scope:["email"]}))
+app.get("/auth/facebook/callback",passport.authenticate("facebook",{}),(req,res)=>{
+    const user = req.user;
+    // const token = jwt.sign(
+    //   { email: user.email, role: user.role, id: user.id },
+    //   process.env.JWTSECRET,
+    //   { expiresIn: "1h" } 
+    // )
+  
+    // if (user.role === 1) {
+    //     res.redirect(`http://localhost:3000/dashboard?token=${token}&role=${user.role}`);
+    // } else {
+    //     res.redirect(`http://localhost:3000/dashboard2?token=${token}&role=${user.role}`);
+    // }
+    res.redirect('http://localhost:3000/userdashboard2'); // Redirect to homepage or another page after successful login
+
+    // res.redirect(`http://localhost:3000/google/success?token=${token}&role=${user.role}&id=${user.id}&email=${user.email}`);
+})
+
+
+app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
+
+app.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
+  const user = req.user;
+  const token = jwt.sign(
+      { email: user.email, role: user.role, id: user.id },
+      process.env.JWTSECRET,
+      { expiresIn: "1h" }
+  );
+  res.redirect('http://localhost:3000/userdashboard2'); 
+  // res.redirect(`http://localhost:3000/success?token=${token}&role=${user.role}&id=${user.id}&email=${user.email}`);
+});
 wss.on('connection', (ws) => {
   console.log('Client connected');
   // Add client to the set

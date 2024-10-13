@@ -4,7 +4,6 @@ import './App.css';
 import 'react-notifications/lib/notifications.css';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-
 import Dashboard2 from './user/Dashboard2';
 import Success from './user/Account/Success';
 import Cancel from './user/Account/Cancel';
@@ -20,8 +19,11 @@ import Cart from './user/Account/Cart';
 import CreditOrDebit from './user/Account/Payment/CreditOrDebit';
 import DomTable from './Pratice/DomTable';
 import Doc from './admin/Document/Doc';
+import ProtectedRoute from './protectedRoute';
+import {LightDarkTheme} from './LightDarkTheme'
+import TodoList from './Pratice/TodoList';
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_KEY);
 
-const stripePromise = loadStripe('pk_test_51Ph8kgFnMqw8LC18U63JgNUhD8F5wAKZfjQAyrnfgoKNwI5fbZtwBYZfXwkVE7VdsxMmKziLUOKi6AXbI7XJN9Oe00iO9DHFpM');
 function withDelay(promise, delay = 1000) {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -64,46 +66,49 @@ function App() {
           <Route path='/register' element={<Suspense fallback={<div className='loader-container'></div>}><Register /></Suspense>}></Route>
           <Route path='/forgotpassword' element={<Suspense fallback={<div className='loader-container'></div>}><ForgotPassword /></Suspense>}></Route>
 
-          <Route path='/admindashboard1' element={<Suspense fallback={<div className='loader-container'></div>}><Dashboard1 /></Suspense>}></Route>
+          <Route path='/admindashboard1' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Dashboard1 /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/registeruser' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditRegisterUser /></ProtectedRoute></Suspense>}></Route>
+          {/*
+          <Route path='/admindashboard1' element={<Suspense fallback={<div className='loader-container'></div>}><LightDarkTheme><Dashboard1 /></LightDarkTheme></Suspense>}></Route>
           <Route path='/registeruser' element={<Suspense fallback={<div className='loader-container'></div>}><AddEditRegisterUser /></Suspense>}></Route>
-          <Route path='/subadmins' element={<Suspense fallback={<div className='loader-container'></div>}><Subadmin /></Suspense>}></Route>
-          <Route path='/subadminaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><SubAdminAddEdit /></Suspense>}></Route>
-          <Route path='/categories' element={<Suspense fallback={<div className='loader-container'></div>}><Categories /></Suspense>}></Route>
-          <Route path='/categoriesaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><CategoryAddEdit /></Suspense>}></Route>
-          <Route path='/cmspages' element={<Suspense fallback={<div className='loader-container'></div>}><Cmspages /></Suspense>}></Route>
-          <Route path='/cmspageaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><CmspageAddEdit /></Suspense>}></Route>
-          <Route path='/products' element={<Suspense fallback={<div className='loader-container'></div> }> <Products />   </Suspense> } />
-          <Route path='/addeditproducts' element={<Suspense fallback={<div className='loader-container'></div>}><AddEditProducts /></Suspense>}></Route>
-          <Route path='/productsimage' element={<Suspense fallback={<div className='loader-container'></div>}><ProductImages /></Suspense>}></Route>
-          <Route path='/brands' element={<Suspense fallback={<div className='loader-container'></div>}><Brands /></Suspense>}></Route>
-          <Route path='/addeditbrands' element={<Suspense fallback={<div className='loader-container'></div>}><AddEditBrands /></Suspense>}></Route>
-          <Route path='/banners' element={<Suspense fallback={<div className='loader-container'></div>}><Banners /></Suspense>}></Route>
-          <Route path='/addeditbanners' element={<Suspense fallback={<div className='loader-container'></div>}><AddEditBanners /></Suspense>}></Route>
+          */}
+          <Route path='/subadmins' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Subadmin /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/subadminaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><SubAdminAddEdit /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/categories' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Categories /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/categoriesaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><CategoryAddEdit /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/cmspages' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Cmspages /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/cmspageaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><CmspageAddEdit /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/products' element={<Suspense fallback={<div className='loader-container'></div> }> <ProtectedRoute roleRequired="admin"><Products /> </ProtectedRoute>  </Suspense> } />
+          <Route path='/addeditproducts' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditProducts /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/productsimage' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><ProductImages /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/brands' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Brands /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/addeditbrands' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditBrands /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/banners' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Banners /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/addeditbanners' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditBanners /></ProtectedRoute></Suspense>}></Route>
           
                   
 
-          <Route path='/userdashboard2' element={<Suspense fallback={<div className='loader-container'></div>}><Dashboard2 /></Suspense>}></Route>
-          <Route path='/contactus' element={<Suspense fallback={<div className='loader-container'></div>}><Contact /></Suspense>}></Route>
-          <Route path='/myAccount' element={<Suspense fallback={<div className='loader-container'></div>}><MyAccount /></Suspense>}></Route>
-          <Route path='/wishlist' element={<Suspense fallback={<div className='loader-container'></div>}><WishList /></Suspense>}></Route>
-          <Route path='/Orders' element={<Suspense fallback={<div className='loader-container'></div>}><Order /></Suspense>}></Route>
-          <Route path='/myCart' element={<Suspense fallback={<div className='loader-container'></div>}><MyCart /></Suspense>}></Route>
-          <Route path='/productDetails' element={<Suspense fallback={<div className='loader-container'></div>}><ProductDetails /></Suspense>}></Route>
-          <Route path='/listproduct' element={<Suspense fallback={<div className='loader-container'></div>}><Listing /></Suspense>}></Route>
+          <Route path='/userdashboard2' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Dashboard2 /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/contactus' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Contact /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/myAccount' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><MyAccount /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/wishlist' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><WishList /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/Orders' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Order /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/myCart' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><MyCart /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/productDetails' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><ProductDetails /></ProtectedRoute></Suspense>}></Route>
+          <Route path='/listproduct' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Listing /></ProtectedRoute></Suspense>}></Route>
           <Route path='/checkout' element={
             <Elements stripe={stripePromise}>
               <Checkout />
             </Elements>
           } />
-          <Route path='/cart' element={<Suspense fallback={<div className='loader-container'></div>}><Cart /></Suspense>}></Route>
+          <Route path='/cart' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Cart /></ProtectedRoute></Suspense>}></Route>
           <Route path='/success' element={< Success/>} ></Route>
           <Route path='/cancel' element={< Cancel/>} ></Route>
           <Route path='/card' element={< CreditOrDebit/>} ></Route>
-
-
           
           <Route path='/DomTable' element={< DomTable/>} ></Route>
           <Route path='/documents' element={<Doc />}></Route>
+          <Route path='/todo' element={<TodoList />}></Route>
         </Routes>
       </BrowserRouter>
      

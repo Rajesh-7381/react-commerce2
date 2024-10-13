@@ -9,15 +9,18 @@ import Footer from '../Components/Footer';
 import Header from '../Components/Header';
 
 const Products = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const navigate=useNavigate();
     const [productdata,setproductdata]=useState([]);
+
     useEffect(()=>{
         document.title="Products";
         retrivedData();
     },[]);
+    
     const retrivedData= async()=>{
         try {
-           const response=await axios.get("http://localhost:8081/api/getAllProducts") ;
+           const response=await axios.get(`${BASE_URL}/api/getAllProducts`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}}) ;
            setproductdata(response.data);
         } catch (error) {
             console.error(error);
@@ -33,7 +36,7 @@ const Products = () => {
         // alert(1)
        const data=await DeleteEntity('Product',id);
         // Fetch the updated data from the server and update the local state
-        const response = await axios.get("http://localhost:8081/api/getAllProducts");
+        const response = await axios.get(`${BASE_URL}/api/getAllProducts`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
         // console.log(response.data.products)
         setproductdata(response.data);
         // setFilterData(response.data);

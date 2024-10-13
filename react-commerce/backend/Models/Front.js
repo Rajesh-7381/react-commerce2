@@ -139,6 +139,36 @@ const Front = {
     } catch (error) {
       return { error: error.message, };
     }
+  },
+  getAdress:async(id)=>{
+    // console.log(id)
+    try {
+      const getAdressQuery="select * from DELIVERY_ADDRESS where user_id=?";
+      return new Promise((resolve,reject)=>{
+        db.query(getAdressQuery,[id],(err,data)=>{
+          if(err){
+            reject(err)
+          }
+          // console.log(data)
+          resolve(data)
+        })
+      })
+    } catch (error) {
+        console.log(error)
+    }
+  },
+  deleteAddress:async(id)=>{
+    const query="delete from DELIVERY_ADDRESS where id=?";
+    try {
+      db.query(query,[id],(err,data)=>{
+        if(err){
+          console.log(err)
+        }
+        console.log(data)
+      })
+    } catch (error) {
+      
+    }
   }
 };
 module.exports = Front;

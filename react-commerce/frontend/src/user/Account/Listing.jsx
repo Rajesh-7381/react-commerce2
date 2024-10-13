@@ -5,6 +5,7 @@ import Header from '../Component/Header'
 import axios from 'axios'
 
 const Listing = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const navigate=useNavigate();
   const { id } = useParams();
   const [listProduct, setListProduct] = useState([]);
@@ -29,7 +30,7 @@ const Listing = () => {
   useEffect(() => {
     const fetchProductDetailsCount = async () => {
       try {
-        const res = await axios.get("http://localhost:8081/api/productdetailscount");
+        const res = await axios.get(`${BASE_URL}/api/productdetailscount`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
         console.log(res.data[0].total)
         if (res.data[0] && typeof res.data[0].total === 'number') {
           setProductCount(res.data[0].total);
@@ -44,7 +45,7 @@ const Listing = () => {
 
     
     const fetchProduct = async () => {
-      const response = await axios.get(`http://localhost:8081/api/listingproduct`);
+      const response = await axios.get(`${BASE_URL}/api/listingproduct`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       // console.log(response.data)
       setListProduct(response.data);
       console.log(listProduct)
@@ -524,7 +525,7 @@ const Listing = () => {
                     <div className="product-m">
                       <div className="product-m__thumb" onClick={()=>handleProductClick(product.id)}>
                         <Link className="aspect aspect--bg-grey aspect--square u-d-block" >
-                          <img className="aspect__img listing_productImage" src={product.image ? `http://localhost:8081/productsimage/${product.image}` : 'https://png.pngtree.com/png-vector/20221125/ourmid/pngtree-no-image-available-icon-flatvector-illustration-pic-design-profile-vector-png-image_40966566.jpg'} alt={product.product_name} />
+                          <img className="aspect__img listing_productImage" src={product.image ? `${BASE_URL}/productsimage/${product.image}` : 'https://png.pngtree.com/png-vector/20221125/ourmid/pngtree-no-image-available-icon-flatvector-illustration-pic-design-profile-vector-png-image_40966566.jpg'} alt={product.product_name} />
                         </Link>
                         <div className="product-m__quick-look">
                           <a className="fas fa-search" data-modal="modal" data-modal-id="#quick-look" data-tooltip="tooltip" data-placement="top" title="Quick Look" />

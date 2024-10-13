@@ -8,13 +8,8 @@ import axios from "axios";
 import { NotificationContainer, NotificationManager } from "react-notifications";
 
 const Contact = () => {
-
-  const initialValues={
-    name:"",
-    email:"",
-    subject:"",
-    message:""
-  };
+  const BASE_URL=process.env.REACT_APP_BASE_URL
+  const initialValues={  name:"",  email:"",  subject:"",  message:""};
   const validationSchema=Yup.object({
     name: Yup.string().max(100).min(3).matches(/^[a-zA-Z\s.,!?]+$/,"Please remove digits and special characters!").required("Please enter your name!"), //+ means(greedy quantifier) matches one or more of these letters and $ means  end of the string
     subject: Yup.string().max(300).min(3).matches(/^[a-zA-Z0-9\s.,!?]+$/, "Please enter a valid subject!").required("Please enter subject"),
@@ -30,7 +25,7 @@ const Contact = () => {
       formData.append("email",values.email);
       formData.append("subject",values.subject);
       formData.append("message",values.message);
-      await axios.post("http://localhost:8081/ContactUS",values);
+      await axios.post(`${BASE_URL}/ContactUS`,values,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       NotificationManager.success("Form submitted successfully!");
       action.resetForm();
     } catch (error) {

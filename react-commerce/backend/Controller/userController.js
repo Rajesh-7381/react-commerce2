@@ -303,15 +303,23 @@ class AdminUserController{
     res.json(results)
   }
 
-  // for read documentation
-  static async documents(req,res){
+  // for read and write using stream
+  static async documents(req, res) {
     try {
-      const result=await User.DOCX.docx()
-      // console.log(result)
-      res.json(result)
+      if (req.method === 'GET') {
+          const result = await User.DOCX.docx()
+          res.json(result)
+      } else if (req.method === 'PATCH') {
+          let {doc} = req.body
+          // console.log(doc)
+          const updatedResult = await User.DOCX.updateDocx(doc)
+          res.json(updatedResult)
+      } else {
+        res.status(405).json({ error: 'Method not allowed' })
+      }
     } catch (error) {
-        console.log(error)
-        res.status(500).json({message:"internal server error"})
+      console.log(error)
+      res.status(500).json({ message: 'Internal server error' })
     }
   }
 }

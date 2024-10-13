@@ -1,14 +1,15 @@
 import axios from 'axios';
 
 const fetchDataEntity = async () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     try {
         const responses = await Promise.all([
-            axios.get("http://localhost:8081/api/countuser"),
-            axios.get("http://localhost:8081/api/countadmin"),
-            axios.get("http://localhost:8081/api/countsubadmin"),
-            axios.get("http://localhost:8081/api/uniquecategories"),
-            axios.get("http://localhost:8081/api/allproductcount"),
-            axios.get("http://localhost:8081/api/AllBrandCount")
+            axios.get(`${BASE_URL}/api/countuser`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}}),
+            axios.get(`${BASE_URL}/api/countadmin`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}}),
+            axios.get(`${BASE_URL}/api/countsubadmin`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}}),
+            axios.get(`${BASE_URL}/api/uniquecategories`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}}),
+            axios.get(`${BASE_URL}/api/allproductcount`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}}),
+            axios.get(`${BASE_URL}/api/AllBrandCount`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}})
         ]);
         // console.log(responses[0])
         return {

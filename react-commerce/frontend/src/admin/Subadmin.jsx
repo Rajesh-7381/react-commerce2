@@ -12,6 +12,7 @@ import Header from './Components/Header';
 
 
 const Subadmin = (args) => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const navigate=useNavigate();
     const [data, setData] = useState([]);
     const [filterData, setFilterData] = useState([]);
@@ -44,7 +45,7 @@ const Subadmin = (args) => {
     // Fetch data
     const handleData = async () => {
         try {
-            const response = await axios.get("http://localhost:8081/api/getAllSubAdminData");
+            const response = await axios.get(`${BASE_URL}/api/getAllSubAdminData`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             setData(response.data);
             setFilterData(response.data);
         } catch (error) {
@@ -76,7 +77,7 @@ const Subadmin = (args) => {
     // single data using modal 
     const toggle = async (id) => {
         try {
-          const response = await axios.get(`http://localhost:8081/api/singledata/${id}`);
+          const response = await axios.get(`${BASE_URL}/api/singledata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
           // console.log(response.data[0])
           setmodaldata(response.data[0]);
           setModal(!modal);
@@ -95,7 +96,7 @@ const Subadmin = (args) => {
     const handledelete = async (id) => {
         await DeleteEntity('SubAdmin',id)
         // Fetch the updated data from the server and update the local state
-        const response = await axios.get("http://localhost:8081/api/getAllAdminSubadminUsers");
+        const response = await axios.get(`${BASE_URL}/api/getAllAdminSubadminUsers`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
         setData(response.data);
         setFilterData(response.data);
          

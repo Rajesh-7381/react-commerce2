@@ -1,7 +1,8 @@
 const { db }= require("../config/dbconfig");
 const bcrypt=require("bcrypt")
 const SALT=parseInt(process.env.GEN_SALT);
-const fs=require("fs").promises;
+// const fs=require("fs").promises; // when deleteing
+const fs=require("fs");
 // console.log(SALT)
 
 const CheckAdminUserLogin=async(email,callback)=>{
@@ -385,13 +386,44 @@ class getAllSubAdminData{
 class DOCX{
   static async docx(){
     try {
-      const data=await fs.readFile('./backup.txt','utf8');
-        return data;
+      // in this way we provide data but memory usage(spike) high 
+      // const data=await fs.readFile('./backup.txt','utf8');
+      //   return data;
+
+      // using stream we can easily chunk of data send not all data send at a time 
+      return new Promise((resolve,reject)=>{
+        const readStream=fs.createReadStream('./backup.txt','utf-8');
+        let data='';
+
+        readStream.on('data',(chunk)=>{
+          data +=chunk;
+        })
+
+        readStream.on('end',()=>{
+          resolve(data)
+        })
+
+        readStream.on('error',(err)=>{
+          reject(err)
+        })
+
+      })
       
     } catch (error) {
         console.log("unable to read")
         throw error
     }
+  }
+  static async updateDocx(doc){
+    const writeableStream=fs.createWriteStream('./backup.txt',{encoding:"utf-8"})
+    writeableStream.on('finish',()=>{
+    })
+    writeableStream.on('error', (err) => {
+      console.error('An error occurred:', err.message);
+    });
+    writeableStream.write(doc+'\n');
+
+    writeableStream.end();
   }
 }
 

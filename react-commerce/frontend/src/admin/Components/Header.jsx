@@ -1,12 +1,16 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate, NavLink } from 'react-router-dom'
+import {ThemeContext} from '../../LightDarkTheme';
 
 const Header = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
+  const REACT_APP_LOCATION_IQ_URL=process.env.REACT_APP_LOCATION_IQ_URL
     const navigate=useNavigate();
     const [userData, setUserData] = useState(null);
     const [CurrentPosition, setCurrentPosition] = useState(null);
-
+    // const { theme, toggleTheme } = useContext(ThemeContext);
+    
     useEffect(() => {
       // Get the user's current location
           navigator.geolocation.getCurrentPosition(position => {
@@ -14,7 +18,7 @@ const Header = () => {
           const lng = position.coords.longitude;
 
           // Use LocationIQ API to reverse geocode the coordinates
-          const apiUrl = `https://us1.locationiq.com/v1/reverse.php?key=pk.9af8fc17b5bd73b33cbdd1e279d0ac9d&lat=${lat}&lon=${lng}&format=json`;
+          const apiUrl = `${REACT_APP_LOCATION_IQ_URL}=${lat}&lon=${lng}&format=json`;
             fetch(apiUrl)
             .then(response => response.json())
             .then(data => {      
@@ -37,7 +41,7 @@ const Header = () => {
       
       const fetchuserdata=async(id)=>{
         try {
-          const reponse=await axios.get(`http://localhost:8081/api/singledata/${id}`);
+          const reponse=await axios.get(`${BASE_URL}/api/singledata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
           setUserData(reponse.data.data);
           // console.log(reponse.data.data)
         } catch (error) {
@@ -51,7 +55,7 @@ const Header = () => {
       }
   return (
     <div>
-    <nav className="main-header navbar navbar-expand navbar-white navbar-light">
+    <nav className="main-header navbar navbar-expand navbar-white navbar-light" >
     {/* Left navbar links */}
     <ul className="navbar-nav">
       <li className="nav-item">
@@ -62,6 +66,8 @@ const Header = () => {
       </li>
       <li className="nav-item d-none d-sm-inline-block">
         <button  onClick={handlelogout} className="nav-link">Logout</button>
+      </li>
+      <li className="nav-item d-none d-sm-inline-block">
       </li>
     </ul>
     {/* Right navbar links */}
@@ -187,7 +193,7 @@ const Header = () => {
   {/* /.navbar */}
   {/* Main Sidebar Container */}
   
-  <aside className="main-sidebar sidebar-dark-primary elevation-4">
+  <aside className="main-sidebar sidebar-dark-primary elevation-4" style={{position:"fixed"}}>
     {/* Brand Logo */}
     <Link to={"/admindashboard1"} className="brand-link">
       <img src={"./pngtree-e-letter-logo-ecommerce-shop-store-design-png-image_4381099 (1).png"} alt="AdminLTE Logo" className="brand-image img-circle elevation-3 rounded-circle" style={{opacity: '.8'}}  />
@@ -199,7 +205,7 @@ const Header = () => {
       {/* Sidebar user panel (optional) */}
       <div className="user-panel mt-3 pb-3 mb-3 d-flex">
         <div className="image">
-        <img src={`http://localhost:8081/api/profile/${userData && userData.image}`} className="img-circle elevation-2" alt={userData && userData.name} />
+        <img src={`${BASE_URL}/api/profile/${userData && userData.image}`} className="img-circle elevation-2" alt={userData && userData.name} />
         </div>
         <div className='text-light '>{userData && userData.name}</div>
         <div className="info">

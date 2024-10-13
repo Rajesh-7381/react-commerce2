@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { SpinnerCircular } from 'spinners-react';
 
 const CreditOrDebit = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const [isOpen, setIsOpen] = useState(false);
     const [isOpen2, setIsOpen2] = useState(false);
     const { register,handleSubmit,formState:{errors}}=useForm();
@@ -61,8 +62,9 @@ const CreditOrDebit = () => {
         form.append('card_cvv',formData.card_cvv);
         
         try {
-            const response=await axios.post("http://localhost:8081/api/cardData",form,{
+            const response=await axios.post(`${BASE_URL}/api/cardData`,form,{
                 headers:{
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type':'multipart/form-data',
                 },
             });
@@ -93,7 +95,7 @@ const CreditOrDebit = () => {
 
     const GetAllCards=async()=>{
         try {
-            const response= await axios.get("http://localhost:8081/api/getAllCards");
+            const response= await axios.get(`${BASE_URL}/api/getAllCards`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             // console.log(response);
             setallCard(response.data.data)
             // console.log(allCard)

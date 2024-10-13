@@ -3,6 +3,7 @@ import { NotificationManager } from "react-notifications";
 import Swal from "sweetalert2";
 
 export const DeleteEntity = async (entity, id) => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
     try {
       const confirmed = await Swal.fire({
         title: 'Are you sure?',
@@ -17,36 +18,36 @@ export const DeleteEntity = async (entity, id) => {
       if (confirmed.isConfirmed) {
         switch (entity) {
           case 'Category':
-            await axios.delete(`http://localhost:8081/api/categorydelete/${id}`);
+            await axios.delete(`${BASE_URL}/api/categorydelete/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             break;
 
           case 'Brand':
-            await axios.delete(`http://localhost:8081/api/branddelete/${id}`);
+            await axios.delete(`${BASE_URL}/api/branddelete/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             break;
 
           case 'Product':
-            await axios.delete(`http://localhost:8081/api/productdelete/${id}`);
+            await axios.delete(`${BASE_URL}/api/productdelete/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             break;
 
           case 'Banner':
             // alert(id)
-            await axios.delete(`http://localhost:8081/api/DeleteBanners/${id}`);
+            await axios.delete(`${BASE_URL}/api/DeleteBanners/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             break;
 
           case 'Cms':
-            await axios.delete(`http://localhost:8081/api/cmsdelete/${id}`);
+            await axios.delete(`${BASE_URL}/api/cmsdelete/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             break;
 
           case 'ProductsImage':
-            await axios.delete(`http://localhost:8081/api/ProductsImageDelete/${id}`);
+            await axios.delete(`${BASE_URL}/api/ProductsImageDelete/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             break;
 
           case 'SubAdmin':
-            await axios.delete(`http://localhost:8081/api/deleteAdminSubAdminUser/${id}`);
+            await axios.delete(`${BASE_URL}/api/deleteAdminSubAdminUser/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             break;  
 
           case 'Admin':
-            await axios.delete(`http://localhost:8081/api/deleteAdminSubAdminUser/${id}`);
+            await axios.delete(`${BASE_URL}/api/deleteAdminSubAdminUser/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             break;  
 
           default:

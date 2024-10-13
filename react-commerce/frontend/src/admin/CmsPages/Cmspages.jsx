@@ -1,44 +1,92 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
 import { StatusEntity } from '../CRUDENTITY/StatusEntity';
 import Footer from '../Components/Footer';
 import Header from '../Components/Header';
-
+import Delay from 'react-delay';
+import debounce from 'lodash.debounce';  
 
 const Cmspages = () => {
-    const navigate=useNavigate();
-    const [cmspagedata,setcmspagedata]=useState([]);
-    const [filterdata,setfilterdata]=useState([]);
-    useEffect(()=>{
-        document.title='CmsPages';
-        cmspagetabledata();
-    },[]);
+  const BASE_URL=process.env.REACT_APP_BASE_URL
+  const navigate = useNavigate();
+  const [cmspagedata, setcmspagedata] = useState([]);
+  const [filterdata, setfilterdata] = useState([]);
+  const [page, setPage] = useState(1);  
+  const [loading, setLoading] = useState(false);  
+  const [hasMore, setHasMore] = useState(true);  
+  const limit = 20
 
-    const cmspagetabledata=async()=>{
-        const response=await axios.get("http://localhost:8081/api/getAllCmss");
-        setcmspagedata(response.data);
-        setfilterdata(response.data);
+  useEffect(() => {
+    document.title = 'CmsPages';
+    fetchCmsPages(); 
+  }, []);
+
+  const fetchCmsPages = async () => {
+    if (loading || !hasMore) return; // Avoid fetching if already loading or no more data to load
+
+    setLoading(true);
+    try {
+      const response = await axios.get(`${BASE_URL}/api/getAllCmss`, { params: { page, limit }, headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      if (response.data.length < limit) {
+        setHasMore(false);  // If the data returned is less than the limit, no more data to load
+      }
+      setcmspagedata(prevData => [...prevData, ...response.data]); 
+      setfilterdata(prevData => [...prevData, ...response.data]);  
+      setPage(prevPage => prevPage + 1);  
+    } catch (error) {
+      console.error("Error fetching CMS pages:", error);
     }
-    
-    const searchfunction=(event)=>{
-        const search_cms_pagedata=event.target.value.toLowerCase().trim();
-        // alert(search_cms_pagedata)
-       if(search_cms_pagedata === ''){
-        setfilterdata(filterdata);
-       }else{
-        const filtered=cmspagedata.filter(item=>(
-            item.title.toLowerCase().includes(search_cms_pagedata) ||  
-            item.description.toLowerCase().includes(search_cms_pagedata) ||  
-            item.url.toLowerCase().includes(search_cms_pagedata) ||  
-            item.meta_title.toLowerCase().includes(search_cms_pagedata) ||  
-            item.meta_keywords.toLowerCase().includes(search_cms_pagedata) ||  
-            item.meta_description.toLowerCase().includes(search_cms_pagedata)  
-         ))
-         setfilterdata(filtered)
-       }
+    setLoading(false);  
+  };
+
+  // Infinite scrolling: Fetch more data when the user scrolls near the bottom
+  const handleScroll = useCallback(() => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && hasMore && !loading) {
+      fetchCmsPages();  
     }
+  }, [loading, hasMore]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);  
+    return () => window.removeEventListener('scroll', handleScroll);  
+  }, [handleScroll]);
+  
+    // Debounced search function wrapped in useCallback for memoization
+const searchFunction = useCallback(
+  debounce((searchTerm) => {
+    if (searchTerm.trim() === '') {
+      // Reset filterdata to original data when search term is empty
+      setfilterdata(cmspagedata);
+      return;
+    }
+
+    // Filter the data based on search term
+    const filteredData = cmspagedata.filter(item =>
+      item.title.toLowerCase().includes(searchTerm) ||
+      item.description.toLowerCase().includes(searchTerm) ||
+      item.url.toLowerCase().includes(searchTerm) ||
+      item.meta_title.toLowerCase().includes(searchTerm) ||
+      item.meta_keywords.toLowerCase().includes(searchTerm) ||
+      item.meta_description.toLowerCase().includes(searchTerm)
+    );
+
+    setfilterdata(filteredData);
+  }, 300), [cmspagedata]);  // Dependencies: search function only recreated if cmspagedata changes
+
+// Handle input change and pass it to the debounced search function
+const  searchfunction= (event) => {
+  const searchQuery = event.target.value.toLowerCase();
+  searchFunction(searchQuery);  // Call the debounced function
+};
+
+// Cleanup debounced function on unmount
+useEffect(() => {
+  return () => {
+    searchFunction.cancel();  // Cancel debounce when component unmounts
+  };
+}, [searchFunction]);  // Ensures the effect runs only when searchFunction is updated
 
     // edit
     const handladdeditcmspage=async(id)=>{
@@ -49,7 +97,8 @@ const Cmspages = () => {
     const handlecmspagedelete=async(id)=>{
         await DeleteEntity('Cms',id);
         // Fetch the updated data from the server and update the local state
-        const response = await axios.get("http://localhost:8081/api/getAllCmss");
+        const response = await axios.get(`${BASE_URL}/api/getAllCmss`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+        // console.log(response.data)
         setcmspagedata(response.data);
         setfilterdata(response.data);
            
@@ -182,7 +231,13 @@ const Cmspages = () => {
                     </div>
                 </div>
             </div>
-        </div>
+            {loading && (
+              <Delay wait={5000}>
+                <div className="loader" style={{textAlign:"center",fontSize:"18px",margin:"20px 0"}}>
+                  Loading...
+                </div>
+              </Delay>
+            )}        </div>
         </section>
       </div>
 

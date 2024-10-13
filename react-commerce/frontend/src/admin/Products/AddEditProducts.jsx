@@ -9,6 +9,7 @@ import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 
 const AddEditProducts = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const navigate = useNavigate();
   const location = useLocation();
   const id = location.state ? location.state.id : null;
@@ -58,14 +59,14 @@ const AddEditProducts = () => {
 
   const productcolor = async () => {
     try {
-      const response = await axios.get("http://localhost:8081/api/productcolor");
+      const response = await axios.get(`${BASE_URL}/api/productcolor`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       setcolorname(response.data);
       // console.log(response.data);
     } catch (error) {}
   };
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`http://localhost:8081/api/getAllCategorys`);
+      const response = await axios.get(`${BASE_URL}/api/getAllCategorys`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       setCategories(response.data);
     } catch (error) {
       console.error(error);
@@ -74,7 +75,7 @@ const AddEditProducts = () => {
 
   const fetchBrands=async()=>{
     try {
-      const response=await axios.get("http://localhost:8081/api/getAllBrands");
+      const response=await axios.get(`${BASE_URL}/api/getAllBrands`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       setbrands(response.data);
     } catch (error) {
         console.error(error)
@@ -86,14 +87,10 @@ const AddEditProducts = () => {
   };
   const handleProductUpdate = async (id) => {
     try {
-      const response = await axios.get(
-        `http://localhost:8081/api/productedit/${id}`
-      );
+      const response = await axios.get( `${BASE_URL}/api/productedit/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       const productdata = response.data.data;
 
-      const response2 = await axios.get(
-        `http://localhost:8081/api/editproductattributes/${id}`
-      );
+      const response2 = await axios.get( `${BASE_URL}/api/editproductattributes/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       const productattributes = response2.data.data;
       // console.log(productattributes)
       // console.log(productdata);
@@ -175,13 +172,12 @@ const AddEditProducts = () => {
         form.append(`attributes[${index}][stock]`, field.stock);
       });
 
-      const url = id
-        ? `http://localhost:8081/api/updateproducts/${id}`
-        : `http://localhost:8081/api/addproducts`;
+      const url = id ? `${BASE_URL}/api/updateproducts/${id}`  : `${BASE_URL}/api/addproducts`;
       const method = id ? "put" : "post";
 
       await axios[method](url, form, {
         headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
           "Content-Type": "multipart/form-data",
         },
       });
@@ -781,7 +777,7 @@ const AddEditProducts = () => {
                               <p>Only accepted jpg,jpeg,webp,png and gif</p>
                               <img
                                 src={
-                                  `http://localhost:8081/api/productsimage/` +
+                                  `${BASE_URL}/api/productsimage/` +
                                   data.image
                                 }
                                 alt=""

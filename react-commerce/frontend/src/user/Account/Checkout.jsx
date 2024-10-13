@@ -16,8 +16,9 @@ import QRCodeGenerator from './QRCodeGenerator';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Swal from "sweetalert2";
 
-const Checkout = () => {
-    const stripe = useStripe();
+const   Checkout = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
+  const stripe = useStripe();
   const elements = useElements();
   const dispatch=useDispatch();
   const [loading, setLoading] = useState(false);
@@ -27,8 +28,22 @@ const Checkout = () => {
   const [dis,setdis]=useState(null)
   const [modal, setModal] = useState(false);
   const navigate=useNavigate();
-
+  const [address,setaddress]=useState([]);
   const toggle = () => setModal(!modal);
+  const id=sessionStorage.getItem('id');
+  const [city,setcity]=useState('')
+  const [circle,setcircle]=useState('')
+
+//   console.log(circle)
+
+  useEffect(()=>{
+    fetchAddress();
+  },[])
+
+  const fetchAddress=async()=>{
+    const response=await axios.get(`${BASE_URL}/api/getDeliveryAddress/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+    setaddress(response.data)
+  }
   async function handleCancel(){
     const confirmed = await Swal.fire({
         icon: "error",
@@ -44,23 +59,14 @@ const Checkout = () => {
   useEffect(()=>{
     document.title="Checkout"
   })
-  const initialValues={
-    name:"",
-    address:"",
-    city:"",
-    state:"",
-    country:"",
-    pincode:"",
-    mobile:"",
-    secondaryMobile:"",
-  }
+  const initialValues={  name:"",  address:"",  city:"",  state:"",   pincode:"",  mobile:"",  secondaryMobile:"",}
   const validationSchema=Yup.object({
     name:Yup.string().required("Name Required"),
     address:Yup.mixed().required("Please Enter Your Address"),
     city:Yup.string().required("Please enter your city"),
     state:Yup.string().required("Enter Your State Name"),
-    country:Yup.string().required("Choose Your Country Name"),
-    mobile:Yup.number().required("enter your mobile number"),
+    pincode:Yup.number().required("Enter Your Pincode"),
+    mobile:Yup.number().min(10).max(10).required("enter your mobile number"),
     secondaryMobile:Yup.number().min(10).max(10).notRequired()
   })
 
@@ -75,13 +81,12 @@ const Checkout = () => {
         formdata.append("address",values.address)
         formdata.append("city",values.city)
         formdata.append("state",values.state)
-        formdata.append("country",values.country)
         formdata.append("pincode",values.pincode)
         formdata.append("mobile",values.mobile)
         formdata.append("secondaryMobile",values.secondaryMobile)
         formdata.append("user_id",user_id)
 
-        const response=await axios.post("http://localhost:8081/api/DeliveryAddress",formdata)
+        const response=await axios.post(`${BASE_URL}/api/DeliveryAddress`,formdata,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}})
         // console.log(response.data.serverStatus===2)
         setTimeout(() => {
             
@@ -103,7 +108,7 @@ const Checkout = () => {
                 clearInterval(timerInterval);
             }
             }).then((result) => {
-            /* Read more about handling dismissals below */
+           
             if (result.dismiss === Swal.DismissReason.timer) {
                 // console.log("I was closed by the timer");
             }
@@ -120,29 +125,32 @@ const Checkout = () => {
     validationSchema:validationSchema,
     onSubmit:onSubmitForm
   });
-//   const MakePayment = async () => {
-//     const stripe = await loadStripe("pk_test_51O4a72SHw6r4P7p3lRcPeLEdr5MlKBBt9O4hJGgIz5uHbedh6yzVa2YTv7dNcRazWeZIe9WmdYgjz3KjinL8ZvnC00IR7KUVcj");
-  
-//     try {
-//       const response = await fetch('http://localhost:8081/create-payment-intent', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({
-//           amount: 1000, // amount in cents
-//           id: 49,
-          
-//         }),
-//       });
-//       console.log(response)
-//       const session = await response.json();
-//       console.log(session)
-//       window.location.href=session.url;
-//     } catch (error) {
-//       console.log(error.message);
-//     }
-//   };
+
+  const handlePinCode = (e) => {
+    const pincode = e.target.value;
+    if (pincode.length === 6) {
+      try {
+        const url = `https://api.postalpincode.in/pincode/${pincode}`;
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            // console.log(data[0]);
+            setcity(data[0].PostOffice[0].District);
+            setcircle(data[0].PostOffice[0].Circle);
+
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    }else{
+        setcircle(null)
+        setcity(null)
+    }
+  };
+
 const handlePaymentChange=(event)=>{
     dispatch(setPaymentMethod(event.target.value))
 }
@@ -153,9 +161,10 @@ const handlePaymentChange=(event)=>{
             const stripe = await loadStripe("pk_test_51Ph8kgFnMqw8LC18U63JgNUhD8F5wAKZfjQAyrnfgoKNwI5fbZtwBYZfXwkVE7VdsxMmKziLUOKi6AXbI7XJN9Oe00iO9DHFpM");
   
     try {
-      const response = await fetch('http://localhost:8081/api/create-payment-intent', {
+      const response = await fetch(`${BASE_URL}/api/create-payment-intent`, {
         method: 'POST',
         headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -186,6 +195,32 @@ const handlePaymentChange=(event)=>{
             break;
         default:
             break;    
+    }
+  }
+
+  const deleteAddress=async(id)=>{
+    try {
+        // alert(id)
+        const confirmed=await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+          });
+          if(confirmed.isConfirmed){
+            const response=await axios.delete(`${BASE_URL}/api/deleteAddress/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}})
+            // console.log(response.data)
+            // setData(response.data);
+            fetchAddress()
+          }else{
+            alert("you cancelled!")
+          }
+        
+    } catch (error) {
+        console.log(error)
     }
   }
   
@@ -311,18 +346,18 @@ const handlePaymentChange=(event)=>{
                             <div className="o-summary__box">
                             <div className="ship-b">
                                 <span className="ship-b__text">Ship to:</span>
-                                <div className="ship-b__box u-s-m-b-10">
-                                <input type="radio" id="address1" name="address_id" />
-                                <p className="ship-b__p">Amit Gupta, 1234 Test Address, Delhi-110001 India 9800000000</p>
-                                <a className="ship-b__edit btn--e-transparent-platinum-b-2" data-modal="modal" data-modal-id="#edit-ship-address">Edit</a>
-                                <a className="ship-b__edit btn--e-transparent-platinum-b-2" data-modal="modal" data-modal-id="#edit-ship-address">Delete</a>
-                                </div>
-                                <div className="ship-b__box u-s-m-b-10">
-                                <input type="radio" id="address1" name="address_id" />
-                                <p className="ship-b__p">Amit Gupta, 1234 Test Address Delhi-110001 India 9800000000</p>
-                                <a className="ship-b__edit btn--e-transparent-platinum-b-2" data-modal="modal" data-modal-id="#edit-ship-address">Edit</a>
-                                <a className="ship-b__edit btn--e-transparent-platinum-b-2" data-modal="modal" data-modal-id="#edit-ship-address">Delete</a>
-                                </div>
+                                {
+                                    address.map((item,index)=>(
+                                    <div className="ship-b__box u-s-m-b-10" key={index}>
+                                        <input type="radio" id="address1" name="address_id" />
+                                        
+                                        <p className="ship-b__p">{item.name}, {item.address},{item.city},{item.state} {item.pincode},{item.mobile}</p>
+                                        <button className="ship-b__edit btn--e-transparent-platinum-b-2 btn-success" data-modal="modal" data-modal-id="#edit-ship-address">Edit</button>
+                                        <button className="ship-b__edit btn--e-transparent-platinum-b-2 btn-danger" data-modal="modal" data-modal-id="#edit-ship-address" onClick={(e)=>{deleteAddress(item.id)}}>Delete</button>
+                                    </div>
+                                    ))
+                                }
+                                
                             </div>
                             </div>
                         </div>
@@ -348,60 +383,6 @@ const handlePaymentChange=(event)=>{
                                     <div className='text-danger'>{formik.errors.name}</div>
                                 ):null}
                             </div>
-                            {/*====== End - NAME ======*/}
-                            {/*====== ADDRESS ======*/}
-                            <div className="u-s-m-b-15 text-start">
-                                <label className="gl-label" htmlFor="shipping-address">ADDRESS *</label>
-                                <input className="input-text input-text--primary-style" type="text" id="shipping-address" name='address' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.address} />
-                                {formik.touched.address && formik.errors.address ?(
-                                    <div className='text-danger'>{formik.errors.address}</div>
-                                ):null}
-                            </div>
-                            {/*====== End - ADDRESS ======*/}
-                            {/*====== CITY ======*/}
-                            <div className="u-s-m-b-15 text-start">
-                                <label className="gl-label" htmlFor="shipping-city">CITY *</label>
-                                <input className="input-text input-text--primary-style" type="text" id="shipping-city" name='city' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.city} />
-                                {formik.touched.city && formik.errors.city ?(
-                                    <div className='text-danger'>{formik.errors.city}</div>
-                                ):null}
-                            </div>
-                            {/*====== End - CITY ======*/}
-                            {/*====== STATE ======*/}
-                            <div className="u-s-m-b-15 text-start">
-                                <label className="gl-label" htmlFor="shipping-state">STATE *</label>
-                                <input className="input-text input-text--primary-style" type="text" id="shipping-state" name='state' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.state}/>
-                                {formik.touched.state && formik.errors.state ?(
-                                    <div className='text-danger'>{formik.errors.state}</div>
-                                ):null}
-                            </div>
-                            {/*====== End - STATE ======*/}
-                            {/*====== Country ======*/}
-                            <div className="u-s-m-b-15 text-start">
-                                {/*====== Select Box ======*/}
-                                <label className="gl-label" htmlFor="billing-country">COUNTRY *</label><select className="select-box select-box--primary-style" id="billing-country" name='country' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.country}>
-                                <option  value>Choose Country</option>
-                                <option value="India" selected={formik.values.country === "India"}>India</option>
-                                <option value="United Arab Emirate" selected={formik.values.country === "United Arab Emirate"}>United Arab Emirate</option>
-                                <option value="United Kingdom" selected={formik.values.country === "United Kingdom"}>United Kingdom</option>
-                                <option value="United States" selected={formik.values.country === "United States"}>United States</option>
-                                </select>
-                                {/*====== End - Select Box ======*/}
-                                {formik.touched.country && formik.errors.country ?(
-                                    <div className='text-danger'>{formik.errors.country}</div>
-                                ):null}
-                            </div>
-                            {/*====== End - Country ======*/}
-                            {/*====== PINCODE ======*/}
-                            <div className="u-s-m-b-15 text-start">
-                                <label className="gl-label" htmlFor="shipping-pincode">PINCODE *</label>
-                                <input className="input-text input-text--primary-style" type="text" id="shipping-pincode" name='pincode' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.pincode} />
-                                {formik.touched.pincode && formik.errors.pincode ?(
-                                    <div className='text-danger'>{formik.errors.pincode}</div>
-                                ):null}
-                            </div>
-                            {/*====== End - PINCODE ======*/}
-                            {/*====== MOBILE ======*/}
                             <div className="u-s-m-b-15 text-start">
                                 <label className="gl-label" htmlFor="shipping-mobile">MOBILE *</label>
                                 <input className="input-text input-text--primary-style" type="text" id="shipping-mobile" name='mobile' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.mobile} />
@@ -409,19 +390,52 @@ const handlePaymentChange=(event)=>{
                                     <div className='text-danger'>{formik.errors.mobile}</div>
                                 ):null}
                             </div>
+
                             <div className="u-s-m-b-15 text-start">
                                 <label className="gl-label" htmlFor="shipping-mobile2">MOBILE(Optional)</label>
                                 <input className="input-text input-text--primary-style" type="text" id="shipping-mobile2" name='secondaryMobile' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.secondaryMobile} />
                             </div>
-                            {/*====== End - MOBILE ======*/}
+
+                            <div className="u-s-m-b-15 text-start">
+                                <label className="gl-label" htmlFor="shipping-pincode">PINCODE *</label>
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-pincode" name='pincode' onChange={(e)=>{formik.handleChange(e);handlePinCode(e)}} onBlur={formik.handleBlur} value={formik.values.pincode} />
+                                {formik.touched.pincode && formik.errors.pincode ?(
+                                    <div className='text-danger'>{formik.errors.pincode}</div>
+                                ):null}
+                            </div>
+                            <div className="u-s-m-b-15 text-start">
+                                <label className="gl-label" htmlFor="shipping-address">ADDRESS *</label>
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-address" name='address' onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.address} />
+                                {formik.touched.address && formik.errors.address ?(
+                                    <div className='text-danger'>{formik.errors.address}</div>
+                                ):null}
+                            </div>
+                            
+                            <div className="u-s-m-b-15 text-start">
+                                <label className="gl-label" htmlFor="shipping-city">CITY *</label>
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-city" name='city' onChange={formik.handleChange} onBlur={formik.handleBlur} value={city ? city : ''} />
+                                {formik.touched.city && formik.errors.city ?(
+                                    <div className='text-danger'>{formik.errors.city}</div>
+                                ):null}
+                            </div>
+                           
+                            <div className="u-s-m-b-15 text-start">
+                                <label className="gl-label" htmlFor="shipping-state">STATE *</label>
+                                <input className="input-text input-text--primary-style" type="text" id="shipping-state" name='state' onChange={formik.handleChange} onBlur={formik.handleBlur} value={circle ? circle : ''}/>
+                                {formik.touched.state && formik.errors.state ?(
+                                    <div className='text-danger'>{formik.errors.state}</div>
+                                ):null}
+                            </div>
+                                                      
+                                                        
                             <div className="u-s-m-b-10 text-start">
-                                {/*====== Check Box ======*/}
+                               
                                 <div className="check-box">
                                 <input type="checkbox" id="make-default-address" />
                                 <div className="check-box__state check-box__state--primary">
                                     <label className="check-box__label" htmlFor="make-default-address">Make this default delivery address</label></div>
                                 </div>
-                                {/*====== End - Check Box ======*/}
+                                
                             </div>
                             <div>
                             <NotificationContainer />

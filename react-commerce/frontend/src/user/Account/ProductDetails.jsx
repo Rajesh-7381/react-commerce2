@@ -8,6 +8,7 @@ import { incrementQuantity,decrementQuantity } from './redux/features/productSli
 import { addToCart } from './redux/features/cartSlice'
 
 const ProductDetails = () => {
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const location = useLocation();
   const { id } = location.state || {};
 
@@ -39,9 +40,10 @@ const ProductDetails = () => {
   }, []);
 
   const fetchProduct = async () => {
-    const response = await axios.get(`http://localhost:8081/api/productDetails/49`);
-    // const response = await axios.get(`http://localhost:8081/listingproduct/${id}`);
+    const response = await axios.get(`${BASE_URL}/api/productDetails/49`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+    // const response = await axios.get(`${BASE_URL}/listingproduct/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
     setlistProduct(response.data[0]);
+    
     // console.log(listproduct)
   };
 

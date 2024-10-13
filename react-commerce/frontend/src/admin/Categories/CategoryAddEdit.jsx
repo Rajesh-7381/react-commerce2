@@ -7,6 +7,7 @@ import Footer from '../Components/Footer';
 import Header from '../Components/Header';
 
 const CategoryAddEdit = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const location = useLocation();
     const { register, handleSubmit, setValue,formState:{errors} } = useForm();
     const [data, setData] = useState({});
@@ -25,7 +26,7 @@ const CategoryAddEdit = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`http://localhost:8081/api/getAllCategorys`);
+            const response = await axios.get(`${BASE_URL}/api/getAllCategorys`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             setCategories(response.data);
         } catch (error) {
             console.log(error);
@@ -35,7 +36,7 @@ const CategoryAddEdit = () => {
 
     const handleCategoryUpdate = async (id) => {
         try {
-            const response = await axios.get(`http://localhost:8081/api/categoryeditdata/${id}`);
+            const response = await axios.get(`${BASE_URL}/api/categoryeditdata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             const categoryData = response.data.data;
             setData(categoryData);
             setValue('category_name', categoryData.category_name);
@@ -81,8 +82,9 @@ const CategoryAddEdit = () => {
             form.append('category_image', formData.category_image[0]);
 
             if (id) {
-                const response = await axios.put(`http://localhost:8081/api/updatecategory/${id}`, form, {
+                const response = await axios.put(`${BASE_URL}/api/updatecategory/${id}`, form, {
                     headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                         'Content-Type': 'multipart/form-data'
                     }
                 });
@@ -91,8 +93,9 @@ const CategoryAddEdit = () => {
                     navigate("/categories");
                 }, 2000);
             } else {
-                const response = await axios.post('http://localhost:8081/api/addcategory', form, {
+                const response = await axios.post(`${BASE_URL}/api/addcategory`, form, {
                     headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                         'Content-Type': 'multipart/form-data'
                     }
                 });
@@ -205,7 +208,7 @@ const CategoryAddEdit = () => {
                                                         <input type="file" className="form-control" id="exampleInputCategoryfile" name='category_image' {...register("category_image", { "required": !id })} />
                                                         {data && data.category_image && (
                                                             <div>
-                                                                <img ref={imageRef} src={`http://localhost:8081/api/CategoryImage/${data.category_image}`} width={50} height={50} alt='' style={{transition :'width 0.5s,height 0.5s'}} />
+                                                                <img ref={imageRef} src={`${BASE_URL}/api/CategoryImage/${data.category_image}`} width={50} height={50} alt='' style={{transition :'width 0.5s,height 0.5s'}} />
                                                                 <button className='btn btn-success mr-1' onClick={zoomIn}>+</button>
                                                                 <button className='btn btn-danger' onClick={zoomOut}>-</button>
                                                             </div>
