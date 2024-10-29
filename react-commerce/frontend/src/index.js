@@ -11,7 +11,7 @@ import store from './user/Account/redux/store'
 import store2 from './Pratice/store'
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Provider store={store2}>
+  <Provider store={store}>
     <React.StrictMode>
     
         <Auth0Provider domain={process.env.REACT_APP_API_DOMAIN}

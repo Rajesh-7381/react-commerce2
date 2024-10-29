@@ -2,11 +2,11 @@ import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { NotificationManager, NotificationContainer,} from "react-notifications";
 import ReactImageMagnify from "@blacklab/react-image-magnify";
 import Swal from "sweetalert2";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
+import { toast, ToastContainer } from "react-toastify";
 
 const AddEditProducts = () => {
   const BASE_URL=process.env.REACT_APP_BASE_URL
@@ -31,9 +31,8 @@ const AddEditProducts = () => {
   const [productImagesPreview, setProductImagesPreview] = useState([]);
   const [allproductsAttributes, setallproductsAttributes] = useState([]);
   const [PImages, setPImages] = useState([]);
-  const [dynamicfields, setDynamicFields] = useState([
-    { size: "", sku: "", price: "", stock: "" },
-  ]);
+  const [dynamicfields, setDynamicFields] = useState([ { size: "", sku: "", price: "", stock: "" }, ]);
+  const [loading,setloading]=useState(false)
 
   const selectFiles = (event) => {
     setSelectedFiles([...event.target.files]);
@@ -51,7 +50,6 @@ const AddEditProducts = () => {
   }, [id]);
 
   useEffect(() => {
-    // Fetch categories from the backend when the component mounts
     fetchCategories();
     productcolor();
     fetchBrands();
@@ -89,14 +87,11 @@ const AddEditProducts = () => {
     try {
       const response = await axios.get( `${BASE_URL}/api/productedit/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       const productdata = response.data.data;
-
       const response2 = await axios.get( `${BASE_URL}/api/editproductattributes/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       const productattributes = response2.data.data;
-      // console.log(productattributes)
-      // console.log(productdata);
       setData(productdata);
       setproductattributedata(productattributes);
-      setValue("category_id", productdata.category_id); // Add category_id to FormData
+      setValue("category_id", productdata.category_id); 
       setValue("product_name", productdata.product_name);
       setValue("brand_id", productdata.brand_id);
       setValue("product_code", productdata.product_code);
@@ -133,9 +128,10 @@ const AddEditProducts = () => {
   };
 
   const onSubmit = async (formData) => {
+    setloading(true)
     try {
       const form = new FormData();
-      form.append("category_id", formData.category_id); // Add category_id to FormData
+      form.append("category_id", formData.category_id); 
       form.append("product_name", formData.product_name);
       form.append("brand_id", formData.brand_id);
       form.append("product_code", formData.product_code);
@@ -181,14 +177,14 @@ const AddEditProducts = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      NotificationManager.success(
-        id ? "product updated successfully!" : "product added successfully!"
-      );
-      navigate("/products");
+      toast.success( `product ${id ? 'Updated' : 'Added'} successfully!` );
+      setTimeout(()=>navigate("/products"),3000);
 
     } catch (error) {
-      console.error(error);
-      NotificationManager.error("Error occurred while saving the product.");
+        console.error(error);
+        toast.error("Error occurred while saving the product.");
+    }finally{
+      setloading(false)
     }
   };
 
@@ -776,12 +772,7 @@ const AddEditProducts = () => {
                               />
                               <p>Only accepted jpg,jpeg,webp,png and gif</p>
                               <img
-                                src={
-                                  `${BASE_URL}/api/productsimage/` +
-                                  data.image
-                                }
-                                alt=""
-                              />
+                                src={ `${BASE_URL}/api/productsimage/` + data.image }  alt="" />
                               {errors.product_image && (
                                 <span className="text-danger">
                                   product images is required{" "}
@@ -854,7 +845,7 @@ const AddEditProducts = () => {
                                               />
                                             </td>
                                             <td>
-                                              <NotificationContainer />
+                                              <ToastContainer />
                                               <button className="btn btn-dark btn-sm  mr-1">
                                                 <i className="fas  fa-toggle-on"></i>
                                               </button>
@@ -1255,9 +1246,14 @@ const AddEditProducts = () => {
                       </div>
 
                       <div className="text-start">
-                        <button type="submit" className="btn btn-primary">
-                          {id ? "Update " : "Submit"}
-                        </button>
+                        <ToastContainer />
+                        {loading ? (
+                          <div>
+                            <button type="submit" className={`${id ? 'btn btn-success' : 'btn btn-primary'}`} disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> {id ? 'Update' : 'Submit'} </button>
+                             <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
+                        ) : (
+                          <button type="submit" className={`${id ? 'btn btn-success' : 'btn btn-primary'}`}>{id ? 'Update' : 'Submit'}</button>
+                        )}
                       </div>
                     </form>
                   </div>

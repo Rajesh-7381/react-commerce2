@@ -5,6 +5,7 @@ import {  NotificationManager } from 'react-notifications';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import Footer from '../Components/Footer';
 import Header from '../Components/Header';
+import { toast, ToastContainer } from 'react-toastify';
 
 const AddEditBrands = () => {
     const BASE_URL=process.env.REACT_APP_BASE_URL
@@ -15,12 +16,11 @@ const AddEditBrands = () => {
     const navigate = useNavigate();
     const imageRef=useRef(null);
     const imageRef2=useRef(null);
-   
+    const [loading,setloading]=useState(false)
 
     useEffect(() => {
         document.title="AddEditBrands"
         if (id) {
-            // alert(id)
             GetSingleBrands(id);
         }
     }, [id]);
@@ -28,11 +28,8 @@ const AddEditBrands = () => {
     const GetSingleBrands = async (id) => {
         try {
             const response = await axios.get(`${BASE_URL}/api/GetSingleBrandDetails/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
-            // console.log(response.data.data)
             const brandData = response.data.data;
-            // console.log(brandData)
             setBrandData(brandData);
-            // Set form values
             setValue('brand_name', brandData.brand_name);
             setValue('brand_discount', brandData.brand_discount);
             setValue('description', brandData.description);
@@ -47,6 +44,7 @@ const AddEditBrands = () => {
     };
 
     const onSubmit = async (formData) => {
+        setloading(true)
         try {
             const form = new FormData();
             form.append('brand_name', formData.brand_name);
@@ -57,7 +55,6 @@ const AddEditBrands = () => {
             form.append('meta_description', formData.meta_description);
             form.append('meta_keyword', formData.meta_keyword);
             
-            // Append image files
             if (formData.brand_image[0]) {
                 form.append('brand_image', formData.brand_image[0]);
             }
@@ -73,15 +70,13 @@ const AddEditBrands = () => {
                     'Content-Type':'multipart/form-data'
                 }
             })
-
-            // navigate
-            setTimeout(() => {
-                NotificationManager.success("Created successfully!");
-                navigate("/brands");
-
-            }, 2000);
+            toast.success(`Brand  ${id ? 'Updated' : 'Added'} Successfully!`)
+            setTimeout(()=>navigate("/brands"))
         } catch (error) {
             console.log(error);
+            toast.error("form submission failed")
+        }finally{
+            setloading(false)
         }
     };
 
@@ -279,7 +274,14 @@ const AddEditBrands = () => {
                                       </div>
                                   </div>
                                   <div className='text-start'>
-                                      <button type="submit" className='btn btn-outline-primary'>{id ? "Update" : "Submit"}</button>
+                                    <ToastContainer />
+                                    {loading ? (
+                                        <div>
+                                          <button type="submit" className={id ? 'btn btn-success' : 'btn btn-primary'} disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> {id ? 'Update' : 'Submit'} </button>
+                                           <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
+                                      ) : (
+                                        <button type="submit" className={id ? 'btn btn-success' : 'btn btn-primary'}>{id ? 'Update' : 'Submit'}</button>
+                                      )}
                                   </div>
                               </form>
                           </div>

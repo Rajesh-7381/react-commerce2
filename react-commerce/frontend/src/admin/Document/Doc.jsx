@@ -6,15 +6,17 @@ import Header from '../Components/Header';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../../Loader';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const Doc = () => {
-    const BASE_URL=process.env.REACT_APP_BASE_URL
+    const BASE_URL = process.env.REACT_APP_BASE_URL;
     const [data, setData] = useState('');
     const [doc, setDoc] = useState('');
     const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
-      document.title="DocumentTation "
+        document.title = "Documentation";
         fetchData();
     }, []);
 
@@ -38,7 +40,7 @@ const Doc = () => {
         try {
             setTimeout(async() => {
               const response = await axios.patch(`${BASE_URL}/api/documentation`, { doc },{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
-              toast.success('Update Successful!');
+              toast.success('Update Successful!',{position:'bottom-right'});
               setLoading(false)
             }, 3000);
         } catch (error) {
@@ -48,11 +50,8 @@ const Doc = () => {
         }
     };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        if (name === 'doc') {
-            setDoc(value);
-        }
+    const handleDocChange = (content) => {
+        setDoc(content); 
     };
 
     return (
@@ -118,16 +117,19 @@ const Doc = () => {
                                     <div className="card">
                                         <div className="card-header"></div>
                                         <div className="card-body">
-                                           
                                             {loading ? (
-                                                <Loader /> 
+                                                <Loader />
                                             ) : (
                                                 <form onSubmit={handleSubmit}>
-                                                    <textarea id="doc" name="doc" rows={30}  cols={80} className="form-control" value={doc} onChange={handleChange}></textarea>
-                                                    <div>
-                                                    
-                                                        <button type="submit" className="btn btn-success"> Update </button>
-                                                        
+                                                    <ReactQuill
+                                                        value={doc}
+                                                        onChange={handleDocChange}
+                                                        className="form-control"
+                                                        style={{ minHeight: '500px' }}
+                                                    />
+                                                    <div className="mt-3">
+                                                    <br />
+                                                        <button type="submit" className="btn btn-success">Update</button>
                                                     </div>
                                                 </form>
                                             )}

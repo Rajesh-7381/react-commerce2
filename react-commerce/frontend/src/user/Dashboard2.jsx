@@ -20,10 +20,10 @@ const Dashboard2 = () => {
 
   const fetchProducts=async()=>{
     const response=await axios.get(`${BASE_URL}/api/AllProductDetailsShown`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
-    console.log(response)
-    console.log(response.data.result)
+    // console.log(response)
+    // console.log(response.data.result)
     setproducts(response.data.result);
-    console.log(products)
+    // console.log(products)
   }
   const items = [
     {

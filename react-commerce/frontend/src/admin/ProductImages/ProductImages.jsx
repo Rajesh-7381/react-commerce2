@@ -10,7 +10,6 @@ import Header from '../Components/Header';
 
 const ProductImages = () => {
     const BASE_URL=process.env.REACT_APP_BASE_URL
-    // const navigate=useNavigate();
     const [productsimage,setproductsimage]=useState([]);
     const [filterdata,setfilterdata]=useState([]);
     useEffect(()=>{

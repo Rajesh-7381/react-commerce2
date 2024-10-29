@@ -1067,3 +1067,28 @@ const handleColumnDrop = (e, index) => {
   setColumns(newColumns);    // Update column state
   setFilterData(newFilteredData); // Update row data according to new column order
 };
+
+
+
+searching
+
+ const searchFunction = (event) => {
+        const searchData = event.target.value.toLowerCase().trim();
+        const queryparms=new URLSearchParams(window.location.search)
+        queryparms.set('q',searchData)
+        const newURL=`${window.location.pathname}?${queryparms.toString()}`
+        window.history.pushState({},'',newURL)
+        // console.log(searchData)
+        if (searchData === '') {
+            setFilterData(data);
+        } else {
+            const filtered = data.filter(item =>
+              item &&  item.name.toLowerCase().includes(searchData) 
+            );
+            setFilterData(filtered);
+        }
+    };
+
+
+
+    

@@ -3,6 +3,7 @@ const bcrypt=require("bcrypt")
 const SALT=parseInt(process.env.GEN_SALT);
 // const fs=require("fs").promises; // when deleteing
 const fs=require("fs");
+const redisClient=require("../config/redisClient")
 // console.log(SALT)
 
 const CheckAdminUserLogin=async(email,callback)=>{
@@ -158,6 +159,7 @@ class TotalAdmin{
 class TotalSubAdmin{
   static async TotalSubAdmin(){
     try {
+      
       const query = "SELECT COUNT(id) AS total FROM AdminUser where role='subadmin'"; // Alias 'count(id)' as 'total'
       const result=await new Promise((resolve,reject)=>{
         db.query(query,(err,results)=>{
@@ -175,7 +177,13 @@ class TotalSubAdmin{
 }
 class getAllAdminSubadminUsers{
   static async TotalAdminSubAdminUser(){
+    // const cacheKey='admin_subadmin_users'
     try {
+      // const cacheData=await redisClient.get(cacheKey)
+      // if(cacheData){
+      //   console.log('Cache Hit: Returning data from Redis');
+      //   return JSON.parse(cacheData);
+      // }
       const query = "SELECT * FROM AdminUser where deleted_at is null";
       const result=await new Promise((resolve,reject)=>{
         db.query(query,(err,results)=>{
@@ -185,6 +193,9 @@ class getAllAdminSubadminUsers{
           resolve(results)
         })
       })
+
+      // await redisClient.setEx(cacheKey,3600,JSON.stringify(result))
+      // console.log('Cache Miss: Data fetched from MySQL and cached');
       return result;
     } catch (error) {
         throw error
@@ -309,7 +320,7 @@ class SearchAdminSubAdminUser{
           }
           resolve(results);
         });
-      });
+      });  
       return result;
     } catch (error) {
       console.error("Error fetching users by date:", error); 

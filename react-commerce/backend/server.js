@@ -23,6 +23,7 @@ const productRoutes=require("./Routes/productRoutes")
 const bannerRoutes=require("./Routes/bannerRoutes")
 const brandRoutes=require("./Routes/brandRoute")
 const frontRoutes=require("./Routes/frontRoutes");
+const enqueryRoutes=require("./Routes/enquiry.routes")
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const passport=require("./utils/SocialLogin")
 const WebSocket = require('ws');
@@ -33,6 +34,14 @@ const swaggerFile = require('./Swagger/swagger_output.json');
 const path = require("node:path");
 const sharp=require("sharp");
 const { authenticate } = require("./Middleware/PassPort");
+const { default: csrftoken, default: csrfprotection } = require("./Middleware/csrfProtection");
+// const redisClient = require('./config/redisClient'); 
+const SERVERPORT=process.env.SERVERPORT;
+
+// this 2 line requiered when connect with appConfig.js
+// const appConfig=require("./config/appConfig")
+// const {SERVERPORT}=appConfig
+
 
 const app = express(); //create express.js(framework) instance
 // middleware
@@ -70,6 +79,7 @@ app.use("/api",productRoutes)
 app.use("/api",brandRoutes)
 app.use("/api",bannerRoutes)
 app.use("/api",frontRoutes)
+app.use("/api",enqueryRoutes)
 // console.log(__dirname)
 
 app.set('view engine','ejs')
@@ -174,7 +184,8 @@ wss.on('connection', (ws) => {
 
 // sharp('./images.jpeg').resize(200).toFormat('webp',{palette:true}).toFile('op5.webp')
 
-app.listen(process.env.SERVERPORT, () => {
-  console.log(`server listening at port http://localhost:${process.env.SERVERPORT}`);
-  console.log(`Swagger UI is available at http://localhost:${process.env.SERVERPORT}/api-docs`);
-});
+  
+app.listen(SERVERPORT, () => {
+  console.log(`server listening at port http://localhost:${SERVERPORT}`);
+  console.log(`Swagger UI is available at http://localhost:${SERVERPORT}/api-docs`);
+}); 

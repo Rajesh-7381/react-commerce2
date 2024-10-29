@@ -30,6 +30,7 @@ const AddEditRegisterUser = (args) => {
   const [selectedRows, setSelectedRows] = useState({});
   const navigate=useNavigate();
   let sRow=false;
+  const [loading,setloading]=useState(false)
 
   const toggle = async (id) => {
     try {
@@ -199,14 +200,18 @@ const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
       NotificationManager.error("Password strength is not strong enough!");
       return;
     }
+    setloading(true)
     try {
-      await axios.put(`${BASE_URL}/api/update/${id}`, values,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
-      NotificationManager.success("Form updated successfully!");
-      // Fetch the updated data from the server and update the local state
-      const response = await axios.get(`${BASE_URL}/api/getAllAdminSubadminUsers`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
-      setData(response.data);
-      setFilterData(response.data);
-      setModal2(false); // Close the modal after successful submission
+        setTimeout(async() => {
+          await axios.put(`${BASE_URL}/api/update/${id}`, values,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+          NotificationManager.success("Form updated successfully!");
+          // Fetch the updated data from the server and update the local state
+          const response = await axios.get(`${BASE_URL}/api/getAllAdminSubadminUsers`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+          setData(response.data);
+          setFilterData(response.data);
+          setModal2(false); 
+          setloading(false)
+        }, 3000);
     } catch (error) {
         NotificationManager.error("Form  not updated successfully!");
       console.error("Error updating data", error);
@@ -226,7 +231,6 @@ const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
 //   delete functionality
   const handledelete = async (id) => {
     await DeleteEntity('Admin',id);  
-    // Fetch the updated data from the server and update the local state
     const response = await axios.get(`${BASE_URL}/api/getAllAdminSubadminUsers`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
     setData(response.data);
     setFilterData(response.data);
@@ -545,7 +549,13 @@ const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
                       </div>
                       {/* /.card-body */}
                       <div className="card-footer">
-                        <button  type="submit" className="btn btn-success">Update</button>
+                      {loading ? (
+                        <div>
+                          <button type="submit" className="btn btn-success" disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> Update </button>
+                           <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
+                      ) : (
+                        <button type="submit" className="btn btn-success">Update</button>
+                      )}
                       </div>
                     </form>
                   </div>

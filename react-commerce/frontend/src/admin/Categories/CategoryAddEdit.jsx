@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
 import Footer from '../Components/Footer';
 import Header from '../Components/Header';
+import { toast, ToastContainer } from 'react-toastify';
 
 const CategoryAddEdit = () => {
     const BASE_URL=process.env.REACT_APP_BASE_URL
@@ -15,7 +16,8 @@ const CategoryAddEdit = () => {
     const id = location.state ? location.state.id : null;
     const navigate = useNavigate();
     const imageRef=useRef(null);
-    // console.log(categories[0])
+    const [loading,setloading]=useState(false)
+
     useEffect(() => {
         document.title = 'AddEditCategories';
         if (id) {
@@ -67,6 +69,7 @@ const CategoryAddEdit = () => {
     
     
     const onSubmit = async (formData) => {
+        setloading(true)
         try {
             const form = new FormData();
             // Append form data
@@ -81,31 +84,22 @@ const CategoryAddEdit = () => {
             // Append image file
             form.append('category_image', formData.category_image[0]);
 
-            if (id) {
-                const response = await axios.put(`${BASE_URL}/api/updatecategory/${id}`, form, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                NotificationManager.success("updated successfully!");
-                setTimeout(() => {
-                    navigate("/categories");
-                }, 2000);
-            } else {
-                const response = await axios.post(`${BASE_URL}/api/addcategory`, form, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                NotificationManager.success("form submitted successfully!");
-                setTimeout(() => {
-                    navigate("/categories");
-                }, 2000);
-            }
+            const url= id ? `${BASE_URL}/api/updatecategory/${id}` : `${BASE_URL}/api/addcategory`;
+            const method= id ? 'put' : 'post';
+            await axios[method](url,form,{
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            toast.success(`Category ${id ? "updated" : "added"} successfully!`,{position:'bottom-right'})
+            setTimeout(()=>navigate("/categories",3000))
+
         } catch (error) {
             console.log(error);
+            toast.error("form submission failed!")
+        }finally{
+            setloading(false)
         }
     };
     // console.log(data)
@@ -131,7 +125,7 @@ const CategoryAddEdit = () => {
             />
           </div>
           {/* Navbar */}
-          <Header></Header>
+          <Header />
           <div className="content-wrapper">
             {/* Content Header (Page header) */}
             <div className="content-header">
@@ -300,8 +294,15 @@ const CategoryAddEdit = () => {
                                         </div>
 
                                         <div className='text-start'>
-                                            <button type="submit" className='btn btn-primary'>{id ? "Update" : "Submit"}</button>
-                                        </div>
+                                            <ToastContainer />
+                                            {loading ? (
+                                                <div>
+                                                  <button type="submit" className={id ? 'btn btn-success' : 'btn btn-primary'} disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> {id ? 'Update' : 'Submit'} </button>
+                                                   <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
+                                              ) : (
+                                                <button type="submit" className={id ? 'btn btn-success' : 'btn btn-primary'}>{id ? 'Update' : 'Submit'}</button>
+                                              )
+                                            }                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -310,7 +311,7 @@ const CategoryAddEdit = () => {
           </div>
 
           {/* /.content-wrapper */}
-          <Footer></Footer>
+          <Footer />
         </div>
         {/* ./wrapper */}
         </div>

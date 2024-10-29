@@ -10,14 +10,12 @@ import { DeleteEntity } from './CRUDENTITY/DeleteEntity';
 import Footer from './Components/Footer';
 import Header from './Components/Header';
 
-
 const Subadmin = (args) => {
     const BASE_URL=process.env.REACT_APP_BASE_URL
     const navigate=useNavigate();
     const [data, setData] = useState([]);
     const [filterData, setFilterData] = useState([]);
     const [modal, setModal] = useState(false);
-  // inside modal data shown(eye)
     const [modaldata, setmodaldata] = useState({});
     const [currentPage,setCurrentPage]=useState(1);
     const [columns,setColumns]=useState([
@@ -29,7 +27,6 @@ const Subadmin = (args) => {
       {key :'actions',label : 'ACTIONS' }
     ]);
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' }); // Sorting configuration
-  
 
     const recordsPerPage=10;
     // const lastIndex=currentPage * recordsPerPage;
@@ -64,6 +61,10 @@ const Subadmin = (args) => {
     // Searching function
     const searchFunction = (event) => {
         const searchData = event.target.value.toLowerCase().trim();
+        const queryparms=new URLSearchParams(window.location.search)
+        queryparms.set('q',searchData)
+        const newURL=`${window.location.pathname}?${queryparms.toString()}`
+        window.history.pushState({},'',newURL)
         // console.log(searchData)
         if (searchData === '') {
             setFilterData(data);
@@ -291,7 +292,7 @@ const Subadmin = (args) => {
                                                     <td>{item.mobile}</td>
                                                     <td>{item.email}</td>
                                                     <td><span className={`badge badge-${item.role === 'user' ? 'primary' : item.role === 'subadmin' ? 'warning' : 'success'}`}>{item.role === 'admin' ? 'ADMIN' : item.role === 'subadmin' ? 'SUBADMIN' : 'USER'}</span></td>
-                                                   <td>{item.created_at}</td>
+                                                   <td>{item.created_at.split('T')[0]}</td>
                                                     <td>
                                                         <button className='btn btn-dark btn-sm mr-2' onClick={()=> toggle(item.id)}><i className='fas fa-eye'></i></button>
                                                         <button className='btn btn-success btn-sm mr-2' onClick={()=> handleupdate(item.id)}><i className='fas fa-pencil-alt'></i></button>

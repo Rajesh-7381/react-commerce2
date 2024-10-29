@@ -5,7 +5,7 @@ const frontController=require("../Controller/frontController")
 const RouteCheckAuth = require("../Auth/RouteCheckAuth");
 
 router.post("/ContactUS",RouteCheckAuth ,upload.none(),frontController.contactUs)
-router.get("/AllProductDetailsShown",RouteCheckAuth ,frontController.AllProductDetails)
+router.get("/AllProductDetailsShown" ,frontController.AllProductDetails)
 router.get("/listingproduct",RouteCheckAuth ,frontController.listingproduct)
 router.get("/productDetails/:id",RouteCheckAuth ,frontController.productDetails)
 router.get("/productdetailscount",RouteCheckAuth ,frontController.productdetailscount)

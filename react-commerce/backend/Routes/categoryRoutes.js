@@ -4,7 +4,7 @@ const upload=require("../utils/multerConfig")
 const categoryController=require("../Controller/categoryController");
 const RouteCheckAuth = require("../Auth/RouteCheckAuth");
 
-router.get("/getAllCategorys",RouteCheckAuth ,categoryController.getAll);
+router.get("/getAllCategorys" ,categoryController.getAll);
 router.post("/addcategory",RouteCheckAuth ,upload.single("category_image"),categoryController.create);
 router.get("/categoryeditdata/:id",RouteCheckAuth ,categoryController.categoryEditData);
 router.put("/updatecategory/:id",RouteCheckAuth ,upload.single("category_image"),categoryController.updateCategory);

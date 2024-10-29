@@ -1,10 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { NotificationManager } from 'react-notifications';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AddEditBanners = () => {
   const BASE_URL=process.env.REACT_APP_BASE_URL
@@ -13,6 +14,7 @@ const AddEditBanners = () => {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const [bannerData, setBannerData] = useState({});
   const navigate = useNavigate();
+  const [loading,setloading]=useState(false)
 
   useEffect(() => {
     document.title="AddEditBanners"
@@ -23,8 +25,10 @@ const AddEditBanners = () => {
 
   const GetBannerDetails = async (id) => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/EditBannerDetails/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+      const response = await axios.get(`http://localhost:8081/api/EditBannerDetails/${id}`);
+      // const response = await axios.get(`${BASE_URL}/api/EditBannerDetails/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
       const data = response.data.data[0];
+      console.log(data)
       setBannerData(data);
       setValue("type", data.type);
       setValue("link", data.link);
@@ -35,39 +39,39 @@ const AddEditBanners = () => {
   };
 
   const onSubmit = async (formData) => {
+    setloading(true);
+    
     try {
       const form = new FormData();
       form.append('type', formData.type);
       form.append('link', formData.link);
       form.append('alt', formData.alt);
-
-      if (formData.BannerImage && formData.BannerImage[0]) {
+      
+      if (formData.BannerImage?.[0]) {
         form.append('BannerImage', formData.BannerImage[0]);
       }
-
-      if (id) {
-        await axios.put(`${BASE_URL}/api/UpdateBanners/${id}`, form, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-        NotificationManager.success("Banner updated successfully!");
-      } else {
-        await axios.post(`${BASE_URL}/api/AddBanners`, form, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-        NotificationManager.success("Banner added successfully!");
-      }
-      navigate("/banners");
+  
+      const url = id ? `${BASE_URL}/api/UpdateBanners/${id}` : `${BASE_URL}/api/AddBanners`;
+      const method = id ? 'put' : 'post';
+  
+      await axios[method](url, form, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+  
+      toast.success(`Banner ${id ? "updated" : "added"} successfully!`, { position: "bottom-right" });
+      setTimeout(() => navigate("/banners"), 3000);
+  
     } catch (error) {
-      console.error("Error submitting form:", error);
-      NotificationManager.error("Form submission failed!");
+        console.error("Error submitting form:", error);
+        toast.error("Form submission failed!");
+    } finally {
+        setloading(false);
     }
   };
+  
   return (
     <div>
     <Header></Header>
@@ -151,7 +155,14 @@ const AddEditBanners = () => {
                                     </div>
                                 </div>
                                 <div className='text-start'>
-                                    <button type="submit" className='btn btn-outline-primary'>{id ? "Update" : "Submit"}</button>
+                                <ToastContainer />
+                                {loading ? (
+                                  <div>
+                                    <button type="submit" className="btn btn-success" disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> Update </button>
+                                     <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
+                                ) : (
+                                  <button type="submit" className="btn btn-success">Update</button>
+                                )}
                                 </div>
                             </form>
                         </div>

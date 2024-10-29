@@ -10,7 +10,6 @@ export const StatusEntity = async (entityType, id, currentStatus, setData, data)
     // console.log(data)
     try {
         const newStatus = currentStatus === 1 ? 0 : 1;
-        console.log(newStatus)
         let url = '';
 
         switch (entityType) {
@@ -44,7 +43,7 @@ export const StatusEntity = async (entityType, id, currentStatus, setData, data)
                 throw new Error('Invalid entity type');
         }
 
-        await axios.put(url, { status: newStatus });
+        await axios.put(url, { status: newStatus },{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
 
         const updatedData = data.map(item => {
             if (item.id === id) { //here item.id means api providing data and their corresponding id  

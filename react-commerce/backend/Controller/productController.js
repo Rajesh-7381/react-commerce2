@@ -1,11 +1,22 @@
 const Product = require("../Models/Product");
 const { cloudinary }=require("../helper/cloudinaryConfig")
+const redisClient=require("../config/redisClient")
+const CACHE_EXPIRY_TIME=3600;
 
 exports.getAllProducts = async (req, res) => {
   // console.log(1)
   try {
+    const cachedProducts=await redisClient.get('allProducts')
+    if(cachedProducts){
+      console.log("filtering from redis cache")
+      return res.json(JSON.parse(cachedProducts))
+    }
+
     const products = await Product.Product.getAll();
     // console.log(products)
+    await redisClient.setEx('allProducts',CACHE_EXPIRY_TIME,JSON.stringify(products))
+    // console.log('Fetching from MySQL and storing in Redis cache...');
+
     res.json(products);
   } catch (err) {
     console.error(err);

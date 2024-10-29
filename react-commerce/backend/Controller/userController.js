@@ -6,7 +6,7 @@ const { registerSchema, passwordForgotSchema } = require("../utils/Validation");
 const {  cloudinary } = require("../helper/cloudinaryConfig");
 const  sendMail  = require("../utils/email");
 const { UUID } = require("../utils/UserIID");
-
+const redisClient=require("../config/redisClient")
 
 // const Salt=process.env.GEN_SALT;
   // console.log(Salt)
@@ -70,7 +70,7 @@ const Login=async(req,res)=>{
 // for registering new one
 class RegisterUser{
    async CreateRegisterAdminUser(req,res){
-    // console.log(1)
+    console.log(1)
     try {
       const combinedData={
         ...req.body,
@@ -84,7 +84,7 @@ class RegisterUser{
       }
 
       const {name,mobile,email,password}=req.body;
-      // console.log(req.body)
+      console.log(req.body)
       const uuid=await UUID();
       // console.log(uuid)
       // here 1st user is import user and 2nd is user class
@@ -170,13 +170,13 @@ class AdminUserController{
       
       await User.forgotPassword.updatePassword(email,newPassword)
       // console.log("success")
-      return res.status(200).json({message:"✅ Password updated successfully!"})
+      return res.status(200).json({message:" Password updated successfully!"})
   
       
       
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "🚫 Internal server error" });
+        return res.status(500).json({ error: " Internal server error" });
     }
   }
 
@@ -209,10 +209,7 @@ class AdminUserController{
   static async getAllAdminSubadminUsers(req,res){
     // console.log(1)
     try {
-      // if(!req.user){
-        
-      //   return res.status(401).json({ message: 'Unauthorized' });
-      // }
+      
       const result=await User.getAllAdminSubadminUsers.TotalAdminSubAdminUser();
       // console.log(result)
       res.json(result)

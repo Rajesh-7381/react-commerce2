@@ -84,7 +84,7 @@ const Register = () => {
       
             await axios.post(`${BASE_URL}/api/register`, formData, {
               headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data'                
               }
             });
       

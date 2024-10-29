@@ -40,23 +40,8 @@ exports.deletePage = async (req, res) => {
 
 exports.updatePage = async (req, res) => {
   const id = req.params.id;
-  const {
-    title,
-    url,
-    description,
-    meta_title,
-    meta_keywords,
-    meta_description,
-  } = req.body;
-
-  const updatedPage = {
-    title,
-    url,
-    description,
-    meta_title,
-    meta_keywords,
-    meta_description,
-  };
+  const {  title,  url,  description,  meta_title,  meta_keywords,  meta_description,} = req.body;
+  const updatedPage = {  title,  url,  description,  meta_title,  meta_keywords,  meta_description,};
 
   try {
     await CmsPage.update(id, updatedPage);
@@ -68,23 +53,9 @@ exports.updatePage = async (req, res) => {
 };
 
 exports.addPage = async (req, res) => {
-  const {
-    title,
-    url,
-    description,
-    meta_title,
-    meta_keywords,
-    meta_description,
-  } = req.body;
+  const {  title,  url,  description,  meta_title,  meta_keywords,  meta_description,} = req.body;
   // console.log(req.body)
-  const newPage = {
-    title,
-    url,
-    description,
-    meta_title,
-    meta_keywords,
-    meta_description,
-  };
+  const newPage = {  title,  url,  description,  meta_title,  meta_keywords,  meta_description,};
 
   try {
     const result = await CmsPage.add(newPage);

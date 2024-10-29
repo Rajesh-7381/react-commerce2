@@ -70,7 +70,9 @@ exports.deleteBanner = async (req, res) => {
   };
   
   exports.getBannerById = async (req, res) => {
+    console.log(1)
     const id = req.params.id;
+    console.log(id)
     try {
       const result = await Banner.getById(id);
       if (result.length === 0) {

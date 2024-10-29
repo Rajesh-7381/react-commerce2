@@ -7,8 +7,10 @@ import { NotificationManager, NotificationContainer } from 'react-notifications'
 import zxcvbn from 'zxcvbn';
 
 const ForgotPassword = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL;
     const navigate=useNavigate();
     const [passwordStrength, setPasswordStrength] = useState(0);
+    const [loading,setloading]=useState(false)
     // console.log(passwordStrength)
 
     useEffect(()=>{
@@ -27,35 +29,32 @@ const ForgotPassword = () => {
     });
 
     const onSubmitForm = async (values) => {
-        alert(values)
+        // alert(values)
         if (passwordStrength !== 4) {
             NotificationManager.error("Password strength is not strong enough!");
             return;
-          }
-        const { email, password } = values; // Destructuring values
-        console.log(values)
+        }
+        setloading(true)
+        const { email, password } = values; 
+        // console.log(values)
         try {
-          const response = await axios.get(`http://localhost:8081/api/checkemail/${email}`);
-          console.log(response.data)
+          const response = await axios.get(`${BASE_URL}/api/checkemail/${email}`);
+        //   console.log(response.data)
           if (response.data.emailExists) {
             try {
-              const response = await axios.post(`http://localhost:8081/api/passwordforgot/${email}`, { password });
-              console.log(response.data.message);
-              NotificationManager.success("Password Updated Successfully!")
-              setTimeout(()=>{
-                // add loader logic
-                navigate("/");
-              },3000);
-            //   navigate("/");
+              setTimeout(async() => {
+                const response = await axios.post(`${BASE_URL}/api/passwordforgot/${email}`, { password });
+                NotificationManager.success("Password updated successfully!")
+                setloading(false)
+                navigate("/")
+              }, 3000);
+
             } catch (error) {
                 NotificationManager.error("Password Updated not Successfully!")
-
-              console.error(error);
+                console.error(error);
             }
           } else {
             NotificationManager.error("This email is not registered!")
-
-            // alert('This email is not registered!');
           }
         } catch (error) {
           console.error(error);
@@ -71,7 +70,7 @@ const ForgotPassword = () => {
     });
     const calculatePasswordStrength=(password)=>{
         const result=zxcvbn(password);
-        console.log(result.score)
+        // console.log(result.score)
         setPasswordStrength(result.score);
     }
 
@@ -176,8 +175,13 @@ const ForgotPassword = () => {
                                                     </div>
                                                     <div className="u-s-m-b-30">
                                                     <NotificationContainer />
-                                                        <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary float-left" type="submit">SUBMIT</button>
-                                                    </div>
+                                                    {loading ? (
+                                                        <div>
+                                                          <button type="submit" className="btn btn-success" disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> Submit </button>
+                                                           <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
+                                                      ) : (
+                                                        <button type="submit" className="btn btn-success">Submit</button>
+                                                      )}                                                    </div>
                                                     <div className="u-s-m-b-30">
                                                         <Link className="gl-link" to={"/"}>Back to Login</Link>
                                                     </div>
