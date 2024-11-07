@@ -7,6 +7,7 @@ const {  cloudinary } = require("../helper/cloudinaryConfig");
 const  sendMail  = require("../utils/email");
 const { UUID } = require("../utils/UserIID");
 const redisClient=require("../config/redisClient")
+const sheets  = require('../service/gSheet'); // Adjust the path as necessary
 
 // const Salt=process.env.GEN_SALT;
   // console.log(Salt)
@@ -67,10 +68,11 @@ const Login=async(req,res)=>{
     }
    })
 }
+
 // for registering new one
 class RegisterUser{
    async CreateRegisterAdminUser(req,res){
-    console.log(1)
+    // console.log(1)
     try {
       const combinedData={
         ...req.body,
@@ -84,8 +86,9 @@ class RegisterUser{
       }
 
       const {name,mobile,email,password}=req.body;
-      console.log(req.body)
+      // console.log(req.body)
       const uuid=await UUID();
+
       // console.log(uuid)
       // here 1st user is import user and 2nd is user class
       if(await User.User.exists(email,mobile)){
@@ -95,16 +98,38 @@ class RegisterUser{
       const image=req.file ? await cloudinary.uploader.upload(req.file.path,{ folder:'User'}) : null; //to check cloudinary folder
       // console.log(image)
       const user=new User.User(name,mobile,email,password,image ,uuid)
-      console.log(user)
+      // console.log(user)
       await user.Save();
       // console.log(1)
       await sendMail(email, "Welcome to E-commerce", `Hi ${name}, thank you for registering.`)
+      await this.logEnquiry(name,mobile, email, password);
+
       res.json({message:"✅ User created successfully!"});
     } catch (error) {
       console.error("🚫 Error submitting form", error);
       res.status(500).json({ message: "🚫 Internal server error" });
     }
   }
+  async logEnquiry(name, mobile, email, password) {
+    try {
+      const response = await sheets.spreadsheets.values.append({
+        spreadsheetId: process.env.GOOGLE_SHEET_ID, 
+        range: 'Users!A:D', 
+        insertDataOption: 'INSERT_ROWS',
+        valueInputOption: 'RAW',
+        requestBody: {
+            values: [[name,mobile, email, password]], 
+        },
+    });
+
+        if (response.status !== 200) {
+            throw new Error('Failed to log enquiry to Google Sheets');
+        }
+    } catch (error) {
+        console.error('Error logging enquiry:', error);
+        throw new Error('Logging enquiry failed');
+    }
+}
 }
 class AdminUserController{
   static async checkUniqeID(req,res){

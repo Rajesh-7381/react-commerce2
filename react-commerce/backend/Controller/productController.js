@@ -1,7 +1,8 @@
 const Product = require("../Models/Product");
 const { cloudinary }=require("../helper/cloudinaryConfig")
-const redisClient=require("../config/redisClient")
-const CACHE_EXPIRY_TIME=3600;
+const redisClient=require("../config/redisClient");
+const sheets = require("../service/gSheet");
+const CACHE_EXPIRY_TIME=3600; 
 
 exports.getAllProducts = async (req, res) => {
   // console.log(1)
@@ -26,14 +27,11 @@ exports.getAllProducts = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   const id = req.params.id;
-  console.log(id)
-
+  // console.log(id)
   const { category_id,brand_id, product_name, product_code,group_code, product_color, family_color, product_price,  product_discount,product_weight,final_price, discount_type, description, washcare,  fabric,keywords,  pattern,  sleeve,  fit,occassion,meta_title,    meta_description,meta_keywords,    is_featured }=req.body;
-
   const product_video = req.files['product_video'] ? req.files['product_video'][0].filename : null;
   const product_images = req.files['product_image'] ? req.files['product_image'] : [];
   const is_featured_val = is_featured === 'true' ? 'Yes' : 'No';
-
   const productData={category_id,brand_id, product_name,product_video,product_images, product_code,group_code, product_color, family_color, product_price,  product_discount,product_weight,final_price, discount_type, description, washcare,  fabric,keywords,  pattern,  sleeve,  fit,occassion,meta_title,    meta_description,meta_keywords,    is_featured_val}
   
   try {
@@ -215,7 +213,7 @@ exports.SearchProduct = async (req, res) => {
 
 exports.addProduct = async (req, res) => {
   try {
-    const { category_id, brand_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured} = req.body;
+    const {AdminUser_id, category_id, brand_id, product_name, product_code, product_color, family_color, group_code, product_price, product_weight, product_discount, discount_type, final_price, description, washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured} = req.body;
     let attributes = req.body.attribute;
     if (typeof attributes === 'string') {
       attributes = JSON.parse(attributes);
@@ -233,12 +231,12 @@ exports.addProduct = async (req, res) => {
     const product_images = req.files['product_image'] ? Array.isArray(req.files['product_image'].map(image=> cloudinary.uploader.upload(image.path,{folder:'ProductsIMAGE'}))) : []; 
     const is_featured_val = is_featured === 'true' ? 'Yes' : 'No';
 
-    const product = { category_id, brand_id, product_name, product_code, product_color, family_color, group_code,  product_price_number, product_weight, product_discount, discount_type, final_price, description,  washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured: is_featured_val  };
+    const product = {AdminUser_id, category_id, brand_id, product_name, product_code, product_color, family_color, group_code,  product_price_number, product_weight, product_discount, discount_type, final_price, description,  washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured: is_featured_val  };
 
     if (Array.isArray(attributes) && attributes.length > 0) {
       await Product.Products.addProduct(product, product_video, product_images,attributes);
     }
-
+    await logPageToGoogleSheets(product)
     res.status(200).json({ message: "Product added successfully!" });
 
   } catch (err) {
@@ -246,3 +244,50 @@ exports.addProduct = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+async function logPageToGoogleSheets(product) {
+  try {
+    const response=await sheets.spreadsheets.values.append({
+      spreadsheetId:process.env.GOOGLE_SHEET_ID,
+      range:'Products!A:Y',
+      insertDataOption:'INSERT_ROWS',
+      valueInputOption:'RAW',
+      requestBody:{
+        values:[[
+          product.category_id,
+          product.brand_id,
+          product.product_name,
+          product.product_code,
+          product.product_color,
+          product.family_color,
+          product.group_code,
+          product.product_price_number,
+          product.product_weight,
+          product.product_discount,
+          product.discount_type,
+          product.final_price,
+          product.description,
+          product.washcare,
+          product.keywords,
+          product.fabric,
+          product.pattern,
+          product.sleeve,
+          product.fit,
+          product.occassion,
+          product.meta_title,
+          product.meta_description,
+          product.meta_keywords,
+          product.is_featured,
+          product.AdminUser_id
+        ]]
+      }
+    })
+
+    if(response.status !==200){
+      throw new Error('Failed to log page data to google sheets')
+    }
+  } catch (error) {
+      console.error('Error logging page data',error)
+      throw new Error('Logging page data failed')
+  }
+}

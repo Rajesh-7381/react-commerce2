@@ -83,6 +83,7 @@ const CategoryAddEdit = () => {
             form.append('parent_id', formData.parent_id); // Append parent category ID
             // Append image file
             form.append('category_image', formData.category_image[0]);
+            form.append('AdminUser_id',localStorage.getItem('id'));
 
             const url= id ? `${BASE_URL}/api/updatecategory/${id}` : `${BASE_URL}/api/addcategory`;
             const method= id ? 'put' : 'post';

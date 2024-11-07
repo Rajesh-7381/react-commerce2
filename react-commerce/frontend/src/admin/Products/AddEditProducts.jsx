@@ -160,7 +160,7 @@ const AddEditProducts = () => {
       form.append("meta_title", formData.meta_title);
       form.append("occassion", formData.occassion);
       form.append("is_featured", isFeatured ? "Yes" : "No");
-
+      form.append('AdminUser_id',localStorage.getItem('id'))
       dynamicfields.forEach((field, index) => {
         form.append(`attributes[${index}][size]`, field.size);
         form.append(`attributes[${index}][sku]`, field.sku);

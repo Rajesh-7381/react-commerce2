@@ -27,19 +27,19 @@ const Dashboard2 = () => {
   }
   const items = [
     {
-      src: 'https://picsum.photos/id/123/1200/400',
+      src: 'https://www.shutterstock.com/image-vector/internet-shopping-set-customers-buying-260nw-1643133313.jpg',
       altText: 'Slide 1',
       caption: 'Slide 1',
       key: 1,
     },
     {
-      src: 'https://picsum.photos/id/456/1200/400',
+      src: 'https://img.freepik.com/premium-photo/collection-different-things-including-shopping-cart-word-family-word-family_1103290-62221.jpg',
       altText: 'Slide 2',
       caption: 'Slide 2',
       key: 2,
     },
     {
-      src: 'https://picsum.photos/id/678/1200/400',
+      src: 'https://media.licdn.com/dms/image/D4D12AQF8NKzCINtp4Q/article-cover_image-shrink_600_2000/0/1689398931729?e=2147483647&v=beta&t=XcNjpvrI953uWLnJKic4pBSkfwDcNAv8_goGOrlIa7s',
       altText: 'Slide 3',
       caption: 'Slide 3',
       key: 3,
@@ -93,7 +93,13 @@ const Dashboard2 = () => {
     
     <div className="app-content">
       {/*====== Primary Slider ======*/}
-       {/*<div className="s-skeleton s-skeleton--h-600 s-skeleton--bg-grey">
+      <Carousel  activeIndex={activeIndex}  next={next}   previous={previous}  >
+      <CarouselIndicators  items={items}  activeIndex={activeIndex}  onClickHandler={goToIndex}/>
+        {slides}
+      <CarouselControl  direction="prev"  directionText="Previous"  onClickHandler={previous}/>
+     <CarouselControl  direction="next"  directionText="Next"  onClickHandler={next}/>
+    </Carousel>
+       {/* <div className="s-skeleton s-skeleton--h-600 s-skeleton--bg-grey">
         <div className="owl-carousel primary-style-1" id="sitemakers-slider">
         <div className="sitemakers-slide sitemakers-slide--1" style={{backgroundImage: `url("./frontend/images/banners/sitemaker-slider-banner-1.png")`}}>
         <div className="container">
@@ -129,7 +135,7 @@ const Dashboard2 = () => {
             </div>
           </div>
         </div>
-      </div>*/}
+      </div> */}
 
       {/*====== End - Primary Slider ======*/}
       {/*====== Section 1 ======*/}
@@ -188,29 +194,7 @@ const Dashboard2 = () => {
       {/*====== End - Section 1 ======*/}
        {/*====== slider start ======*/}
 
-     <Carousel
-     activeIndex={activeIndex}
-     next={next}
-     previous={previous}
      
-   >
-     <CarouselIndicators
-       items={items}
-       activeIndex={activeIndex}
-       onClickHandler={goToIndex}
-     />
-     {slides}
-     <CarouselControl
-       direction="prev"
-       directionText="Previous"
-       onClickHandler={previous}
-     />
-     <CarouselControl
-       direction="next"
-       directionText="Next"
-       onClickHandler={next}
-     />
-   </Carousel>
    {/*====== slider end ======*/}
       {/*====== Section 2 ======*/}
       <div className="u-s-p-b-60">

@@ -15,11 +15,11 @@ const Category = {
 
   // Add a new category
   add: async (category) => {
-    const {category_name,parent_id,category_image,category_discount,description,url,meta_title,meta_description,meta_keyword} = category;
+    const {AdminUser_id,category_name,parent_id,category_image,category_discount,description,url,meta_title,meta_description,meta_keywords} = category;
 
-    const query = `INSERT INTO categories (category_name, parent_id, category_image, category_discount,  description, url, meta_title, meta_description, meta_keyword) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO categories (AdminUser_id,category_name, parent_id, category_image, category_discount,  description, url, meta_title, meta_description, meta_keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)`;
     try {
-      const [result] = await db.promise().query(query, [category_name,parent_id,category_image ? category_image.secure_url : null,category_discount,description,url,meta_title,meta_description,meta_keyword ]);
+      const [result] = await db.promise().query(query, [AdminUser_id,category_name,parent_id,category_image ? category_image.secure_url : null,category_discount,description,url,meta_title,meta_description,meta_keywords ]);
       // console.log(result)
       return result;
     } catch (error) {

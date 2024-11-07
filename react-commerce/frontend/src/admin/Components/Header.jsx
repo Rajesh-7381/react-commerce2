@@ -6,11 +6,13 @@ import {ThemeContext} from '../../LightDarkTheme';
 const Header = () => {
   const BASE_URL=process.env.REACT_APP_BASE_URL
   const REACT_APP_LOCATION_IQ_URL=process.env.REACT_APP_LOCATION_IQ_URL
-    const navigate=useNavigate();
-    const [userData, setUserData] = useState(null);
-    const [CurrentPosition, setCurrentPosition] = useState(null);
+  const navigate=useNavigate();
+  const [userData, setUserData] = useState(null);
+  const [CurrentPosition, setCurrentPosition] = useState(null);
     // const { theme, toggleTheme } = useContext(ThemeContext);
-    
+  const [bellset,setbellset]=useState(0)  
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State to manage dropdown visibility
+ 
     useEffect(() => {
       // Get the user's current location
           navigator.geolocation.getCurrentPosition(position => {
@@ -50,9 +52,20 @@ const Header = () => {
       }
 
     const handlelogout=()=>{
-        sessionStorage.clear();
-        navigate("/");
-      }
+      sessionStorage.clear();
+      navigate("/");
+    }
+
+    const toggleDropdown = () => {
+      setIsDropdownOpen(prevState => !prevState);
+    };
+
+    const playNotificationSound = () => {
+      setbellset(prevBellset =>  prevBellset + 1);
+      toggleDropdown()
+    };
+    
+    
   return (
     <div>
     <nav className="main-header navbar navbar-expand navbar-white navbar-light" >
@@ -68,7 +81,13 @@ const Header = () => {
         <button  onClick={handlelogout} className="nav-link">Logout</button>
       </li>
       <li className="nav-item d-none d-sm-inline-block">
-      </li>
+          <button onClick={playNotificationSound} className='nav-link'>
+            <i className="far fa-bell" />
+            {bellset > 0 && (
+              <span className="badge badge-warning navbar-badge">{bellset}</span>
+            )}
+          </button>
+        </li>
     </ul>
     {/* Right navbar links */}
     <ul className="navbar-nav ml-auto">
@@ -95,10 +114,10 @@ const Header = () => {
       </li>
       {/* Messages Dropdown Menu */}
       <li className="nav-item dropdown">
-        <a className="nav-link" data-toggle="dropdown" href="#">
+        <button className="nav-link" data-toggle="dropdown" href="#" >
           <i className="far fa-comments" />
-          <span className="badge badge-danger navbar-badge">3</span>
-        </a>
+          <span className="badge badge-danger navbar-badge"><i class="fa fa-bell"></i></span>
+        </button>
         <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <a href="#" className="dropdown-item">
             {/* Message Start */}
@@ -153,12 +172,17 @@ const Header = () => {
       </li>
       {/* Notifications Dropdown Menu */}
       <li className="nav-item dropdown">
-        <a className="nav-link" data-toggle="dropdown" href="#">
-          <i className="far fa-bell" />
-          <span className="badge badge-warning navbar-badge">15</span>
-        </a>
+        
+        {isDropdownOpen && (
+          <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <span className="dropdown-item dropdown-header">{bellset} Notifications</span>
+            <div className="dropdown-divider" />
+            {/* You can add more notification items here */}
+            <a href="#" className="dropdown-item dropdown-footer">See All Notifications</a>
+          </div>
+        )}
         <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span className="dropdown-item dropdown-header">15 Notifications</span>
+          <span className="dropdown-item dropdown-header">{bellset} Notifications</span>
           <div className="dropdown-divider" />
           <a href="#" className="dropdown-item">
             <i className="fas fa-envelope mr-2" /> 4 new messages
@@ -189,7 +213,7 @@ const Header = () => {
         </a>
       </li>
     </ul>
-  </nav>
+    </nav>
   {/* /.navbar */}
   {/* Main Sidebar Container */}
   

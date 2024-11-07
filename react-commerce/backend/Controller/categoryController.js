@@ -1,7 +1,8 @@
 const { db }= require("../config/dbconfig");
 const upload = require("../utils/multerConfig");
 const Category=require("../Models/Category");
-const { cloudinary }=require("../helper/cloudinaryConfig")
+const { cloudinary }=require("../helper/cloudinaryConfig");
+const sheets = require("../service/gSheet");
 
 // Get all categories
 exports.getAll = async (req, res) => {
@@ -18,14 +19,15 @@ exports.getAll = async (req, res) => {
 // Add category
 exports.create = async (req, res) => {
        
-        const {  parent_id,category_name, category_discount, description, url, meta_title, meta_description, meta_keyword } = req.body;
+        const {AdminUser_id,  parent_id,category_name, category_discount, description, url, meta_title, meta_description, meta_keywords } = req.body;
         // console.log(req.body)
         const category_image = req.file ? await cloudinary.uploader.upload(req.file.path,{folder:'Category'}) : null;
         // console.log(category_image)
-        const newCategory={parent_id,category_name, category_image,category_discount,description,url,meta_title,meta_description,meta_keyword};
+        const newCategory={AdminUser_id,parent_id,category_name, category_image,category_discount,description,url,meta_title,meta_description,meta_keywords};
         try {
             await Category.add(newCategory);
             // console.log(1)
+            await logPageToGoogleSheets(newCategory)
             res.json({message:"new category added successfully!"})
         } catch (error) {
             console.error(error);
@@ -33,6 +35,26 @@ exports.create = async (req, res) => {
         }
     
 };
+
+async function logPageToGoogleSheets(newCategory) {
+    try {
+        const response=await sheets.spreadsheets.values.append({
+            spreadsheetId:process.env.GOOGLE_SHEET_ID,
+            range:'Categorys!A:I',
+            insertDataOption:'INSERT_ROWS',
+            valueInputOption:'RAW',
+            requestBody:{
+                values:[[newCategory.parent_id,newCategory.category_name,newCategory.category_discount,newCategory.description,newCategory.url,newCategory.meta_title,newCategory.meta_description,newCategory.meta_keywords,newCategory.AdminUser_id]]
+            }
+        })
+        if(response.status !==200){
+            throw new Error('Failed to log page data to google sheets')
+          }
+    } catch (error) {
+        console.error('Error logging page data',error)
+        throw new Error('Logging page data failed')
+    }
+}
 
 // Get single category data
 exports.categoryEditData = async (req, res) => {

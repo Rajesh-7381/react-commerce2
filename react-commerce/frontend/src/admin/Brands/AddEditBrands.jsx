@@ -54,6 +54,7 @@ const AddEditBrands = () => {
             form.append('meta_title', formData.meta_title);
             form.append('meta_description', formData.meta_description);
             form.append('meta_keyword', formData.meta_keyword);
+            form.append('AdminUser_id',localStorage.getItem('id'))
             
             if (formData.brand_image[0]) {
                 form.append('brand_image', formData.brand_image[0]);
@@ -112,7 +113,7 @@ const AddEditBrands = () => {
             />
           </div>
           {/* Navbar */}
-          <Header></Header>
+          <Header />
           {/* Content Wrapper. Contains page content */}
           <div className="wrapper">
           <div className="content-wrapper">
@@ -292,7 +293,7 @@ const AddEditBrands = () => {
       </div>
 
           {/* /.content-wrapper */}
-          <Footer></Footer>
+          <Footer />
           {/* Control Sidebar */}
           <aside className="control-sidebar control-sidebar-dark">
             {/* Control sidebar content goes here */}

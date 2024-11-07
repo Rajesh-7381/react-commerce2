@@ -1,7 +1,8 @@
 
 const Brand = require("../Models/Brand");
 const path=require("path")
-const { cloudinary }=require("../helper/cloudinaryConfig")
+const { cloudinary }=require("../helper/cloudinaryConfig");
+const sheets = require("../service/gSheet");
 
 exports.getAllBrands=async(req,res)=>{
     try {
@@ -60,16 +61,17 @@ exports.deleteBrand = async (req, res) => {
   };
   
   exports.addBrand = async (req, res) => {
-    const { brand_name, brand_discount,description,url, meta_title, meta_description,meta_keyword } = req.body;
+    const {AdminUser_id, brand_name, brand_discount,description,url, meta_title, meta_description,meta_keyword } = req.body;
     // console.log(req.body)
     // const brand_image = req.files?.brand_image ? path.basename(req.files.brand_image[0].path) : null; //[ath.basename extracts only image name not full path]
     // const brand_logo = req.files?.brand_logo ? path.basename(req.files.brand_logo[0].path) : null;
     const brand_image = req.files?.brand_image ? await cloudinary.uploader.upload(req.files.brand_image[0].path,{folder:'BrandIMAGE'}) : null; //[ath.basename extracts only image name not full path]
     const brand_logo = req.files?.brand_logo ? await cloudinary.uploader.upload(req.files.brand_logo[0].path,{folder:'BrandLogo'}) : null;
     // console.log(req.body)
-    const newBrand = { brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_description,meta_keyword  };
+    const newBrand = {AdminUser_id, brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_description,meta_keyword  };
     try {
       await Brand.add(newBrand);
+      await logPageToGoogleSheets(newBrand)
       res.status(200).json({ message: "new Brand adding successful" });
       // console.log(1)
     } catch (err) {
@@ -77,6 +79,22 @@ exports.deleteBrand = async (req, res) => {
       res.status(500).json({ message: "Internal server error" });
     }
   };
+
+  async function logPageToGoogleSheets(newBrand) {
+    try {
+      const response=await sheets.spreadsheets.values.append({
+        spreadsheetId:process.env.GOOGLE_SHEET_ID,
+        range:'Brands!A:G',
+        insertDataOption:'INSERT_ROWS',
+        valueInputOption:'RAW',
+        requestBody:{
+          values:[[newBrand.brand_name,newBrand.brand_discount,newBrand.description,newBrand.url,newBrand.meta_title,newBrand.meta_keyword,newBrand.meta_description,newBrand.AdminUser_id]]
+        }
+      })
+    } catch (error) {
+      
+    }
+  }
   
   exports.getBrandById = async (req, res) => {
     const id = req.params.id;

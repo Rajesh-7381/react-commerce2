@@ -102,12 +102,13 @@ const Banner = {
 
   // Add a new banner
   add: async (page) => {
-    const { image, type, link, alt } = page;
-    const query = `INSERT INTO Banners (UUID,PublicId, image, type, link, alt)  VALUES (?, ?, ?, ?, ?, ?)`;
+    const {AdminUser_id, image, type, link, alt } = page;
+    // console.log(page)
+    const query = `INSERT INTO Banners (AdminUser_id,UUID, image, type, link, alt)  VALUES (?, ?, ?, ?, ?,?)`;
     const UUID = uuidv4();
 
     try {
-      const [result] = await db.promise().query(query, [UUID, image.public_id , image ? image.secure_url : null, type, link, alt]);
+      const [result] = await db.promise().query(query, [AdminUser_id,UUID , image ? image.secure_url : null, type, link, alt]);
       // console.log(result)
       return result;
     } catch (error) {

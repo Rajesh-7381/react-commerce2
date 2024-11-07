@@ -1,6 +1,6 @@
 const { db } = require("../config/dbconfig");
 const { v4: uuidv4 } = require("uuid");
-// const { faker } = require('@faker-js/faker');
+const { faker } = require('@faker-js/faker');
 const CmsPage = {
   getAll: async (limit,offset) => {
     // console.log(limit)
@@ -143,7 +143,7 @@ const CmsPage = {
 
 
 // async function generateAndAddPages() {
-//   for (let i = 0; i < 10000; i++) {
+//   for (let i = 0; i < 1000; i++) {
 //     const page = {
 //       title: faker.lorem.sentence(),
 //       url: faker.internet.url(),
@@ -157,7 +157,7 @@ const CmsPage = {
 // }
 
 // generateAndAddPages().then(() => {
-//   console.log("Added 100 fake CMS pages to the database");
+//   console.log("Added 1000 fake CMS pages to the database");
 // }).catch((error) => {
 //   console.error("Error generating and adding pages:", error);
 // });

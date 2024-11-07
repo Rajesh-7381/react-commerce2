@@ -267,12 +267,12 @@ const Product = {
 
 const Products = {
   addProduct: async (product, product_video, product_images, attributes) => {
-    const {  category_id, brand_id, product_name, product_code, product_color, family_color, group_code,  product_price, product_weight, product_discount, discount_type, final_price, description,  washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured} = product;
+    const { AdminUser_id, category_id, brand_id, product_name, product_code, product_color, family_color, group_code,  product_price, product_weight, product_discount, discount_type, final_price, description,  washcare, keywords, fabric, pattern, sleeve, fit, occassion, meta_title, meta_description, meta_keywords, is_featured} = product;
 
-    const query = `   INSERT INTO products (category_id, brand_id, product_name, product_code, product_color, family_color,   group_code, product_price, product_weight, product_discount, discount_type, final_price,   product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords,   meta_description, meta_title, occassion, is_featured)    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) `;
+    const query = `INSERT INTO products (AdminUser_id,category_id, brand_id, product_name, product_code, product_color, family_color,   group_code, product_price, product_weight, product_discount, discount_type, final_price,   product_video, description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords,   meta_description, meta_title, occassion, is_featured)    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?) `;
 
     try {
-      const [result] = await db.promise().query(query, [   category_id, brand_id, product_name, product_code, product_color, family_color, group_code,   product_price, product_weight, product_discount, discount_type, final_price, product_video,   description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description,   meta_title, occassion, is_featured ]);
+      const [result] = await db.promise().query(query, [AdminUser_id, category_id, brand_id, product_name, product_code, product_color, family_color, group_code,   product_price, product_weight, product_discount, discount_type, final_price, product_video,   description, washcare, keywords, fabric, pattern, sleeve, fit, meta_keywords, meta_description,   meta_title, occassion, is_featured ]);
 
       const productId = result.insertId;
 
@@ -331,7 +331,7 @@ const Products = {
   },
 
   addProductImages: async (productId, product_images) => {
-    const imageQuery = ` INSERT INTO products_image (product_id, image, image_sort)  VALUES ? `;
+    const imageQuery = ` INSERT INTO products_image (AdminUser_id,product_id, image, image_sort)  VALUES ? `;
 
     const imageValues = product_images.map((file, index) => [
       productId, file.filename, index + 1,
@@ -341,7 +341,7 @@ const Products = {
   },
 
   addProductAttributes: async (productId, attributes) => {
-    const attributesQuery = ` INSERT INTO product_attributes (product_id, size, sku, price, stock)  VALUES ? `;
+    const attributesQuery = ` INSERT INTO product_attributes (AdminUser_id,product_id, size, sku, price, stock)  VALUES ? `;
     const attributeValues = attributes.map(attribute => [
       productId, attribute.size, attribute.sku, attribute.price, attribute.stock,
     ]);

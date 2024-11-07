@@ -5,6 +5,7 @@ const SALT=parseInt(process.env.GEN_SALT);
 const fs=require("fs");
 const redisClient=require("../config/redisClient")
 // console.log(SALT)
+const { sheets } = require('../service/gSheet'); // Adjust the path as necessary
 
 const CheckAdminUserLogin=async(email,callback)=>{
     try {
@@ -21,7 +22,7 @@ const CheckAdminUserLogin=async(email,callback)=>{
     }
   }
 class AdminUserModel{
-  static async findByUUID(uuid){
+  static async findByUUID(uuid){ 
     // console.log(uuid)
     try {
       const query="select * from AdminUser where uuid=? and deleted_at is null";
@@ -34,38 +35,64 @@ class AdminUserModel{
   }
 }
 
-class User{
-  constructor(name,mobile,email,password,image,uuid){
-    this.name=name;
-    this.email=email;
-    this.mobile=mobile;
-    this.password=password;
-    this.image=image;
-    this.uuid=uuid;
+class User {
+  constructor(name, mobile, email, password, image, uuid) {
+      this.name = name;
+      this.email = email;
+      this.mobile = mobile;
+      this.password = password;
+      this.image = image;
+      this.uuid = uuid;
   }
-  static async exists(email,mobile){
-    const query="select count(*) as count from AdminUser where email=? or mobile=?";
-    const result=await new Promise((resolve,reject)=>{
-      db.query(query,[email,mobile],(err,results)=>{
-        if(err){
-          return reject(err);
-        }
-        resolve(results[0].count)
-      })
-    })
-    return result > 0;
+
+  static async exists(email, mobile) {
+      const query = "SELECT COUNT(*) AS count FROM AdminUser  WHERE email=? OR mobile=?";
+      const result = await new Promise((resolve, reject) => {
+          db.query(query, [email, mobile], (err, results) => {
+              if (err) {
+                  return reject(err);
+              }
+              resolve(results[0].count);
+          });
+      });
+      return result > 0;
   }
-    async Save(){
-    const hashedPassword=await bcrypt.hash(this.password,SALT)
-    const query="INSERT INTO AdminUser (name, mobile, email, password, image, UUID) VALUES (?, ?, ?, ?, ?, ?)"
-    await new Promise((resolve,reject)=>{
-      db.query(query,[this.name,this.mobile,this.email,hashedPassword,this.image ? this.image.secure_url : null,this.uuid],(err,results)=>{
-        if(err){
-          return reject(err);
-        }
-        resolve(results)
-      })
-    })
+
+  async Save() {
+      const hashedPassword = await bcrypt.hash(this.password, SALT);
+      const query = "INSERT INTO AdminUser  (name, mobile, email, password, image, UUID) VALUES (?, ?, ?, ?, ?, ?)";
+      await new Promise((resolve, reject) => {
+          db.query(query, [this.name, this.mobile, this.email, hashedPassword, this.image ? this.image.secure_url : null, this.uuid], (err, results) => {
+              if (err) {
+                  return reject(err);
+              }
+              resolve(results);
+          });
+      });
+  }
+
+  async logEnquiry(message) {
+      try {
+          // Hash the password before logging the enquiry
+          const hashedPassword = await bcrypt.hash(this.password, SALT);
+
+          // GOOGLE SHEET ENTRY
+          const response = await sheets.spreadsheets.values.append({
+              spreadsheetId: process.env.GOOGLE_SHEET_ID,
+              range: 'AdminUsers!A:E', // Adjusted range to include all fields
+              insertDataOption: 'INSERT_ROWS',
+              valueInputOption: 'RAW',
+              requestBody: {
+                  values: [[this.uuid, this.name, this.email, hashedPassword, this.mobile]], // Include UUID
+              },
+          });
+
+          if (response.status !== 200) {
+              console.error('Error adding data to Google Sheets:', response);
+          }
+      } catch (error) {
+          console.error('Error logging enquiry:', error);
+      }
   }
 }
 

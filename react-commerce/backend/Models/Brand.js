@@ -100,11 +100,11 @@ const Brand = {
 
   // Add a new brand
   add: async (page) => {
-    const { brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_description,meta_keyword } = page;
+    const {AdminUser_id, brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_description,meta_keyword } = page;
     // console.log(page)
-    const query = `INSERT INTO Brands (UUID,brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_descriptions,meta_keywords) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO Brands (AdminUser_id,UUID,brand_name, brand_image, brand_logo,brand_discount,description,url, meta_title, meta_descriptions,meta_keywords) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?,?)`;
     try {
-      const [result] = await db.promise().query(query, [UUID,brand_name, brand_image ? brand_image.secure_url : null, brand_logo ? brand_logo.secure_url : null,brand_discount,description,url, meta_title, meta_description, meta_keyword]);
+      const [result] = await db.promise().query(query, [AdminUser_id,UUID,brand_name, brand_image ? brand_image.secure_url : null, brand_logo ? brand_logo.secure_url : null,brand_discount,description,url, meta_title, meta_description, meta_keyword]);
       // console.log(result)
       return result;
     } catch (error) {

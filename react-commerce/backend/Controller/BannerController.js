@@ -1,5 +1,6 @@
 const Banner = require("../Models/Banner");
 const { cloudinary } =require("../helper/cloudinaryConfig");
+const sheets = require("../service/gSheet");
 
 exports.getAllBanners=async(req,res)=>{
     try {
@@ -54,20 +55,42 @@ exports.deleteBanner = async (req, res) => {
   
   exports.addBanner = async (req, res) => {
     // console.log("banner")
-    const {  type, link, alt}=req.body;
+    const {AdminUser_id,  type, link, alt}=req.body;
     // const image = req.file ? req.file.filename : null;
     const image=req.file ? await cloudinary.uploader.upload(req.file.path,{folder:'Banners'}) : null
   // console.log(image)
-    const newBanner = {image, type, link, alt };
+    const newBanner = {AdminUser_id,image, type, link, alt };
     try {
       const result=await Banner.add(newBanner);
       // console.log(result)
+      await logPageToGoogleSheets(newBanner)
       res.status(200).json({ message: "new Banner added successful" });
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Internal server error" });
     }
   };
+
+  async function logPageToGoogleSheets(newBanner) {
+    try {
+      const response=await sheets.spreadsheets.values.append({
+        spreadsheetId:process.env.GOOGLE_SHEET_ID,
+        range:'Banners!A:D',
+        insertDataOption:'INSERT_ROWS',
+        valueInputOption:'RAW',
+        requestBody:{
+          values:[[newBanner.type,newBanner.link,newBanner.alt,newBanner.AdminUser_id]]
+        }
+      })
+
+      if(response.status !==200){
+        throw new Error('Failed to log page data to google sheets')
+      }
+    } catch (error) {
+        console.error('Error logging page data',error)
+        throw new Error('Logging page data failed')
+    }
+  }
   
   exports.getBannerById = async (req, res) => {
     console.log(1)

@@ -46,7 +46,7 @@ const AddEditBanners = () => {
       form.append('type', formData.type);
       form.append('link', formData.link);
       form.append('alt', formData.alt);
-      
+      form.append('AdminUser_id',localStorage.getItem('id'))
       if (formData.BannerImage?.[0]) {
         form.append('BannerImage', formData.BannerImage[0]);
       }
@@ -66,7 +66,7 @@ const AddEditBanners = () => {
   
     } catch (error) {
         console.error("Error submitting form:", error);
-        toast.error("Form submission failed!");
+        toast.error("Form submission failed!",{position:"bottom-left"});
     } finally {
         setloading(false);
     }
@@ -74,7 +74,7 @@ const AddEditBanners = () => {
   
   return (
     <div>
-    <Header></Header>
+    <Header />
         <div className="wrapper">
         <div className="content-wrapper">
             <section className="content-header">
@@ -161,7 +161,7 @@ const AddEditBanners = () => {
                                     <button type="submit" className="btn btn-success" disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> Update </button>
                                      <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
                                 ) : (
-                                  <button type="submit" className="btn btn-success">Update</button>
+                                  <button type="submit" className="btn btn-primary">Submit</button>
                                 )}
                                 </div>
                             </form>
