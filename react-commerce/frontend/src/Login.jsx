@@ -32,10 +32,12 @@ const Login = () => {
       try {
         const response = await axios.post(`${BASE_URL}/api/login`, values);
         const data = response.data;
+
         localStorage.setItem('token', data.token);
         localStorage.setItem('email', data.email);
         sessionStorage.setItem('id', data.id);
         sessionStorage.setItem('role', data.role);
+
 
         if (data.status === 1) {
           NotificationManager.success("Login successful!");

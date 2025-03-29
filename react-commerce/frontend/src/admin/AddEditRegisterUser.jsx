@@ -173,7 +173,8 @@ const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
     name: Yup.string().max(100).min(3).required("please enter your name!"),
     email: Yup.string().max(100).min(2).required("please enter your email!"),
     password: Yup.string().max(100).min(6).required("please enter your password!"),
-    role: Yup.string().required("please enter your name!")
+    role: Yup.string().required("please enter your name!"),
+    // image: Yup.mixed().required('Image is required')
   });
 
   const onSubmitForm = async (id) => {
@@ -187,6 +188,7 @@ const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
         email: data.email,
         password: data.password,
         role: data.role
+        // image:data.image
       });
       setId(data.id); // Set id state
     } catch (error) {
@@ -222,11 +224,18 @@ const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
       name: "",
       email: "",
       password: "",
-      role: ""
+      role: "",
+      mobile: ''
+      // image:null
     },
     validationSchema: validationSchema,
     onSubmit: handleSubmit
   });
+
+  // const handleImageChange = (event) => {
+  //   const d=formik.setFieldValue('image', event.currentTarget.files[0]);
+  //   console.log(d)
+  // };
 
 //   delete functionality
   const handledelete = async (id) => {
@@ -487,7 +496,7 @@ const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
 
       {/* for update modal*/}
       <Modal isOpen={modal2} toggle={toggle2} {...args}>
-        <ModalHeader toggle={toggle2}>Hi This is Your Personal Information</ModalHeader>
+        <ModalHeader toggle={toggle2}>Hi <span style={{background:"pink",color:"blue"}}>{modaldata.name}</span> is Your Personal Information</ModalHeader>
         <ModalBody>
           <section className="content">
             <div className="container-fluid">
@@ -516,6 +525,13 @@ const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
                           <input type="email" className="form-control" id="email" placeholder="Enter email" name='email' value={formik.values.email} onChange={formik.handleChange} autoComplete='username' />
                           {formik.touched.email && formik.errors.email ? <div className="text-danger">{formik.errors.email}</div> : null}
                         </div>
+                        {/*
+                        <div className="form-group">
+                          <label htmlFor="image"><i className="fas fa-solid fa-user"></i> Profile</label>
+                          <input type="file" className="form-control" id="image" name='image' onChange={handleImageChange} onBlur={formik.handleBlur} />
+                          {formik.touched.image && formik.errors.image ? <div className="text-danger">{formik.errors.image}</div> : null}
+                        </div>
+                        */}
                         <div className="form-group">
                           <label htmlFor="exampleInputMobile"><i class="fas fa-solid fa-phone"></i>  Mobile</label>
                           <input type="text" className="form-control" id="exampleInputMobile" placeholder="Enter Mobile" name='mobile' value={formik.values.mobile} onChange={formik.handleChange} onBlur={formik.handleBlur} />

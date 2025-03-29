@@ -75,6 +75,7 @@ app.use(morganMiddleware)
 // app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
+
 app.use("/api",userRoutes)//register and login and check email and check mobile
 // app.use("/api",authenticate,userRoutes)//register and login and check email and check mobile
 app.use("/api",cmsRoutes) //cms api
@@ -99,114 +100,9 @@ app.get("/",(req,res)=>{
 })
 
 
-// for google login (implementation code in utils/sociallogin.js)
-app.get('/auth/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
-}));
-
-app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
-  res.redirect('http://localhost:3000/userdashboard2'); // Redirect to homepage or another page after successful login
-});
-
-//for facebook
-app.get("/auth/facebook",passport.authenticate("facebook",{scope:["email"]}))
-app.get("/auth/facebook/callback",passport.authenticate("facebook",{}),(req,res)=>{
-    const user = req.user;
-    // const token = jwt.sign(
-    //   { email: user.email, role: user.role, id: user.id },
-    //   process.env.JWTSECRET,
-    //   { expiresIn: "1h" } 
-    // )
-  
-    // if (user.role === 1) {
-    //     res.redirect(`http://localhost:3000/dashboard?token=${token}&role=${user.role}`);
-    // } else {
-    //     res.redirect(`http://localhost:3000/dashboard2?token=${token}&role=${user.role}`);
-    // }
-    res.redirect('http://localhost:3000/userdashboard2'); // Redirect to homepage or another page after successful login
-
-    // res.redirect(`http://localhost:3000/google/success?token=${token}&role=${user.role}&id=${user.id}&email=${user.email}`);
-})
 
 
-app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
-
-app.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
-  const user = req.user;
-  const token = jwt.sign(
-      { email: user.email, role: user.role, id: user.id },
-      process.env.JWTSECRET,
-      { expiresIn: "1h" }
-  );
-  res.redirect('http://localhost:3000/userdashboard2'); 
-  // res.redirect(`http://localhost:3000/success?token=${token}&role=${user.role}&id=${user.id}&email=${user.email}`);
-});
-
-// for socket
-const io=socketIo(httpServer,{
-  cors: {origin: '*', methods:["GET","POST","PUT","PATCH","DELETE"]}
-})
-// MAKE IO ACESS GLOBALLY
-app.set('io',io)
-// for connection
-io.on("connection",(socket)=>{
-  console.log('user connected',socket.id);
-
-  // handle disconnection
-  socket.on("disconnect",()=>{
-    console.log("user disconnected",socket.id)
-  })
-})
-
-wss.on('connection', (ws) => {
-  console.log('Client connected');
-  // Add client to the set
-  clients.add(ws);
-
-  ws.on('message', async (message) => {
-    console.log(`Received message: ${message}`);
-    // Handle incoming message from client
-    // Convert the message to a string before broadcasting it
-    const messageString = message.toString();
-    
-    const genAI = new GoogleGenerativeAI(process.env.API_KEYGEMINI);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = messageString;
-
-    try {
-      const result = await model.generateContent(prompt);
-      const response = await result.response.text();
-      // console.log(response);
-      
-      // Send response back to the client
-      ws.send(response);
-      
-      // Broadcast the original message to other clients
-      wss.clients.forEach((client) => {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-          client.send(messageString);
-        }
-      });
-    } catch (error) {
-      console.log(error);
-      // Send error response back to the client
-      ws.send('Error occurred while processing your message');
-    }
-  });
-
-  ws.on('close', () => {
-    console.log('Client disconnected');
-    // Remove client from the set
-    clients.delete(ws);
-  });
-  // Send data to client
-  // ws.send('Hello from backend!');
-});
-
-// sharp('./images.jpeg').resize(200).toFormat('webp',{palette:true}).toFile('op5.webp')
-
-  
 httpServer.listen(SERVERPORT, () => {  
   console.log(`server listening at port http://localhost:${SERVERPORT}`);
   console.log(`Swagger UI is available at http://localhost:${SERVERPORT}/api-docs`);
-}); 
+})

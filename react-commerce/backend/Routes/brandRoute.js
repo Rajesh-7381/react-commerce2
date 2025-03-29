@@ -12,4 +12,3 @@ router.get("/AllBrandCount",RouteCheckAuth ,brandController.brandCount)
 router.delete("/branddelete/:id",RouteCheckAuth ,brandController.deleteBrand)
 router.put("/handlebrandstatus/:id",RouteCheckAuth ,brandController.updateBrandStatus)
 router.get("/SearchBrands/:searchTerm",RouteCheckAuth ,brandController.Search)
-module.exports=router;

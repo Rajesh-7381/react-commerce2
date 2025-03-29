@@ -78,6 +78,29 @@ const Dashboard1 = () => {
     setCards(newCards);
     setDragAndDropPerformed(1)
   };
+  useEffect(() => {
+    document.title = 'Dashboard';
+      // navigate("/"); 
+      const id=sessionStorage.getItem("id");
+      // console.log(id)
+      // alert(id)
+      if(id){
+        fetchuserdata(id);
+      }else{
+        navigate("/")
+      }   
+    
+  }, [ navigate]); 
+  const fetchuserdata=async(id)=>{
+    try {
+      const reponse=await axios.get(`http://localhost:8081/singledata/${id}`);
+      setUserData(reponse.data.data);
+      // console.log(reponse.data.data)
+      // alert(JSON.stringify(userData))
+    } catch (error) {
+      
+    }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -181,6 +204,8 @@ const Dashboard1 = () => {
   const handleChartChange = (e) => {
     setSelectedChart(e.target.value);
   };
+
+ 
   
   // download csv file
   const headers=[
@@ -271,6 +296,7 @@ const Dashboard1 = () => {
                     More info <i className="fas fa-arrow-circle-right" />
                   </Link>
                 </div>
+
               </div>
             ))}
           </div>

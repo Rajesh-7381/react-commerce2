@@ -8,6 +8,7 @@ import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import { toast, ToastContainer } from "react-toastify";
 
+
 const AddEditProducts = () => {
   const BASE_URL=process.env.REACT_APP_BASE_URL
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const AddEditProducts = () => {
   const [productattributedata, setproductattributedata] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setbrands] = useState([]);
+
   const [productPrice, setProductPrice] = useState(0);
   const [productDiscount, setProductDiscount] = useState(0);
   const [finalPrice, setFinalPrice] = useState(0);
@@ -65,7 +67,11 @@ const AddEditProducts = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/getAllCategorys`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+
+      const response = await axios.get(`http://localhost:8081/categories`);
+      const response2 = await axios.get(`http://localhost:8081/productBrands`);
       setCategories(response.data);
+      setbrands(response2.data);
     } catch (error) {
       console.error(error);
     }
@@ -92,6 +98,9 @@ const AddEditProducts = () => {
       setData(productdata);
       setproductattributedata(productattributes);
       setValue("category_id", productdata.category_id); 
+      setproductattributedata(productattributes)
+      setValue("category_id", productdata.category_id); // Add category_id to FormData
+      setValue("brand_id", productdata.brand_id);
       setValue("product_name", productdata.product_name);
       setValue("brand_id", productdata.brand_id);
       setValue("product_code", productdata.product_code);
@@ -131,7 +140,9 @@ const AddEditProducts = () => {
     setloading(true)
     try {
       const form = new FormData();
-      form.append("category_id", formData.category_id); 
+
+      form.append("category_id", formData.category_id); // Add category_id to FormData
+      form.append("brand_id", formData.brand_id);
       form.append("product_name", formData.product_name);
       form.append("brand_id", formData.brand_id);
       form.append("product_code", formData.product_code);
@@ -419,6 +430,57 @@ const AddEditProducts = () => {
                                 </span>
                               )}
                             </div>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-md-12">
+                        <div className="card-body">
+                          <div className="form-group text-start">
+                            <label htmlFor="category_id">Select Brand</label>
+                            <select
+                              name="brand_id"
+                              id="brand_id"
+                              className="form-control"
+                              {...register("brand_id", { required: true })}
+                              value={data.brand_id}
+                            >
+                              <option value="">Select</option>
+                              {brands.map((brand) => (
+                                <option key={brand.id} value={brand.id}>
+                                  {brand.brand_name}
+                                </option>
+                              ))}
+                            </select>
+                            {errors.brand_id && (
+                              <span className="text-danger">
+                                Brand is required
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="card-body">
+                          <div className="form-group text-start">
+                            <label htmlFor="exampleInputProductName">
+                              Product Name{" "}
+                              <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="exampleInputProductName"
+                              name="product_name"
+                              {...register("product_name", { required: true })}
+                              defaultValue={data.product_name}
+                            />
+                            {errors.product_name && (
+                              <span className="text-danger">
+                                Product Name is required{" "}
+                              </span>
+                            )}
                           </div>
                         </div>
 
