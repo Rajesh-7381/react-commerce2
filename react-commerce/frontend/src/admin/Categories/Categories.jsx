@@ -7,6 +7,8 @@ import "react-notifications/lib/notifications.css";
 import { StatusEntity } from "../CRUDENTITY/StatusEntity";
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
+import io from "socket.io-client";
+const socket=io("http://localhost:8081")
 
 const Categories = () => {
   const BASE_URL=process.env.REACT_APP_BASE_URL
@@ -19,11 +21,24 @@ const Categories = () => {
   const firstIndex = lastIndex - recordsPerPage;
   const totalPages = Math.ceil(filterData.length / recordsPerPage);
   const numbers = [...Array(totalPages + 1).keys()].slice(1);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     document.title = "Categories";
     handlecategorydata();
+    fetchNotifications(); 
   }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/api/notifications',);
+      const newNotifications = response.data;
+        console.log(newNotifications)
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
 
   const handlecategorydata = async () => {
     const response = await axios.get(`${BASE_URL}/api/getAllCategorys`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
@@ -175,7 +190,7 @@ const Categories = () => {
                           <table className="table table-bordered table-striped">
                             <thead>
                               <tr>
-                                <th className="bg-dark text-light">SL NO.</th>
+                                <th className="bg-dark text-light" >SL NO.</th>
                                 <th className="bg-dark text-light">  CATEGORY NAME</th>
                                 <th className="bg-dark text-light">  PARENT CATEGORY{" "}</th>
                                 <th className="bg-dark text-light">  CATEGORY IMAGE</th>
@@ -230,6 +245,8 @@ const Categories = () => {
                                 }
                             </tbody>
                           </table>
+                          
+
                           <br></br>
                           <nav className="float-right">
                             <ul className="pagination">

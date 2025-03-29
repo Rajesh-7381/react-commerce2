@@ -1,0 +1,131 @@
+Stage 1: Basics
+=================
+Programming Fundamentals:
+
+Learn a programming language (C++, Java, Python, or JavaScript).
+Focus on syntax, loops, conditionals, and functions.
+Time and Space Complexity:
+
+Big O Notation.
+Analyze time complexity of loops, nested loops, and recursive calls.
+Space complexity basics.
+Basic Mathematics:
+
+Prime numbers, GCD/LCM.
+Modular arithmetic.
+Exponentiation by squaring.
+
+
+
+Stage 2: Data Structures
+==========================
+Arrays and Strings:
+One-dimensional arrays: Traversal, Insertion, Deletion.
+Two-dimensional arrays: Matrix operations.
+Sliding Window, Prefix Sum, and Two-pointer Techniques.
+Problems: Kadane's Algorithm, Maximum Subarray, Subarray Sum Equals K.
+Linked List:
+Singly Linked List: Reversal, Merging.
+Doubly Linked List.
+Circular Linked List.
+Problems: Detect Loop, Merge Two Sorted Lists, LRU Cache.
+Stack and Queue:
+Stack: Implementation, Infix to Postfix, Balanced Parentheses.
+Queue: Circular Queue, Deque, Priority Queue.
+Problems: Next Greater Element, Stock Span Problem, Sliding Window Maximum.
+Hashing:
+Hash Tables and Maps.
+Problems: Two Sum, Group Anagrams, Subarray with 0 Sum.
+Trees:
+Binary Trees: Traversals (Inorder, Preorder, Postorder).
+Binary Search Trees (BST).
+Problems: Lowest Common Ancestor, Diameter of Tree, Serialize/Deserialize Tree.
+Heaps:
+Min-Heap, Max-Heap.
+Priority Queues.
+Problems: Kth Largest Element, Merge K Sorted Lists.
+Graphs:
+Representation: Adjacency List, Adjacency Matrix.
+Traversals: BFS, DFS.
+Shortest Path: Dijkstra, Bellman-Ford, Floyd-Warshall.
+Problems: Connected Components, Cycle Detection, Topological Sort.
+Advanced Data Structures:
+Segment Tree.
+Fenwick Tree (Binary Indexed Tree).
+Trie.
+Disjoint Set Union (Union-Find).
+
+
+
+
+
+Stage 3: Algorithms
+======================
+Sorting Algorithms:
+Bubble Sort, Selection Sort, Insertion Sort.
+Quick Sort, Merge Sort.
+Problems: Sort Colors, Merge Intervals.
+Searching Algorithms:
+Linear Search, Binary Search.
+Problems: Find Peak Element, Median of Two Sorted Arrays.
+Divide and Conquer:
+Problems: Maximum Subarray (Divide and Conquer), Merge Sort.
+Dynamic Programming (DP):
+Basics: Recursion to DP, Memoization vs Tabulation.
+Problems: Fibonacci Sequence, Longest Common Subsequence, 0/1 Knapsack.
+Advanced Problems: Matrix Chain Multiplication, Palindromic Substrings.
+Greedy Algorithms:
+Problems: Activity Selection, Huffman Encoding, Minimum Spanning Tree (Kruskal/Prim).
+Backtracking:
+Problems: N-Queens, Sudoku Solver, Subset Sum.
+Bit Manipulation:
+Basics: AND, OR, XOR, Left/Right Shift.
+Problems: Single Number, Subsets using Bits.
+String Matching:
+Algorithms: KMP, Rabin-Karp, Z Algorithm.
+Problems: Find Pattern in Text, Longest Prefix Suffix.
+
+
+
+
+
+
+Stage 4: Problem-Solving Practice
+================================
+Easy-Level Problems:
+
+Focus on implementation and basic logic.
+Platforms: LeetCode Easy, Codeforces Div 4.
+Medium-Level Problems:
+
+Solve 200–300 problems focusing on arrays, strings, and dynamic programming.
+Platforms: LeetCode Medium, Codeforces Div 3.
+Hard-Level Problems:
+
+Advanced DP, Graphs, and Trees.
+Platforms: LeetCode Hard, Codeforces Div 2, CodeChef.
+Stage 5: Competitive Programming (Optional)
+Learn Contest Platforms: Codeforces, Atcoder, CodeChef.
+Focus on problem-solving speed and accuracy.
+Learn additional algorithms (e.g., Number Theory, Game Theory).
+Stage 6: Mock Interviews
+Mock coding rounds on platforms like InterviewBit, Pramp, or HackerRank.
+Time-bound problem-solving.
+Behavioral interview preparation.
+Resources
+Books:
+
+"Introduction to Algorithms" by Cormen (CLRS).
+"Cracking the Coding Interview" by Gayle Laakmann McDowell.
+Websites:
+
+LeetCode, HackerRank, GeeksforGeeks, Codeforces, CodeChef.
+Courses:
+
+MIT OpenCourseWare (Introduction to Algorithms).
+Udemy: Master the Coding Interview by Andrei Neagoie.
+Tips for Success
+Practice daily with increasing difficulty.
+Start with brute force solutions and optimize step by step.
+Participate in coding contests to improve problem-solving speed.
+Revise key concepts regularly.

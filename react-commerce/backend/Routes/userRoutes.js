@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../utils/multerConfig");
-const { Login, RegisterUser, AdminUserController,} = require("../Controller/userController");
+const { Login, RegisterUser, AdminUserController, Logout,} = require("../Controller/userController");
 const RouteCheckAuth = require("../Auth/RouteCheckAuth");
 const {authenticate} = require("../Middleware/PassPort");
 
 const registerusercontroller = new RegisterUser();
 router.post("/register", upload.single("image"), (req, res) => { registerusercontroller.CreateRegisterAdminUser(req, res) });
 router.post("/login",Login);
+router.post('/logout',Logout.Logout)
 router.get("/checkemail/:email", AdminUserController.checkEmail);
 router.get("/checkmobile/:mobile" , AdminUserController.Mobile);
 router.get("/UniqueID/:unique_id",RouteCheckAuth , AdminUserController.checkUniqeID);

@@ -3,8 +3,9 @@ const router = express.Router();
 const upload=require("../utils/multerConfig")
 const categoryController=require("../Controller/categoryController");
 const RouteCheckAuth = require("../Auth/RouteCheckAuth");
+// console.log(RouteCheckAuth)
 
-router.get("/getAllCategorys" ,categoryController.getAll);
+router.get("/getAllCategorys" ,RouteCheckAuth,categoryController.getAll);
 router.post("/addcategory",RouteCheckAuth ,upload.single("category_image"),categoryController.create);
 router.get("/categoryeditdata/:id",RouteCheckAuth ,categoryController.categoryEditData);
 router.put("/updatecategory/:id",RouteCheckAuth ,upload.single("category_image"),categoryController.updateCategory);

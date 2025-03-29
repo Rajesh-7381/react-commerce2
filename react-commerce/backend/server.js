@@ -1,6 +1,10 @@
 const express = require("express");
+const app = express(); //create express.js(framework) instance 
 const cors = require("cors");
 const session=require("express-session")
+const http=require('http')
+const socketIo=require('socket.io')
+const httpServer=http.createServer(app)
 // db
 const { db } = require("./config/dbconfig");
 // for multiple database
@@ -14,7 +18,6 @@ const cluster=require("node:cluster");
 const os=require("os")
 const ejs=require("ejs")
 
-const errhandler = require("./Middleware/ErrorHandler");
 // const { swaggerSpec }= require('./Swagger/swaggerConfig');
 const userRoutes=require("./Routes/userRoutes")
 const cmsRoutes=require("./Routes/cmsRoutes")
@@ -26,6 +29,7 @@ const frontRoutes=require("./Routes/frontRoutes");
 const enqueryRoutes=require("./Routes/enquiry.routes")
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const passport=require("./utils/SocialLogin")
+const { morganMiddleware } = require('./utils/logger');
 const WebSocket = require('ws');
 const clients = new Set();
 const wss = new WebSocket.Server({ port: 8080 });
@@ -35,6 +39,7 @@ const path = require("node:path");
 const sharp=require("sharp");
 const { authenticate } = require("./Middleware/PassPort");
 const { default: csrftoken, default: csrfprotection } = require("./Middleware/csrfProtection");
+const { ar } = require("@faker-js/faker");
 // const redisClient = require('./config/redisClient'); 
 const SERVERPORT=process.env.SERVERPORT;
 
@@ -42,8 +47,6 @@ const SERVERPORT=process.env.SERVERPORT;
 // const appConfig=require("./config/appConfig")
 // const {SERVERPORT}=appConfig
 
-
-const app = express(); //create express.js(framework) instance
 // middleware
 // setup session
 app.use(session({secret: process.env.JWT_SECRET, resave: false, saveUninitialized: false, cookie: { secure: false, maxAge: 20000 }})); //maxage 24 hours
@@ -55,7 +58,7 @@ app.use(express.json()); // parses incoming requests with JSON payloads.
 app.use(bodyParser.json());  //Parses incoming JSON-formatted request bodies and makes them accessible on the req.body property of the request object.
 app.use(bodyParser.urlencoded({ extended: true })); //Parses incoming URL-encoded request bodies and makes them accessible on the req.body property.
 // The extended: true option enables parsing of nested objects and arrays, allowing for more complex data structures.
-app.use(errhandler);
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static('public'));
@@ -67,7 +70,8 @@ app.use(express.static('public'));
 
 // app.use("/profile", express.static(path.join(__dirname, "uploads/profile")));
 
-
+// for logger
+app.use(morganMiddleware)
 // app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
@@ -137,6 +141,23 @@ app.get('/auth/github/callback', passport.authenticate('github', { failureRedire
   res.redirect('http://localhost:3000/userdashboard2'); 
   // res.redirect(`http://localhost:3000/success?token=${token}&role=${user.role}&id=${user.id}&email=${user.email}`);
 });
+
+// for socket
+const io=socketIo(httpServer,{
+  cors: {origin: '*', methods:["GET","POST","PUT","PATCH","DELETE"]}
+})
+// MAKE IO ACESS GLOBALLY
+app.set('io',io)
+// for connection
+io.on("connection",(socket)=>{
+  console.log('user connected',socket.id);
+
+  // handle disconnection
+  socket.on("disconnect",()=>{
+    console.log("user disconnected",socket.id)
+  })
+})
+
 wss.on('connection', (ws) => {
   console.log('Client connected');
   // Add client to the set
@@ -185,7 +206,7 @@ wss.on('connection', (ws) => {
 // sharp('./images.jpeg').resize(200).toFormat('webp',{palette:true}).toFile('op5.webp')
 
   
-app.listen(SERVERPORT, () => {
+httpServer.listen(SERVERPORT, () => {  
   console.log(`server listening at port http://localhost:${SERVERPORT}`);
   console.log(`Swagger UI is available at http://localhost:${SERVERPORT}/api-docs`);
 }); 

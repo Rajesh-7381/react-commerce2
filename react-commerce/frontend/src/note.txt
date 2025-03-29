@@ -1034,8 +1034,58 @@ const debouncedSearchFunction = debounce(async (event, searchEntity) => {
 
 
 
+````````````````---------------------------------------------------for global error handling in react application 
+-> need to create errorbounddary file to load error acrross entire file have any error occuurs
+
+  // ErrorBoundary.jsx
 
 
+import React from "react";
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Error caught by ErrorBoundary:", error, errorInfo);
+    this.setState({ errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          <h1>Oops! Something went wrong.</h1>
+          <details style={{ whiteSpace: "pre-wrap" }}>
+            {this.state.error && this.state.error.toString()}
+            <br />
+            {this.state.errorInfo && this.state.errorInfo.componentStack}
+          </details>
+          <button onClick={() => window.location.reload()}>Reload</button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default ErrorBoundary;
+
+-------------------
+-> it runs 1st constuctor load set haserror false
+if any error occurs that catch by child componenet like -> static getDerivedStateFromError
+if it contain any error then it haserror now true render method now satisfy the condition and show user friendly error instaed of application crash
+->in devolopement server not works correctkly but need to build it 
+  steps to build react application 
+    ->npm run build 
+    ->npx serve -s build 
 
 // for column swap
 
@@ -1092,3 +1142,338 @@ searching
 
 
     
+                                                               // for quick sort 
+    // Choose a Pivot: Select an element from the array to be the pivot (commonly the last element, first element, or a random element).
+
+// Partitioning:
+
+// Rearrange the array so that all elements less than the pivot are on the left, and all elements greater than the pivot are on the right.
+// Place the pivot in its correct position in the sorted array.
+// Recursively Apply:
+
+// Recursively apply the above steps to the sub-arrays (left and right of the pivot).
+// Base Case: If the array has one or zero elements, it is already sorted.
+
+// Combine: Since the sub-arrays are sorted in place, no additional steps are needed to combine them.
+function quicksort(arr){
+  if(arr.length <=1){
+    console.log(arr)
+    return arr;
+  }
+
+  const pivot=arr[0];
+  const left=[];
+  const right=[];
+
+  for(var i=1;i<arr.length;i++){
+    if(arr[i] <= pivot){
+      left.push(arr[i])
+    }else{
+      right.push(arr[i])
+    }
+  }
+  const sortedLeft=quicksort(left)
+  const sortedRight=quicksort(right)
+
+  return [...sortedLeft,pivot,...sortedRight]
+}
+
+
+const arr=[23,45,5,22,11,899,78];
+const sortarr=quicksort(arr);
+console.log(sortarr)
+
+
+
+--------------------------------for random pivot choosen--------------------------------------------
+function quickSort(arr) {
+  // Base case: if the array has 1 or 0 elements, it is already sorted
+  if (arr.length <= 1) {
+    return arr;
+  }
+
+  // Step 1: Choose a random pivot
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  const pivot = arr[randomIndex];
+
+  // Remove the pivot from the array (optional but helps with partitioning)
+  arr.splice(randomIndex, 1);
+
+  let left = [];   // Elements less than or equal to the pivot
+  let right = [];  // Elements greater than the pivot
+
+  // Step 2: Partition the array
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] <= pivot) {
+      left.push(arr[i]);
+    } else {
+      right.push(arr[i]);
+    }
+  }
+
+  // Step 3: Recursively sort the left and right arrays
+  const sortedLeft = quickSort(left);
+  const sortedRight = quickSort(right);
+
+  // Step 4: Combine sorted left, pivot, and sorted right arrays
+  return [...sortedLeft, pivot, ...sortedRight];
+}
+
+// Example usage:
+const arr = [81, 45, 53, 32, 4, 677, 3];
+const sortedArr = quickSort(arr);
+console.log("Sorted Array:", sortedArr);
+
+
+
+
+
+
+
+
+
+
+
+
+// selection sort
+
+const arr=[23,75,34,45,98,8,11];
+const sortedArray=selectionSort(arr)
+console.log(sortedArray)
+function selectionSort(arr){
+  for(var i=0;i<arr.length-1;i++){
+    var minIndex=i;
+    for(var j=i+1;j<arr.length;j++){
+      if(arr[j] < arr[minIndex]){
+        minIndex=j
+      }
+    }
+    if(minIndex != i){
+      [arr[i],arr[minIndex]]=[arr[minIndex],arr[i]]
+    }
+    // console.log(`Pass ${i + 1}:`, arr);6
+  }
+  return arr;
+}
+
+
+const arr= [1, 4, 3, 2, 6, 5]
+const sortedarr=selectionAndquicksort(arr)
+console.log(sortedarr)
+
+function selectionAndquicksort(arr) {
+  if (arr.length <= 1) {
+    return arr;
+  }
+
+  var pivot = arr[0];
+  var left = [];
+  var right = [];
+  for (var i = 1; i < arr.length; i++) {
+    if (arr[i] <= pivot) {
+      left.push(arr[i]);
+    } else {
+      right.push(arr[i]);
+    }
+  }
+  
+  var sortedleft = selectionAndquicksort(left);
+  var sortedright = selectionAndquicksort(right);
+
+  return [...sortedleft, pivot, ...sortedright];
+}
+
+
+
+
+
+
+
+
+// merge  sort working(to divide subarrays with end termination and then conquer in conquer time to compare with them it will be automatically sorted)
+const arr=[1,56,34,23,5,98,45,6];
+
+const sortedarr=mergesort(arr)
+console.log(sortedarr)
+function mergesort(arr){
+  if(arr.length <= 1){
+    return arr;
+  }
+
+  var mid=Math.floor(arr.length/2)
+  var left=arr.slice(0,mid);
+  var right=arr.slice(mid)
+
+  const sortedLeft=mergesort(left);
+  const sortedRight=mergesort(right)
+
+  return merge(sortedLeft,sortedRight)
+}
+
+function merge(left,right){
+  const result=[];
+  var i=0; var j=0;
+  while(i < left.length && j < right.length){
+    if(left[i] < right[j]){
+      result.push(left[i])
+      i++
+    }else{
+      result.push(right[j]);
+      j++
+    }
+  }
+  
+  while (i < left.length) {
+    result.push(left[i]);
+    i++;
+  }
+
+
+  while (j < right.length) {
+    result.push(right[j]);
+    j++;
+  }
+
+  return result;
+}
+
+
+
+
+
+
+
+
+
+Firebase Cloud Messaging (FCM) Setup Guide for a React Project  (video refernce ->  "https://www.youtube.com/watch?v=IK8x7qc9ZsA")
+This guide provides step-by-step instructions to integrate Firebase Cloud Messaging (FCM) into your React application.
+
+1. Create a Firebase Project
+Open Firebase Console.
+Click on "Go to console" in the top right corner.
+Click "Create a project", follow the setup steps, and enable Google Analytics.
+2. Enable Cloud Messaging
+In the Firebase Console, navigate to Cloud Messaging in the left sidebar.
+Click on the Web (</>) button.
+Wait for Firebase to generate the configuration.
+3. Install Firebase in Your React Project
+Open your project in VS Code.
+Inside the src folder, create a new file named firebase.js.
+Install the Firebase SDK:
+bash
+Copy
+Edit
+npm install firebase
+4. Configure Firebase in Your React App
+Open firebase.js and paste the Firebase configuration from the console.
+
+Import Firebase Messaging:
+
+javascript
+Copy
+Edit
+import { initializeApp } from "firebase/app";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID",
+  measurementId: "YOUR_MEASUREMENT_ID",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+export const messaging = getMessaging(app);
+
+// Function to request permission and get token
+export const generateToken = async () => {
+  const permission = await Notification.requestPermission();
+  console.log("Notification Permission:", permission);
+  if (permission === "granted") {
+    const token = await getToken(messaging, {
+      vapidKey: "YOUR_VAPID_KEY",
+    });
+    console.log("FCM Token:", token);
+    return token;
+  }
+};
+Comment out Google Analytics in firebase.js if it is not needed.
+
+5. Generate VAPID Key for Cloud Messaging
+In Firebase Console, go to Project Settings (gear icon on the left sidebar).
+Click on Cloud Messaging.
+Generate and copy the VAPID Key Pair.
+Add the VAPID key to the generateToken function in firebase.js.
+6. Request Notification Permission in App.js
+Open App.js and import generateToken from firebase.js:
+
+javascript
+Copy
+Edit
+import { useEffect } from "react";
+import { generateToken, messaging } from "./firebase";
+import { onMessage } from "firebase/messaging";
+
+function App() {
+  useEffect(() => {
+    generateToken();
+
+    // Handle incoming messages in the foreground
+    onMessage(messaging, (payload) => {
+      console.log("Message received:", payload);
+    });
+  }, []);
+
+  return <div>My App</div>;
+}
+
+export default App;
+Open the browser console to check if "Notification Permission: granted" is displayed.
+
+7. Fix the Firebase Messaging Error
+If you see an error related to Firebase Messaging, follow these steps:
+
+Create a Service Worker File
+
+Inside the public folder, create a new file named firebase-messaging-sw.js.
+Add the following code:
+javascript
+Copy
+Edit
+importScripts("https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js");
+
+// Initialize Firebase inside the service worker
+firebase.initializeApp({
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID",
+  measurementId: "YOUR_MEASUREMENT_ID",
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {
+  console.log("Background message received:", payload);
+
+  self.registration.showNotification(payload.notification.title, {
+    body: payload.notification.body,
+    icon: "/firebase-logo.png",
+  });
+});
+8. Create Your First Firebase Campaign
+Go to Firebase Console and click "Continue to Console" after dependencies are installed.
+Before creating a campaign, click "View FCM Reporting Dashboard".
+Click "Create your first campaign" and follow the instructions.
+9. Test Your Notifications
+Send a test notification from Firebase Console → Cloud Messaging.
+Check your browser’s console and notification tray for messages.
+✅ Your Firebase Cloud Messaging setup for React is now complete! 🚀

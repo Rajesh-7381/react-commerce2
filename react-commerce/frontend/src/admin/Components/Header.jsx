@@ -12,6 +12,7 @@ const Header = () => {
     // const { theme, toggleTheme } = useContext(ThemeContext);
   const [bellset,setbellset]=useState(0)  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State to manage dropdown visibility
+  let curntPstn;
  
     useEffect(() => {
       // Get the user's current location
@@ -51,10 +52,33 @@ const Header = () => {
         }
       }
 
-    const handlelogout=()=>{
-      sessionStorage.clear();
-      navigate("/");
-    }
+      const handlelogout = async () => {
+        const id = sessionStorage.getItem('id');
+      
+        if (!id) {
+          console.error('User ID not found in sessionStorage.');
+          return;
+        }
+      
+        try {
+          // Send logout request
+          const response = await axios.post(`${BASE_URL}/api/logout`, { id });
+      
+          // Confirm successful logout
+          console.log(response.data.message);
+      
+          // Clear storage after successful logout
+          sessionStorage.clear();
+          localStorage.clear();
+      
+          // Redirect to login or home page
+          navigate("/");
+        } catch (error) {
+          console.error('Error during logout:', error.response?.data?.message || error.message);
+          alert('Failed to log out. Please try again.');
+        }
+      };
+      
 
     const toggleDropdown = () => {
       setIsDropdownOpen(prevState => !prevState);
@@ -222,7 +246,7 @@ const Header = () => {
     <Link to={"/admindashboard1"} className="brand-link">
       <img src={"./pngtree-e-letter-logo-ecommerce-shop-store-design-png-image_4381099 (1).png"} alt="AdminLTE Logo" className="brand-image img-circle elevation-3 rounded-circle" style={{opacity: '.8'}}  />
       <span className="brand-text font-weight-light">e-Com</span>
-      <p id='position' className='text-danger'>{CurrentPosition}</p>
+      <p id='position' className='text-danger'>{CurrentPosition ? CurrentPosition : 'Add Address'}</p>
     </Link>
     {/* Sidebar */}
     <div className="sidebar">

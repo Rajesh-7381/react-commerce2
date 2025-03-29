@@ -6,21 +6,94 @@ const fs=require("fs");
 const redisClient=require("../config/redisClient")
 // console.log(SALT)
 const { sheets } = require('../service/gSheet'); // Adjust the path as necessary
+const { validateFormat, loginAttempt, executeHook } = require("../Middleware/user.hooks");
+const { ne } = require("@faker-js/faker");
+const { logger } = require("../utils/logger");
 
 const CheckAdminUserLogin=async(email,callback)=>{
+  const preHooks=[validateFormat]
+  const postHooks=[loginAttempt]
     try {
+      for(const hook of preHooks){
+        await executeHook(hook,{email})
+      }
       const query="SELECT * FROM AdminUser WHERE email = ?"
       db.query(query,[email],async(err,results)=>{
         if(err){
           return callback(err,null)
         }
+          const user=results[0];
+          for(const hooks of postHooks){
+            await executeHook(hooks,{user})
+          } 
           return callback(null,results[0]);
           //  console.log(results[0])
+          
       })
     } catch (error) {
         console.error(error)
     }
   }
+
+class checkFailedAttempts{
+  static async checkFailedAttempts(lockAccount,failedAttempts,id,callback){
+    const query=`update AdminUser set failed_attempts = ? ${lockAccount} where id=?`
+    db.query(query,[failedAttempts,id],async(err)=>{
+      if(err){
+        console.log(err)
+        callback('unable to process login attempts')
+        return;
+      }
+      const message=failedAttempts >=3 ? '🚫 Account locked due to too many failed attempts. Try again in 24 hours.' : `⚠️ Invalid email or password. You have ${3 - failedAttempts} attempts left.`
+      callback(message);
+    })
+  }
+}  
+
+class resetFailedAttempts{
+  static async resetFailedAttempts(id){
+    const query=`update AdminUser set failed_attempts=0,account_locked_until=null where id=?`
+    try {
+      db.query(query,[id],(err)=>{
+        if(err){
+          console.log(err)
+        }
+      })
+    } catch (error) {
+        throw error
+    }
+  }
+}
+
+class UserActivityLog{
+  static async UserActivityLog(id,action,ip,user_agent){
+    try {
+      const logquery='insert into UserActivityLog (user_id,action,ip_address,device_info) values (?,?,?,?)';
+      db.query(logquery,[id,action,ip,user_agent],(err,results)=>{
+        if(err){
+          console.log(err)
+        }
+      })
+    } catch (error) {
+       console.log(error)
+    }
+  }
+}
+
+class Logout{
+  static async Logout(id,action,ip,user_agent){
+    try {
+      const logquery='insert into UserActivityLog (user_id,action,ip_address,device_info) values (?,?,?,?)';
+      db.query(logquery,[id,action,ip,user_agent],(err,results)=>{
+        if(err){
+          console.log(err)
+        }
+      })
+    } catch (error) {
+       console.log(error)
+    }
+  }
+}
 class AdminUserModel{
   static async findByUUID(uuid){ 
     // console.log(uuid)
@@ -56,6 +129,15 @@ class User {
           });
       });
       return result > 0;
+  }
+  static async storeOTP(email, otp) {
+    try {
+      await redisClient.set(`OTP_${email}`, otp, 'EX', 600); // Store OTP for 10 minutes
+      console.log(`✅ OTP stored for ${email}: ${otp}`);
+    } catch (error) {
+      console.error(`❌ Error storing OTP for ${email}:`, error);
+      throw new Error("Error storing OTP");
+    }
   }
 
   async Save() {
@@ -120,26 +202,78 @@ class MobileCheck{
   }
 }
 
+// class forgotPassword{
+//   static async updatePassword(email,newPassword){
+//       try {
+//         const HashedSALT=await bcrypt.genSalt(SALT);
+//         // console.log(SALT)
+//         const hashedPassword=await bcrypt.hash(newPassword,HashedSALT);
+//         // console.log(hashedPassword)
+//         const query="UPDATE AdminUser SET password=? WHERE email=?";
+//         await new Promise((resolve,reject)=>{
+//           db.query(query,[hashedPassword,email],(err,results)=>{
+//             if(err){
+//               return reject(err)
+//             }
+//             resolve(results)
+//             // console.log(results)
+//           })
+//         })
+//       } catch (error) {
+//           console.error(error)
+//       }
+//   }
+// }
+
 class forgotPassword{
-  static async updatePassword(email,newPassword){
-      try {
-        const HashedSALT=await bcrypt.genSalt(SALT);
-        // console.log(SALT)
-        const hashedPassword=await bcrypt.hash(newPassword,HashedSALT);
-        // console.log(hashedPassword)
-        const query="UPDATE AdminUser SET password=? WHERE email=?";
-        await new Promise((resolve,reject)=>{
-          db.query(query,[hashedPassword,email],(err,results)=>{
-            if(err){
-              return reject(err)
-            }
-            resolve(results)
-            // console.log(results)
-          })
+  static async updatePassword(email,newpassword){
+    const connection=await db.promise().getConnection();
+    await connection.beginTransaction();
+
+    try {
+      const querySelect = "SELECT password FROM AdminUser WHERE email = ?";
+      const [user]=await new Promise((resolve,reject)=>{
+        db.query(querySelect,[email],(err,results)=>{
+          if(err) return reject(err);
+          resolve(results)
         })
-      } catch (error) {
-          console.error(error)
+      })
+      if(!user){
+        logger.warn('user not found')
+        throw new Error('user not found')
       }
+
+      const currentPassword=user.password;
+      const isSamePassword=await bcrypt.compare(newpassword,currentPassword)
+      if(isSamePassword){
+        logger.warn('New password cannot be the same as the old password')
+        throw new Error("New password cannot be the same as the old password");
+      }
+
+      const hashedPassword=await bcrypt.hash(newpassword,SALT);
+
+      const queryUpdate = "UPDATE AdminUser SET password = ? WHERE email = ?";
+      await new Promise((resolve,reject)=>{
+        db.query(queryUpdate,[hashedPassword,email],(err,results)=>{
+          if (err) return reject(err);
+          resolve(results);
+        })
+      })
+
+      // commit the transaction
+      await connection.commit();
+      logger.warn('transaction commited')
+      return true
+
+    } catch (error) {
+        // Rollback the transaction in case of an error
+        await connection.rollback();
+        logger.warn('transaction rollbacked')
+        throw error;
+
+    }finally{
+      connection.release();
+    }
   }
 }
 
@@ -465,9 +599,10 @@ class DOCX{
   }
 }
 
-module.exports={ AdminUserModel,CheckAdminUserLogin,
-  User,EmailCheck,MobileCheck,forgotPassword,TotalUser,
+module.exports={ AdminUserModel,CheckAdminUserLogin,UserActivityLog,
+  resetFailedAttempts,checkFailedAttempts,User,
+  EmailCheck,MobileCheck,forgotPassword,TotalUser,
   TotalAdmin,TotalSubAdmin,getAllAdminSubadminUsers,
   indvidualDetails,EditDetails,UpdateDetails,Delete,
   SearchAdminSubAdminUser,registerUserParticularDate,
-  registerUserfromrDateTotodate,getAllSubAdminData,DOCX }
+  registerUserfromrDateTotodate,getAllSubAdminData,DOCX,Logout }

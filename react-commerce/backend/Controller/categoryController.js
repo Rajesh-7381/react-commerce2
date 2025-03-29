@@ -16,6 +16,15 @@ exports.getAll = async (req, res) => {
     }
 };
 
+// exports.getAll=async(req,res)=>{
+//     try {
+//         const flatData=await Category.getAll();
+//         const buildTree=()
+//     } catch (error) {
+        
+//     }
+// }
+
 // Add category
 exports.create = async (req, res) => {
        
@@ -99,6 +108,11 @@ exports.updateCategoryStatus = async (req, res) => {
     const {status}=req.body;
     try {
         await Category.updateStatus(id,status);
+
+        const io=req.app.get("io");
+        io.emit("notification",{
+            message: `request recived for status change`,
+        })
         res.status(200).json({ message: "Status updated successfully!" });
     } catch (error) {
         console.error(error);

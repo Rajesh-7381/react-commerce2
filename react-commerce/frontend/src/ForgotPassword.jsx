@@ -50,11 +50,13 @@ const ForgotPassword = () => {
               }, 3000);
 
             } catch (error) {
+                setloading(false)
                 NotificationManager.error("Password Updated not Successfully!")
                 console.error(error);
             }
           } else {
             NotificationManager.error("This email is not registered!")
+            setloading(false)
           }
         } catch (error) {
           console.error(error);

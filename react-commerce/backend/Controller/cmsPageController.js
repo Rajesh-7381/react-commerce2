@@ -1,7 +1,7 @@
 const CmsPage = require("../Models/CmsPage");
 const sheets  = require('../service/gSheet'); // Adjust the path as necessary
 const { faker } = require('@faker-js/faker');
-
+const messageing=require("../firebase/firebaseAdmin")
 exports.getAllPages = async (req, res) => {
   const page=parseInt(req.query.page);
   const limit=parseInt(req.query.limit);
@@ -92,6 +92,17 @@ exports.addPage = async (req, res) => {
     // Save the new page to the database
     const result = await CmsPage.add(newPage);
     // console.log("DB insertion result:", result);
+
+    // for notification
+    const message={
+      notification:{
+        title: "New CMS Page Added",
+        body: `Page: ${title} has been added.`,
+      },
+      topic: "cms-updates",
+    }
+    await messageing.send(message)
+    console.log("Push notification sent");
 
     // Log the new page to Google Sheets
     await logPageToGoogleSheets(newPage);

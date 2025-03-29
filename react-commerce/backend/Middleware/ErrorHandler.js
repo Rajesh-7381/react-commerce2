@@ -1,16 +1,13 @@
-const {AppError} =require("../Error/AppError");
-
-const ErrorHandler=(err,req,res,next)=>{
-    console.error('Error',err);
-
-    if(!err.isOperational){
-        console.error(err.stack)
+const handleAsync = (fn, successMessage, logger) => async (req, res, next) => {
+    try {
+      const result = await fn(req, res);
+      logger.info(successMessage);
+      res.json(result);
+    } catch (error) {
+      logger.error(successMessage);
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
     }
+  };
 
-    res.status(err.statusCode || 500).json({
-        status:err.status || 'error',
-        message:err.message || 'Internal server error',
-    })
-}
-
-module.exports=ErrorHandler;
+module.exports=handleAsync

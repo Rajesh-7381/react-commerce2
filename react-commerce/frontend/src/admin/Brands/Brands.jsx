@@ -7,17 +7,18 @@ import Delay from 'react-delay'
 import { SpinnerCircular } from 'spinners-react';
 const BrandTable=lazy(()=>import("./BrandTable"))
 
-
 const Brands = () => {
   const navigate=useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
     // edit brands
     const BrandsAddEdit=async(id)=>{
       // alert(id)
       navigate("/addeditbrands",{state :{id:id}});
   }
-  
-  
-  
+
+  const handleSearchChange=(event)=>{
+    setSearchQuery(event.target.value.toLowerCase().trim())
+  }
   return (
     <div>
       <div>
@@ -50,7 +51,7 @@ const Brands = () => {
                   </div>
                   <form className='d-flex align-items-center justify-content-end'>
                     <div className="input-group">
-                      <input className="form-control mr-2" type="search" placeholder="Search using Brand Name" aria-label="Search"  />
+                      <input className="form-control mr-2" type="search" placeholder="Search using Brand Name" aria-label="Search" value={searchQuery} onChange={handleSearchChange}  />
                       <div className="input-group-append">
                           <NotificationContainer />
                           <button className='btn btn-primary ' onClick={()=>BrandsAddEdit()}>Add</button>
@@ -58,14 +59,7 @@ const Brands = () => {
                       </div>
                      </div>
                 </form>
-                  {/* /.col */}
-                  <div className="col-sm-6">
-                    <ol className="breadcrumb float-sm-right">
-                      
-                     
-                    </ol>
-                  </div>
-                  {/* /.col */}
+                 
                 </div>
                 {/* /.row */}
               </div>
@@ -90,7 +84,7 @@ const Brands = () => {
                       <div className="card-header">
                         <Suspense fallback={<SpinnerCircular thickness={180} speed={169} size={39}  color="rgba(57, 162, 172, 1)" secondaryColor='rgba(172, 57, 59, 0.86)' />} >
                           <Delay wait={3000}>
-                            <BrandTable />
+                            <BrandTable  searchQuery={searchQuery}/>
                           </Delay>
                         </Suspense>
 

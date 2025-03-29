@@ -123,23 +123,14 @@ const Products = () => {
             <div className="content-header">
             <div className="container-fluid">
                 <div className="row mb-2">
-                <div className="col-sm-12">
-                    <h1 className="m-0 float-start">Products Table</h1>
-                    <Link  className="breadcrumb-item float-right" to={"/admindashboard1"}>
-                        Home
-                    </Link>
-                    <br />
-                    
-                </div>
-                
-                {/* /.col */}
-                <div className="col-sm-6">
-                    <ol className="breadcrumb float-sm-right">
-                    
-                    
-                    </ol>
-                </div>
-                {/* /.col */}
+                    <div className="col-sm-12">
+                        <h1 className="m-0 float-start">Products Table</h1>
+                        <Link  className="breadcrumb-item float-right" to={"/admindashboard1"}>
+                            Home
+                        </Link>
+                        <br />
+                        
+                    </div>
                 </div>
                 {/* /.row */}
             </div>

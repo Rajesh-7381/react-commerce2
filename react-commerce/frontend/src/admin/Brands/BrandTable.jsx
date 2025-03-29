@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { DeleteEntity } from "../CRUDENTITY/DeleteEntity";
 import { StatusEntity } from "../CRUDENTITY/StatusEntity";
 
-const BrandTable = () => {
+const BrandTable = ({searchQuery}) => {
   const BASE_URL=process.env.REACT_APP_BASE_URL
   const navigate=useNavigate();
     const [brandData,setbrandData]=useState([]);
@@ -40,17 +40,10 @@ const BrandTable = () => {
       await StatusEntity('BrandStatus',id,status,setbrandData,brandData)
    }
 
-   const searchfunction = (event) => {
-    const searchdata = event.target.value.toLowerCase().trim();
-    if (searchdata === "") {
-      setbrandData(brandData);
-    } else {
-      const filteredData = brandData.filter(item =>
-        item && item.brand_name && item.brand_name.toLowerCase().includes(searchdata)
-      );
-      setbrandData(filteredData);
-    }
-  }
+   const filteredBrandData = brandData.filter(item => 
+    item && item.brand_name && item.brand_name.toLowerCase().includes(searchQuery)
+);
+
   return (
     <div>
     <table className="table table-bordered table-striped">
@@ -67,8 +60,8 @@ const BrandTable = () => {
       </tr>
     </thead>
     <tbody>
-    { brandData && brandData.length > 0 ?
-      brandData.map((item, index) => (
+    { filteredBrandData && filteredBrandData.length > 0 ?
+      filteredBrandData.map((item, index) => (
       <tr key={index}>
         <td>{index+1}</td>
         <td>{item.brand_name}  </td>

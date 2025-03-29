@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter , Routes, Route } from 'react-router-dom';
 import './App.css';
 import 'react-notifications/lib/notifications.css';
@@ -22,7 +22,12 @@ import Doc from './admin/Document/Doc';
 import ProtectedRoute from './protectedRoute';
 import {LightDarkTheme} from './LightDarkTheme'
 import TodoList from './Pratice/TodoList';
+import ErrorBoundary from './ErrorBoundary';
+import BuggyComponent from './BuggyComponent';
+import { generateToken, messaging } from './notifications/firebase';
+import { onMessage } from 'firebase/messaging';
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_KEY);
+
 
 function withDelay(promise, delay = 1000) {
   return new Promise((resolve) => {
@@ -57,59 +62,81 @@ const AddEditBanners = React.lazy(() => withDelay(import('./admin/Banners/AddEdi
 
 
 function App() {
+  useEffect(()=>{
+    generateToken()
+    onMessage(messaging,(payload)=>{
+      console.log(payload)
+    })
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/firebase-messaging-sw.js") // ✅ Corrected path
+        .then((registration) => {
+          console.log("✅ Service Worker Registered:", registration);
+        })
+        .catch((error) => {
+          console.error("❌ Service Worker Registration Failed:", error);
+        });
+    }
+  },[])
+
+  
+
   return (
     <div className="App">
       <BrowserRouter>
-        <Routes> {/*loader-container css -> index.css*/}
-          <Route path='/' element={ <Suspense fallback={<div className='loader-container'></div>}><Login /></Suspense>}></Route>
-          <Route path='/*' element={<Suspense fallback={<div className='loader-container'></div>}><NotFound  /></Suspense>}></Route> {/* fallback routeing*/}
-          <Route path='/register' element={<Suspense fallback={<div className='loader-container'></div>}><Register /></Suspense>}></Route>
-          <Route path='/forgotpassword' element={<Suspense fallback={<div className='loader-container'></div>}><ForgotPassword /></Suspense>}></Route>
+        <ErrorBoundary>
+          <Routes> {/*loader-container css -> index.css*/}
+          <Route path='/a' element={<BuggyComponent />}></Route>
+        <Route path='/' element={ <Suspense fallback={<div className='loader-container'></div>}><Login /></Suspense>}></Route>
+        <Route path='/*' element={<Suspense fallback={<div className='loader-container'></div>}><NotFound  /></Suspense>}></Route> {/* fallback routeing*/}
+        <Route path='/register' element={<Suspense fallback={<div className='loader-container'></div>}><Register /></Suspense>}></Route>
+        <Route path='/forgotpassword' element={<Suspense fallback={<div className='loader-container'></div>}><ForgotPassword /></Suspense>}></Route>
 
-          <Route path='/admindashboard1' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Dashboard1 /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/registeruser' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditRegisterUser /></ProtectedRoute></Suspense>}></Route>
-          {/*
-          <Route path='/admindashboard1' element={<Suspense fallback={<div className='loader-container'></div>}><LightDarkTheme><Dashboard1 /></LightDarkTheme></Suspense>}></Route>
-          <Route path='/registeruser' element={<Suspense fallback={<div className='loader-container'></div>}><AddEditRegisterUser /></Suspense>}></Route>
-          */}
-          <Route path='/subadmins' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Subadmin /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/subadminaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><SubAdminAddEdit /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/categories' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Categories /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/categoriesaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><CategoryAddEdit /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/cmspages' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Cmspages /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/cmspageaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><CmspageAddEdit /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/products' element={<Suspense fallback={<div className='loader-container'></div> }> <ProtectedRoute roleRequired="admin"><Products /> </ProtectedRoute>  </Suspense> } />
-          <Route path='/addeditproducts' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditProducts /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/productsimage' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><ProductImages /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/brands' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Brands /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/addeditbrands' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditBrands /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/banners' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Banners /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/addeditbanners' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditBanners /></ProtectedRoute></Suspense>}></Route>
-          
-                  
+        <Route path='/admindashboard1' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Dashboard1 /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/registeruser' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditRegisterUser /></ProtectedRoute></Suspense>}></Route>
+        {/*
+        <Route path='/admindashboard1' element={<Suspense fallback={<div className='loader-container'></div>}><LightDarkTheme><Dashboard1 /></LightDarkTheme></Suspense>}></Route>
+        <Route path='/registeruser' element={<Suspense fallback={<div className='loader-container'></div>}><AddEditRegisterUser /></Suspense>}></Route>
+        */}
+        <Route path='/subadmins' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Subadmin /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/subadminaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><SubAdminAddEdit /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/categories' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Categories /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/categoriesaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><CategoryAddEdit /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/cmspages' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Cmspages /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/cmspageaddedit' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><CmspageAddEdit /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/products' element={<Suspense fallback={<div className='loader-container'></div> }> <ProtectedRoute roleRequired="admin"><Products /> </ProtectedRoute>  </Suspense> } />
+        <Route path='/addeditproducts' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditProducts /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/productsimage' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><ProductImages /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/brands' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Brands /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/addeditbrands' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditBrands /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/banners' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><Banners /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/addeditbanners' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="admin"><AddEditBanners /></ProtectedRoute></Suspense>}></Route>
+        
+                
 
-          <Route path='/userdashboard2' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Dashboard2 /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/contactus' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Contact /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/myAccount' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><MyAccount /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/wishlist' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><WishList /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/Orders' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Order /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/myCart' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><MyCart /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/productDetails' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><ProductDetails /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/listproduct' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Listing /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/checkout' element={
-            <Elements stripe={stripePromise}>
-              <Checkout />
-            </Elements>
-          } />
-          <Route path='/cart' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Cart /></ProtectedRoute></Suspense>}></Route>
-          <Route path='/success' element={< Success/>} ></Route>
-          <Route path='/cancel' element={< Cancel/>} ></Route>
-          <Route path='/card' element={< CreditOrDebit/>} ></Route>
-          
-          <Route path='/DomTable' element={< DomTable/>} ></Route>
-          <Route path='/documents' element={<Doc />}></Route>
-          <Route path='/todo' element={<TodoList />}></Route>
-        </Routes>
+        <Route path='/userdashboard2' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Dashboard2 /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/contactus' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Contact /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/myAccount' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><MyAccount /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/wishlist' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><WishList /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/Orders' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Order /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/myCart' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><MyCart /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/productDetails' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><ProductDetails /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/listproduct' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Listing /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/checkout' element={
+          <Elements stripe={stripePromise}>
+            <Checkout />
+          </Elements>
+        } />
+        <Route path='/cart' element={<Suspense fallback={<div className='loader-container'></div>}><ProtectedRoute roleRequired="user"><Cart /></ProtectedRoute></Suspense>}></Route>
+        <Route path='/success' element={< Success/>} ></Route>
+        <Route path='/cancel' element={< Cancel/>} ></Route>
+        <Route path='/card' element={< CreditOrDebit/>} ></Route>
+        
+        <Route path='/DomTable' element={< DomTable/>} ></Route>
+        <Route path='/documents' element={<Doc />}></Route>
+        <Route path='/todo' element={<TodoList />}></Route>
+          </Routes>
+        </ErrorBoundary>
       </BrowserRouter>
      
     </div>
