@@ -1,39 +1,43 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { jsPDF } from "jspdf";
 import 'jspdf-autotable';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import Swal from 'sweetalert2';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import zxcvbn from 'zxcvbn';
+import { DeleteEntity } from './CRUDENTITY/DeleteEntity';
+import Footer from './Components/Footer';
+import Header from './Components/Header';
 
 const AddEditRegisterUser = (args) => {
-   
+  const BASE_URL=process.env.REACT_APP_BASE_URL
   const [pass,setpass]=useState(false);
   const [data, setData] = useState([]);
   const [filterData, setFilterData] = useState([]);
-
   const [modal, setModal] = useState(false);
   const [modal2, setModal2] = useState(false);
-
   // inside modal data shown(eye)
   const [modaldata, setmodaldata] = useState({});
-
   const [id, setId] = useState(""); // Define id state
   const [passwordstrength,setPasswordStrength]=useState(0);
-  useEffect(()=>{
-    document.title='AddEditRegister';
-  })
+  // const [checked,setnewchecked]=useState(new Array(data.length).fill(false))
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedRows, setSelectedRows] = useState({});
+  const navigate=useNavigate();
+  let sRow=false;
+  const [loading,setloading]=useState(false)
 
   const toggle = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8081/singledata/${id}`);
-      setmodaldata(response.data.data);
+      const response = await axios.get(`${BASE_URL}/api/singledata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+      // console.log(response.data)
+      setmodaldata(response.data[0]);
+      // console.log(modaldata)
       setModal(!modal);
     } catch (error) {
       console.error("error fetching data", error);
@@ -47,9 +51,10 @@ const AddEditRegisterUser = (args) => {
   };
 
   useEffect(() => {
+    document.title='AddEditRegister';
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8081/alldata");
+        const response = await axios.get(`${BASE_URL}/api/getAllAdminSubadminUsers`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
         setData(response.data);
         setFilterData(response.data);  // Initialize filterData as well
       } catch (error) {
@@ -59,19 +64,36 @@ const AddEditRegisterUser = (args) => {
     fetchData();
   }, []);
 
-  const searchFunction = (event) => {
-    const searchTerm = event.target.value.toLowerCase().trim();
-    if (searchTerm === "") {
-      setFilterData(data);
-    } else {
-      const filtered = data.filter(item =>
-        item.name.toLowerCase().includes(searchTerm) ||
-        item.email.toLowerCase().includes(searchTerm) ||
-        item.role.toLowerCase().includes(searchTerm)
+const debounce=(func,wait)=>{
+  let timerId;
+  // console.log(timerId)
+  return (...args)=>{
+    // console.log(args[0])
+    clearTimeout(timerId)
+    // console.log(timerId)
+    timerId=setTimeout(()=>func(...args),wait)
+    // console.log(timerId)
+  }
+}
+const callApi=async(e)=>{
+  const searchTerm=e.target.value.toUpperCase().trim();
+  try {
+    const response = await axios.get(`${BASE_URL}/api/SearchAdminSubAdminUser/${searchTerm}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+    // console.log(response.data);
+    let filteredData = response.data;
+    if (searchTerm!== "") {
+      filteredData = filteredData.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.role.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilterData(filtered);
     }
-  };
+    setFilterData(filteredData);
+  } catch (error) {
+    console.error(error)
+  }
+}
+const debounceCallApi=useMemo(()=>debounce(callApi,1000),[]);
 
   // csv download
   const headers = [
@@ -99,6 +121,9 @@ const AddEditRegisterUser = (args) => {
       ];
       tablerows.push(rowdata);
     });
+    const backgroundImage=new Image();
+    backgroundImage.src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTcvIcikyjgYcDZuKPzsq8xAZIilsBxUm10g&s"
+    doc.addImage(backgroundImage, 0, 0, 210, 297)
     doc.autoTable(tablecolumn, tablerows, { startY: 20 }); //sets the vertical position (the Y-coordinate) on the PDF document where the table should start being drawn. The value 20 means that the table starts 20 units down from the top of the page
     doc.text("RegisteredUsers", 14, 15); //specific cordinates
     doc.save("RegisteredUsers.pdf");
@@ -114,11 +139,14 @@ const AddEditRegisterUser = (args) => {
   // for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
-  const lastIndex = currentPage * recordsPerPage; //1st time 10
-  const firstIndex = lastIndex - recordsPerPage; //1st time 0
+  const pageNumbersToShow = 5;
+  const totalPages = Math.ceil(filterData.length / recordsPerPage);
+  
+  const firstIndex = Math.floor((currentPage - 1) / pageNumbersToShow) * pageNumbersToShow + 1;//1st time 0
+  const lastIndex = Math.min(firstIndex + pageNumbersToShow - 1, totalPages); //1st time 10
   // const records = filterData.slice(firstIndex, lastIndex); (1st index inclusive and last index not inclusive)
-  const totalPages = Math.ceil(filterData.length / recordsPerPage); //50/10=5
-  const numbers = [...Array(totalPages + 1).keys()].slice(1);
+  // const totalPages = Math.ceil(filterData.length / recordsPerPage); //50/10=5
+  const pageNumbers = [...Array(lastIndex + 1).keys()].slice(firstIndex);
   //here Array(totalPages + 1) this creates new array . let totalPages is 5 +1 =6
   // .keys() this returns iterator over array keys. since the array is created with  totalpages+1 elements, this iterator will return keys from 0 to totalpages
   // the spread(...) operator is used spread the iterator keys into an array.
@@ -138,6 +166,7 @@ const AddEditRegisterUser = (args) => {
 
   const pageChange = (page) => {
     setCurrentPage(page);
+    navigate(`/registeruser?page=${page}&limit=${recordsPerPage}`,{replace:true})
   };
 
   const validationSchema = Yup.object().shape({
@@ -150,8 +179,9 @@ const AddEditRegisterUser = (args) => {
 
   const onSubmitForm = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8081/editdata/${id}`);
-      const { data } = response.data;
+      const response = await axios.get(`${BASE_URL}/api/editdata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+      const  data =response.data.result[0];
+      // console.log(data)
       formik.setValues({
         name: data.name,
         mobile: data.mobile,
@@ -162,20 +192,28 @@ const AddEditRegisterUser = (args) => {
       });
       setId(data.id); // Set id state
     } catch (error) {
-
+        console.log(error)
     }
   };
 
 
   const handleSubmit = async (values) => {
+    if (passwordstrength !== 4) {
+      NotificationManager.error("Password strength is not strong enough!");
+      return;
+    }
+    setloading(true)
     try {
-      await axios.put(`http://localhost:8081/update/${id}`, values);
-      NotificationManager.success("Form updated successfully!");
-      // Fetch the updated data from the server and update the local state
-      const response = await axios.get("http://localhost:8081/alldata");
-      setData(response.data);
-      setFilterData(response.data);
-      setModal2(false); // Close the modal after successful submission
+        setTimeout(async() => {
+          await axios.put(`${BASE_URL}/api/update/${id}`, values,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+          NotificationManager.success("Form updated successfully!");
+          // Fetch the updated data from the server and update the local state
+          const response = await axios.get(`${BASE_URL}/api/getAllAdminSubadminUsers`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+          setData(response.data);
+          setFilterData(response.data);
+          setModal2(false); 
+          setloading(false)
+        }, 3000);
     } catch (error) {
         NotificationManager.error("Form  not updated successfully!");
       console.error("Error updating data", error);
@@ -200,56 +238,120 @@ const AddEditRegisterUser = (args) => {
   // };
 
 //   delete functionality
-const handledelete = async (id) => {
-    try {
-      const confirmed = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'This action cannot be undone.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-      });
-  
-      if (confirmed.isConfirmed) {
-        // Delete the item
-        await axios.delete(`http://localhost:8081/deletesingledata/${id}`);
-        NotificationManager.success("successfully!  deleted data");
-        // Fetch the updated data from the server and update the local state
-        const response = await axios.get("http://localhost:8081/alldata");
-        setData(response.data);
-        setFilterData(response.data);
-      } else {
-        // Do nothing
-        NotificationManager.error("Data not deletd  successfully!");
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  const handledelete = async (id) => {
+    await DeleteEntity('Admin',id);  
+    const response = await axios.get(`${BASE_URL}/api/getAllAdminSubadminUsers`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+    setData(response.data);
+    setFilterData(response.data);
+      
   };
   
  // Function to handle password change and update password strength
- const handlePasswordChange = (event) => {
+  const handlePasswordChange = (event) => {
     const { value } = event.target;
     const result = zxcvbn(value);
     setPasswordStrength(result.score);
     formik.handleChange(event); // Update formik values
   };
+
+  const handleselectAll=(e)=>{
+    setSelectAll(e.target.checked)
+    // console.log(e.target.checked)
+    if(e.target.checked){
+      const selobj={};
+      data.forEach((row)=>{
+        setSelectedRows[row.id]=true;
+      })
+      setSelectedRows(selobj)
+    }else{
+      setSelectedRows({})
+    }
+  }
+  const handleRowSelect=(e,id)=>{
+    // alert(e)
+    // alert(id)
+    const c=e.target.checked
+    alert(c)
+    sRow=data.id === id ? true : false
+  }
+
+  // for sorting
+  
   return (
     <div>
-      <section className="content">
+    <div>
+    <div className="wrapper">
+    {/* Preloader */}
+    <div className="preloader flex-column justify-content-center align-items-center">
+        <img
+        className="animation__shake"
+        src="dist/img/AdminLTELogo.png"
+        alt="AdminLTELogo"
+        height={60}
+        width={60}
+        />
+    </div>
+    {/* Navbar */}
+    <Header></Header>
+    <div className="content-wrapper">
+        {/* Content Header (Page header) */}
+        <div className="content-header">
+        <div className="container-fluid">
+            <div className="row mb-2">
+            <div className="col-sm-12">
+                <h1 className="m-0 float-start">Edit/Update </h1>
+                <section className="content-header">
+                <div className="container-fluid">
+                    <div className="row mb-2">
+                    <div className="col-sm-6"></div>
+                    <div className="col-sm-6">
+                        <ol className="breadcrumb float-sm-right">
+                        <li className="breadcrumb-item ">
+                            <Link to={"/admindashboard1"}>Home</Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to={"/categories"}>Back</Link>
+                        </li>
+                        </ol>
+                    </div>
+                    </div>
+                </div>
+                </section>
+                <br />
+            </div>
+
+            {/* /.col */}
+            <div className="col-sm-6">
+                <ol className="breadcrumb float-sm-right"></ol>
+            </div>
+            {/* /.col */}
+            </div>
+            {/* /.row */}
+        </div>
+        {/* /.container-fluid */}
+        </div>
+        {/* /.content-header */}
+        {/* Main content */}
+        <section className="content">
+        <div className="container-fluid">
+            <div className="row">
+            <div className="col-lg-3 col-6"></div>
+            </div>
+        </div>
+        </section>
+        {/* /.content */}
+
+        <section className="content">
         <div className="container-fluid">
           <div className="row">
             <div className="col-12">
               <div className="card">
                 <div className="card-header ">
-                  <h1 className="card-title " style={{margin:"auto",width:"100%" ,fontWeight:"bold"}}><span className='badge badge-pill badge-warning'>Admin/</span><span className='badge badge-pill badge-info'>Registered User Data</span></h1>
                 </div>
                 <div className="card-body">
                   <form className='d-flex align-items-center justify-content-end'>
                     <div className="input-group">
-                      <input className="mr-2" type="search" placeholder="Search" aria-label="Search" onKeyUp={searchFunction} />
+                      <input className="mr-2" type="search" placeholder="Search" aria-label="Search" onChange={(e)=>{debounceCallApi(e)}} />
                       <div className="input-group-append">
                         <button className="btn btn-outline-success mr-5" type="button" >Search</button>
                         <NotificationContainer />
@@ -267,34 +369,34 @@ const handledelete = async (id) => {
                   <table id="example1" className="table table-bordered table-striped">
                     <thead>
                       <tr>
-                        <th className='bg-dark text-light'>ID</th>
+                        <th className='bg-dark text-light' title='check box through delete'><input type='checkbox'  name='allSelect' checked={selectAll} onChange={ handleselectAll } />SELECT</th>
+                        <th className='bg-dark text-light'>SL NO</th>
                         <th className='bg-dark text-light'>NAME</th>
                         <th className='bg-dark text-light'>MOBILE</th>
                         <th className='bg-dark text-light'>EMAIL</th>
                         <th className='bg-dark text-light'>ROLE</th>
-                        <th className='bg-dark text-light'>Created At</th>
                         <th className='bg-dark text-light'>ACTIONS</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filterData.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage).map((dt, index) => (
 
-                        <tr key={dt.id} className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>
+                        <tr key={dt.id}>
 
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{(currentPage - 1) * recordsPerPage + index + 1}</td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{dt.name}</td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{dt.mobile}</td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{dt.email}</td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>
-                            {dt.role === 'admin' ? 'ADMIN' : dt.role === 'subadmin' ? 'SUBADMIN' : 'USER'}
+                          <td>
+                            <input type="checkbox"  id=""  onChange={(e)=>handleRowSelect(e,dt.id)}  />
                           </td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>{dt.created_at}</td>
-                          <td className={dt.role === 'admin' ? 'bg-warning' : dt.role === 'subadmin' ? 'bg-info' : 'bg-primary'}>
+                          <td>{(currentPage - 1) * recordsPerPage + index + 1}</td>
+                          <td>{dt.name}</td>
+                          <td>{dt.mobile}</td>
+                          <td>{dt.email}</td>
+                          <td><span className={`badge badge-${dt.role === 'user' ? 'primary' : dt.role === 'subadmin' ? 'warning' : 'success'}`}>{dt.role === 'admin' ? 'ADMIN' : dt.role === 'subadmin' ? 'SUBADMIN' : 'USER'}</span></td>
+                          <td>
                             <button className='btn btn-dark btn-sm mr-2' onClick={() => toggle(dt.id)}><i className='fas fa-eye'></i></button>
                             <NotificationContainer />
                             <button className='btn btn-success btn-sm mr-2' onClick={() => toggle2(dt.id)}><i className='fas fa-pencil-alt'></i></button>
                             <NotificationContainer />
-                            <button className='btn btn-danger btn-sm' onClick={() => handledelete(dt.id)}><i className='fas fa-trash'></i></button>
+                            <button  className='btn btn-danger btn-sm' onClick={() => handledelete(dt.id)} ><i className='fas fa-trash'></i></button>
                           </td>
                         </tr>
                       ))}
@@ -302,20 +404,25 @@ const handledelete = async (id) => {
                   </table>
                   <br></br>
                   <nav className='float-right'>
-                    <ul className='pagination'>
-                      <li className='page-item'>
-                        <button onClick={prePage} className='page-link'>Prev</button>
+                  <ul className='pagination paginationRightTab'>
+                    <li className='page-item'>
+                      <button onClick={prePage} className='page-link'>Prev</button>
+                    </li>
+                    {pageNumbers.map((n) => (
+                      <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={n}>
+                        <button onClick={() => pageChange(n)} className='page-link'>{n}</button>
                       </li>
-                      {numbers.map((n, i) => (
-                        <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={i}>
-                          <button onClick={() => pageChange(n)} className='page-link'>{n}</button>
-                        </li>
-                      ))}
+                    ))}
+                    {lastIndex < totalPages && (
                       <li className='page-item'>
-                        <button onClick={nextPage} className='page-link'>Next</button>
+                        <span className='page-link'>...</span>
                       </li>
-                    </ul>
-                  </nav>
+                    )}
+                    <li className='page-item'>
+                      <button onClick={nextPage} className='page-link'>Next</button>
+                    </li>
+                  </ul>
+                </nav>
                 </div>
               </div>
             </div>
@@ -325,18 +432,59 @@ const handledelete = async (id) => {
 
       {/* for show singledata modal*/}
       <Modal isOpen={modal} toggle={toggle} {...args}>
-        <ModalHeader toggle={toggle}>Hi <span className='bg-warning '>{modaldata.name}</span>This is Your Personal Information</ModalHeader>
+        <ModalHeader toggle={toggle} className="bg-primary text-white">
+          Hi {modaldata?.name ? <span className='bg-warning'>{modaldata.name}</span> : <span>No name</span>}
+        </ModalHeader>
+        <div className="text-center">
+          {modaldata?.image ? (
+            <img src={modaldata.image} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} alt={modaldata.name} />
+          ) : (
+            <img src={'https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg'} className='rounded-circle img-thumbnail mx-auto d-block' height={150} width={150} loading="lazy" alt="" />
+          )}
+        </div>
         <ModalBody>
-          <p style={{ fontWeight: "bolder" }}> ID: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span></p>
-          <hr />
-          <p style={{ fontWeight: "bolder" }}> Name: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span></p>
-          <hr />
-          <p style={{ fontWeight: "bolder" }}> Email: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span></p>
-          <hr />
-          <p style={{ fontWeight: "bolder" }}> Role: <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span></p>
-
+          <div className="container">
+            <div className="row">
+              <div className="col-md-12">
+                <h5 className="text-primary">Personal Information </h5>
+                <hr />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>ID:</p>
+              </div>
+              <div className="col-md-4">
+                <p>{modaldata?.id ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.id}</span> : <span>No ID</span>}</p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>Name:</p>
+              </div>
+              <div className="col-md-4">
+                <p>{modaldata?.name ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.name}</span> : <span>No name</span>}</p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>Email:</p>
+              </div>
+              <div className="col-md-4">
+                <p>{modaldata?.email ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.email}</span> : <span>No email</span>}</p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <p style={{ fontWeight: "bolder" }}>Role:</p>
+              </div>
+              <div className="col-md-4">
+                <p>{modaldata?.role ? <span style={{ color: "blue", fontWeight: "bold" }}>{modaldata.role}</span> : <span>No role</span>}</p>
+              </div>
+            </div>
+          </div>
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="bg-light">
           <Button color="primary" onClick={toggle}>
             Ok
           </Button>{' '}
@@ -345,7 +493,6 @@ const handledelete = async (id) => {
           </Button>
         </ModalFooter>
       </Modal>
-
 
       {/* for update modal*/}
       <Modal isOpen={modal2} toggle={toggle2} {...args}>
@@ -418,7 +565,13 @@ const handledelete = async (id) => {
                       </div>
                       {/* /.card-body */}
                       <div className="card-footer">
-                        <button  type="submit" className="btn btn-success">Submit</button>
+                      {loading ? (
+                        <div>
+                          <button type="submit" className="btn btn-success" disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> Update </button>
+                           <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
+                      ) : (
+                        <button type="submit" className="btn btn-success">Update</button>
+                      )}
                       </div>
                     </form>
                   </div>
@@ -439,7 +592,13 @@ const handledelete = async (id) => {
         <Button color="danger" onClick={toggle2}>Cancel</Button>{' '}
         </ModalFooter>
       </Modal>
+    </div>
 
+    {/* /.content-wrapper */}
+    <Footer></Footer>
+    </div>
+    {/* ./wrapper */}
+    </div>
     </div>
   );
 }

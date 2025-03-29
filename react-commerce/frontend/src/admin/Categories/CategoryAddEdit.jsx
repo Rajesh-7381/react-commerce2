@@ -1,16 +1,22 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
+import Footer from '../Components/Footer';
+import Header from '../Components/Header';
+import { toast, ToastContainer } from 'react-toastify';
 
 const CategoryAddEdit = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const location = useLocation();
     const { register, handleSubmit, setValue,formState:{errors} } = useForm();
     const [data, setData] = useState({});
     const [categories, setCategories] = useState([]);
     const id = location.state ? location.state.id : null;
     const navigate = useNavigate();
+    const imageRef=useRef(null);
+    const [loading,setloading]=useState(false)
 
     useEffect(() => {
         document.title = 'AddEditCategories';
@@ -22,7 +28,7 @@ const CategoryAddEdit = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`http://localhost:8081/categories2`);
+            const response = await axios.get(`${BASE_URL}/api/getAllCategorys`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             setCategories(response.data);
         } catch (error) {
             console.log(error);
@@ -32,7 +38,7 @@ const CategoryAddEdit = () => {
 
     const handleCategoryUpdate = async (id) => {
         try {
-            const response = await axios.get(`http://localhost:8081/categoryeditdata/${id}`);
+            const response = await axios.get(`${BASE_URL}/api/categoryeditdata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
             const categoryData = response.data.data;
             setData(categoryData);
             setValue('category_name', categoryData.category_name);
@@ -42,24 +48,28 @@ const CategoryAddEdit = () => {
             setValue('meta_title', categoryData.meta_title);
             setValue('meta_description', categoryData.meta_description);
             setValue('meta_keyword', categoryData.meta_keyword);
-            setValue('parent_id', categoryData.parent_id); // Set the parent category value
+            setValue('parent_id', categoryData.parent_id); 
         } catch (error) {
             console.log(error);
         }
     };
-    const renderCategories = (categories, level = 0) => {
+    const renderCategories = (categories, selectedParentId, level = 0) => {
         return categories.map(category => {
-            const paddingLeft = level * 20; // Adjust the padding based on the level
+            const paddingLeft = level * 20; 
             return (
-                <option key={category.id} value={category.id} style={{ paddingLeft: `${paddingLeft}px` }}>
-                    {level === 0 ? '' : '->'.repeat(level)} {category.category_name}
-                </option>
+                <React.Fragment key={category.id}>
+                    <option value={category.id} selected={category.id === selectedParentId} style={{ paddingLeft: `${paddingLeft}px` }}>
+                        {level === 0 ? '' : '->'.repeat(level)} {category.category_name}
+                    </option>
+                    {category.children && renderCategories(category.children, selectedParentId, level + 1)}
+                </React.Fragment>
             );
         });
     };
     
-
+    
     const onSubmit = async (formData) => {
+        setloading(true)
         try {
             const form = new FormData();
             // Append form data
@@ -73,51 +83,99 @@ const CategoryAddEdit = () => {
             form.append('parent_id', formData.parent_id); // Append parent category ID
             // Append image file
             form.append('category_image', formData.category_image[0]);
+            form.append('AdminUser_id',localStorage.getItem('id'));
 
-            if (id) {
-                const response = await axios.put(`http://localhost:8081/updatecategory/${id}`, form, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                NotificationManager.success("updated successfully!");
-                setTimeout(() => {
-                    navigate("/categories");
-                }, 2000);
-            } else {
-                const response = await axios.post('http://localhost:8081/addcategory', form, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                NotificationManager.success("form submitted successfully!");
-                setTimeout(() => {
-                    navigate("/categories");
-                }, 2000);
-            }
+            const url= id ? `${BASE_URL}/api/updatecategory/${id}` : `${BASE_URL}/api/addcategory`;
+            const method= id ? 'put' : 'post';
+            await axios[method](url,form,{
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            toast.success(`Category ${id ? "updated" : "added"} successfully!`,{position:'bottom-right'})
+            setTimeout(()=>navigate("/categories",3000))
+
         } catch (error) {
             console.log(error);
+            toast.error("form submission failed!")
+        }finally{
+            setloading(false)
         }
     };
+    // console.log(data)
+    function zoomIn(){
+
+    }
+    function zoomOut(){
+
+    }
 
     return (
         <div>
-            <div className="wrapper">
-                <div className="content-wrapper">
+        <div>
+        <div className="wrapper">
+          {/* Preloader */}
+          <div className="preloader flex-column justify-content-center align-items-center">
+            <img
+              className="animation__shake"
+              src="dist/img/AdminLTELogo.png"
+              alt="AdminLTELogo"
+              height={60}
+              width={60}
+            />
+          </div>
+          {/* Navbar */}
+          <Header />
+          <div className="content-wrapper">
+            {/* Content Header (Page header) */}
+            <div className="content-header">
+              <div className="container-fluid">
+                <div className="row mb-2">
+                  <div className="col-sm-12">
+                    <h1 className="m-0 float-start">Edit/Update Products</h1>
                     <section className="content-header">
-                        <div className="container-fluid">
-                            <div className="row mb-2">
-                                <div className="col-sm-6"></div>
-                                <div className="col-sm-6">
-                                    <ol className="breadcrumb float-sm-right">
-                                        <li className="breadcrumb-item"><Link to={"/admindashboard1"}>Home</Link></li>
-                                        <li className="breadcrumb-item"><Link to={"/categories"}>Back</Link></li>
-                                    </ol>
-                                </div>
-                            </div>
+                      <div className="container-fluid">
+                        <div className="row mb-2">
+                          <div className="col-sm-6"></div>
+                          <div className="col-sm-6">
+                            <ol className="breadcrumb float-sm-right">
+                              <li className="breadcrumb-item ">
+                                <Link to={"/admindashboard1"}>Home</Link>
+                              </li>
+                              <li className="breadcrumb-item">
+                                <Link to={"/categories"}>Back</Link>
+                              </li>
+                            </ol>
+                          </div>
                         </div>
+                      </div>
                     </section>
-                    <section className="content">
+                    <br />
+                  </div>
+
+                  {/* /.col */}
+                  <div className="col-sm-6">
+                    <ol className="breadcrumb float-sm-right"></ol>
+                  </div>
+                  {/* /.col */}
+                </div>
+                {/* /.row */}
+              </div>
+              {/* /.container-fluid */}
+            </div>
+            {/* /.content-header */}
+            {/* Main content */}
+            <section className="content">
+              <div className="container-fluid">
+                <div className="row">
+                  <div className="col-lg-3 col-6"></div>
+                </div>
+              </div>
+            </section>
+            {/* /.content */}
+
+            <section className="content">
                         <div className="container-fluid">
                             <div className="row">
                                 <div className="card card-primary">
@@ -143,6 +201,13 @@ const CategoryAddEdit = () => {
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputCategoryfile">Category Image<span className='text-danger'>*</span></label>
                                                         <input type="file" className="form-control" id="exampleInputCategoryfile" name='category_image' {...register("category_image", { "required": !id })} />
+                                                        {data && data.category_image && (
+                                                            <div>
+                                                                <img ref={imageRef} src={`${BASE_URL}/api/CategoryImage/${data.category_image}`} width={50} height={50} alt='' style={{transition :'width 0.5s,height 0.5s'}} />
+                                                                <button className='btn btn-success mr-1' onClick={zoomIn}>+</button>
+                                                                <button className='btn btn-danger' onClick={zoomOut}>-</button>
+                                                            </div>
+                                                        )}
                                                         {errors.category_image && <span className="text-danger">category image is required </span>}
 
                                                     </div>
@@ -154,15 +219,9 @@ const CategoryAddEdit = () => {
                                                 <div className="card-body">
                                                     <div className="form-group text-start">
                                                         <label htmlFor="exampleInputCategoryselectid">Parent Category <span className='text-danger'>*</span></label>
-                                                        <select
-                                                            className="form-control"
-                                                            name="parent_id"
-                                                            style={{ width: '100%' }}
-                                                            {...register("parent_id", { required: true })}
-                                                            defaultValue={data.parent_id ? data.parent_id : ""}
-                                                        >
+                                                        <select className="form-control"    name="parent_id"    style={{ width: '100%' }}    {...register("parent_id", { required: true })}    defaultValue={data.parent_id ? data.parent_id : ""} >
                                                             <option value="">Main Category</option>
-                                                            {renderCategories(categories)}
+                                                            {renderCategories(categories, data.parent_id)}
                                                         </select>
                                                     </div>
                                                 </div>
@@ -236,16 +295,27 @@ const CategoryAddEdit = () => {
                                         </div>
 
                                         <div className='text-start'>
-                                            <button type="submit" className='btn btn-primary'>{id ? "Update" : "Submit"}</button>
-                                        </div>
+                                            <ToastContainer />
+                                            {loading ? (
+                                                <div>
+                                                  <button type="submit" className={id ? 'btn btn-success' : 'btn btn-primary'} disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> {id ? 'Update' : 'Submit'} </button>
+                                                   <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
+                                              ) : (
+                                                <button type="submit" className={id ? 'btn btn-success' : 'btn btn-primary'}>{id ? 'Update' : 'Submit'}</button>
+                                              )
+                                            }                                        </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
                     </section>
-                </div>
-            </div>
-            <NotificationContainer />
+          </div>
+
+          {/* /.content-wrapper */}
+          <Footer />
+        </div>
+        {/* ./wrapper */}
+        </div>
         </div>
     )
 }

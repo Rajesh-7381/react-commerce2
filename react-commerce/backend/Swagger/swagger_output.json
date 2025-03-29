@@ -1,0 +1,2174 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "REST API",
+    "description": "All e-Commerce API Test"
+  },
+  "host": "localhost:8081",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/api/AddBanners": {
+      "post": {
+        "description": "Add a new Banner",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "example": "type of Banner"
+                },
+                "link": {
+                  "example": "Banner Link"
+                },
+                "alt": {
+                  "example": "banner alt"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/getAllBanners": {
+      "get": {
+        "description": "to get all banners",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/EditBannerDetails/{id}": {
+      "get": {
+        "description": "id through get a single banner",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "api/UpdateBanners/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "title of the banners"
+                },
+                "url": {
+                  "example": "banner of the url"
+                },
+                "description": {
+                  "example": "banner description"
+                },
+                "meta_title": {
+                  "example": "banners meta title"
+                },
+                "meta_keywords": {
+                  "example": "banner meta keywords"
+                },
+                "meta_description": {
+                  "example": "banners description"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "api/handlebannerstatus/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "example": ""
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "api/DeleteBanners/{id}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/getAllBrands": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/GetSingleBrandDetails/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣ Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/UpdateBrand/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "brand_name": {
+                  "example": "any"
+                },
+                "brand_discount": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "url": {
+                  "example": "any"
+                },
+                "meta_title": {
+                  "example": "any"
+                },
+                "meta_keywords": {
+                  "example": "any"
+                },
+                "meta_description": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/AddBrand": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "brand_name": {
+                  "example": "any"
+                },
+                "brand_discount": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "url": {
+                  "example": "any"
+                },
+                "meta_title": {
+                  "example": "any"
+                },
+                "meta_descriptions": {
+                  "example": "any"
+                },
+                "meta_keywords": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/AllBrandCount": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },"404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          }
+        }
+      }
+    },
+    "/api/branddelete/{id}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/handlebrandstatus/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/SearchBrands/{searchTerm}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "searchTerm",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },"404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          }
+        }
+      }
+    },
+    "/api/getAllCategorys": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/addcategory": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "parent_id": {
+                  "example": "any"
+                },
+                "category_name": {
+                  "example": "any"
+                },
+                "category_discount": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "url": {
+                  "example": "any"
+                },
+                "meta_title": {
+                  "example": "any"
+                },
+                "meta_description": {
+                  "example": "any"
+                },
+                "meta_keyword": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/categoryeditdata/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣ Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/updatecategory/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "category_name": {
+                  "example": "any"
+                },
+                "parent_id": {
+                  "example": "any"
+                },
+                "category_discount": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "url": {
+                  "example": "any"
+                },
+                "meta_title": {
+                  "example": "any"
+                },
+                "meta_description": {
+                  "example": "any"
+                },
+                "meta_keyword": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/categorydelete/{id}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/handlecategorystatus/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/uniquecategories": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/parentcategory/{parentId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "parentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣ Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/getAllCmss": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/handlecmsstatus/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "example": "34"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/cmspagedelete/{id}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/cmsupdatepage/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "any"
+                },
+                "url": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "meta_title": {
+                  "example": "any"
+                },
+                "meta_keywords": {
+                  "example": "any"
+                },
+                "meta_description": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/cmsaddpage": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "any"
+                },
+                "url": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "meta_title": {
+                  "example": "any"
+                },
+                "meta_keywords": {
+                  "example": "any"
+                },
+                "meta_description": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/cmspageeditdata/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/SearchCMSPageData/{searchTerm}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "searchTerm",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/ContactUS": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "subject": {
+                  "example": "any"
+                },
+                "message": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/AllProductDetailsShown": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          }
+        }
+      }
+    },
+    "/api/listingproduct": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          }
+        }
+      }
+    },
+    "/api/productDetails/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          }
+        }
+      }
+    },
+    "/api/productdetailscount": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          }
+        }
+      }
+    },
+    "/api/cardData": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "card_holder_name": {
+                  "example": "any"
+                },
+                "card_number": {
+                  "example": "any"
+                },
+                "card_expire": {
+                  "example": "any"
+                },
+                "card_cvv": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/DeliveryAddress": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                },
+                "address": {
+                  "example": "any"
+                },
+                "city": {
+                  "example": "any"
+                },
+                "state": {
+                  "example": "any"
+                },
+                "country": {
+                  "example": "any"
+                },
+                "pincode": {
+                  "example": "any"
+                },
+                "mobile": {
+                  "example": "any"
+                },
+                "secondaryMobile": {
+                  "example": "any"
+                },
+                "user_id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          }
+        }
+      }
+    },
+    "/api/getAllCards": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/create-payment-intent": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "example": "any"
+                },
+                "id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          }
+        }
+      }
+    },
+    "/api/getAllProducts": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/productedit/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣ Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/productdelete/{id}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/updateproducts/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "category_id": {
+                  "example": "any"
+                },
+                "brand_id": {
+                  "example": "any"
+                },
+                "product_name": {
+                  "example": "any"
+                },
+                "product_code": {
+                  "example": "any"
+                },
+                "group_code": {
+                  "example": "any"
+                },
+                "product_color": {
+                  "example": "any"
+                },
+                "family_color": {
+                  "example": "any"
+                },
+                "product_price": {
+                  "example": "any"
+                },
+                "product_discount": {
+                  "example": "any"
+                },
+                "product_weight": {
+                  "example": "any"
+                },
+                "final_price": {
+                  "example": "any"
+                },
+                "discount_type": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "washcare": {
+                  "example": "any"
+                },
+                "fabric": {
+                  "example": "any"
+                },
+                "keywords": {
+                  "example": "any"
+                },
+                "pattern": {
+                  "example": "any"
+                },
+                "sleeve": {
+                  "example": "any"
+                },
+                "fit": {
+                  "example": "any"
+                },
+                "occassion": {
+                  "example": "any"
+                },
+                "meta_title": {
+                  "example": "any"
+                },
+                "meta_description": {
+                  "example": "any"
+                },
+                "meta_keywords": {
+                  "example": "any"
+                },
+                "is_featured": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/productcolor": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/allproductcount": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+      "/api/addproducts": {
+        "post": {
+          "description": "",
+          "parameters": [
+            {
+              "name": "body",
+              "in": "body",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "attribute": {
+                    "example": "any"
+                  },
+                  "category_id": {
+                    "example": "any"
+                  },
+                  "brand_id": {
+                    "example": "any"
+                  },
+                  "product_name": {
+                    "example": "any"
+                  },
+                  "product_code": {
+                    "example": "any"
+                  },
+                  "product_color": {
+                    "example": "any"
+                  },
+                  "family_color": {
+                    "example": "any"
+                  },
+                  "group_code": {
+                    "example": "any"
+                  },
+                  "product_price": {
+                    "example": "any"
+                  },
+                  "product_weight": {
+                    "example": "any"
+                  },
+                  "product_discount": {
+                    "example": "any"
+                  },
+                  "discount_type": {
+                    "example": "any"
+                  },
+                  "final_price": {
+                    "example": "any"
+                  },
+                  "description": {
+                    "example": "any"
+                  },
+                  "washcare": {
+                    "example": "any"
+                  },
+                  "keywords": {
+                    "example": "any"
+                  },
+                  "fabric": {
+                    "example": "any"
+                  },
+                  "pattern": {
+                    "example": "any"
+                  },
+                  "sleeve": {
+                    "example": "any"
+                  },
+                  "fit": {
+                    "example": "any"
+                  },
+                  "occassion": {
+                    "example": "any"
+                  },
+                  "meta_title": {
+                    "example": "any"
+                  },
+                  "meta_description": {
+                    "example": "any"
+                  },
+                  "meta_keywords": {
+                    "example": "any"
+                  },
+                  "is_featured": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "✅ Ok"
+            },
+            "404": {
+              "description": "4️⃣0️⃣4️⃣  Not Found"
+            },
+            "400": {
+              "description": "❌ Bad Request"
+            },
+            "500": {
+              "description": "🚫 Internal Server Error"
+            }
+          }
+        }
+      },
+    "/api/getAllproductsImages": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/handleproductstatus/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/ProductsImageDelete/{id}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/handleproductImagesstatus/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/editproductattributes/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/deleteattribute/{id}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/allproductsAttributes": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/SearchProducts/{searchTerm}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "searchTerm",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/register": {
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "check": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/checkemail/{email}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/checkmobile/{mobile}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "mobile",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/UniqueID/{unique_id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "unique_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/passwordforgot/{email}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/countuser": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },"404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/countadmin": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },"404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/countsubadmin": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/getAllAdminSubadminUsers": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/singledata/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/editdata/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/update/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                },
+                "mobile": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "role": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/deleteAdminSubAdminUser/{id}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/SearchAdminSubAdminUser/{searchTerm}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "searchTerm",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/registerUserParticularDate/{date}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/registerUserfromrDateTotodate/{fromdate}/{todate}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "fromdate",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "todate",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/getAllSubAdminData": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          }
+        }
+      }
+    },
+    "/api/documentation": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "✅ Ok"
+          },
+          "404": {
+            "description": "4️⃣0️⃣4️⃣  Not Found"
+          },
+          "400": {
+            "description": "❌ Bad Request"
+          },
+          "500": {
+            "description": "🚫 Internal Server Error"
+          }
+        }
+      }
+    }
+  }
+}

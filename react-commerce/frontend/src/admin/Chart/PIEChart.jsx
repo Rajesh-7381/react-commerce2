@@ -1,38 +1,27 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import PIECHART from 'react-apexcharts';
+import fetchDataEntity from '../CRUDENTITY/FetchDataEntity';
 
 const PIEChart = () => {
-  const [usercount, setUserCount] = useState(0);
-  const [admincount, setAdminCount] = useState(0);
-  const [subadmincount, setSubadminCount] = useState(0);
-  const [categoriescount, setcategoriesCount] = useState(0);
-  const [allproductcount, setallproductcount] = useState(0);
-  const [allbrandcount, setallbrandcount] = useState(0);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userResponse = await axios.get("http://localhost:8081/countuser");
-        const adminResponse = await axios.get("http://localhost:8081/countadmin");
-        const subadminResponse = await axios.get("http://localhost:8081/countsubadmin");
-        const uniquecategoriesResponse = await axios.get("http://localhost:8081/uniquecategories");
-        const productcountResponse = await axios.get("http://localhost:8081/allproductcount");
-        const BrandcountResponse = await axios.get("http://localhost:8081/AllBrandCount");
-        setUserCount(userResponse.data.count);
-        setAdminCount(adminResponse.data.Admincount);
-        setSubadminCount(subadminResponse.data.subaAdmincount);
-        setcategoriesCount(uniquecategoriesResponse.data.catcount);
-        setallproductcount(productcountResponse.data.productcount);
-        setallbrandcount(BrandcountResponse.data.Brandcount);
-        // Cookies.get("id",id);
-      } catch (error) {
-        console.error("Error fetching count data:", error);
-      }
+  const [counts, setCounts] = useState({
+    userCount: 0,
+    adminCount: 0,
+    subAdminCount: 0,
+    categoriesCount: 0,
+    allProductCount: 0,
+    allBrandCount: 0,
+});
+// console.log(counts)
+useEffect(() => {
+    const getCounts = async () => {
+        const data = await fetchDataEntity();
+        // console.log(data)
+        if (data) setCounts(data);
     };
 
-    fetchData();
-  }, []);
+    getCounts();
+}, []);
 
   return (
     <div>
@@ -40,9 +29,14 @@ const PIEChart = () => {
         type="pie"
         width={575}
         height={700}
-        series={[admincount, subadmincount, usercount, categoriescount, allproductcount, allbrandcount]}
+        series={[ counts.adminCount,
+          counts.subAdminCount,
+          counts.userCount,
+          counts.categoriesCount,
+          counts.allProductCount,
+          counts.allBrandCount]}
         options={{
-          title: { text: 'e-Commerce Dashboard', style: { fontSize: 30 } },
+          title: { text: 'e-Commerce Dashboard', style: { fontSize: 30 } }, 
           colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'],
           stroke: { width: 3, curve: 'smooth' },
           fill: { opacity: 1 },

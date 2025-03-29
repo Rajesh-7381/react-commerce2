@@ -1,10 +1,13 @@
 const nodemailer=require("nodemailer");
 
 const transpoter=nodemailer.createTransport({
-    service : process.env.EMAIL_SERVICE, // e.g., 'gmail', 'yahoo', 'outlook', etc.
+    
+    host: process.env.EMAIL_SERVICE,
+    port: process.env.EMAIL_PORT,
+    secure: false, // Use `true` for port 465, `false` for all other port
     auth : {
-        user: process.env.SENDER_EMAIL, // Your email address
-        pass: process.env.EMAIL_PASSKEY, // Your email password or app password
+        user: process.env.SENDER_EMAIL,
+        pass: process.env.EMAIL_PASSKEY, 
     },
 })
 module.exports=transpoter;

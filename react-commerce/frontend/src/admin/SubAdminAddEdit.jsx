@@ -1,17 +1,20 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { NotificationContainer, NotificationManager } from 'react-notifications';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Header from './Components/Header';
+import Footer from './Components/Footer';
 
 const SubAdminAddEdit = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const navigate = useNavigate();
     const location = useLocation();
-    const [editdata, setEditdata] = useState(null);
     const [visible, setVisible] = useState(false);
     const { register, handleSubmit, setValue, formState: { errors } } = useForm();
     const [role, setRole] = useState('');
-
+    const [loading,setloading]=useState(false)
     const id = location.state ? location.state.id : null;
 
     useEffect(() => {
@@ -23,12 +26,9 @@ const SubAdminAddEdit = () => {
 
     const handledit = async (id) => {
         try {
-            const response = await axios.get(`http://localhost:8081/editdata/${id}`);
-            const userData = response.data.data;
-            setEditdata(userData);
+            const response = await axios.get(`${BASE_URL}/api/editdata/${id}`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+            const userData = response.data.result[0];
             setRole(userData.role);
-
-            // Set form values
             setValue('name', userData.name);
             setValue('mobile', userData.mobile);
             setValue('email', userData.email);
@@ -39,40 +39,95 @@ const SubAdminAddEdit = () => {
         }
     };
 
-    const toggleRole = () => {
-        const newRole = role === 'subadmin' ? 'user' : 'subadmin';
-        setRole(newRole);
-    };
+  const toggleRole = () => {
+    const newRole = role === 'subadmin' ? 'user' : 'subadmin';
+    setRole(newRole);
+  };
 
-    const handlesubmit = async (formData) => {
-        try {
-            const response = await axios.put(`http://localhost:8081/update/${id}`, formData);
-            console.log(response.data.message); // Log success message
-            NotificationManager.success("form updated successfully!")
-            setTimeout(()=>navigate("/subadmins"),2000);
-            // navigate("/subadmins");
-
-            
-        } catch (error) {
-            console.error("Error updating data", error);
-        }
+ 
+  const handlesubmit = async (formData) => {
+    setloading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await axios.put(`${BASE_URL}/api/update/${id}`, formData, {headers: { Authorization: `Bearer ${localStorage.getItem('token')}`, }, });
+      toast.success("Form updated successfully!", { position: "bottom-right"});
+      setTimeout(() => navigate("/subadmins"), 6000);
+    } catch (error) {
+      console.error("Error updating data:", error);
+      toast.error("Failed to update form data. Please try again.", { position: "bottom-right"});
+    } finally {
+        setloading(false);
     }
+  };
 
     return (
         <div>
-            <div className="wrapper">
-                <div className="content-wrapper">
+        <div>
+        <div className="wrapper">
+          {/* Preloader */}
+          <div className="preloader flex-column justify-content-center align-items-center">
+            <img
+              className="animation__shake"
+              src="dist/img/AdminLTELogo.png"
+              alt="AdminLTELogo"
+              height={60}
+              width={60}
+            />
+          </div>
+          {/* Navbar */}
+          <Header></Header>
+          <div className="content-wrapper">
+            {/* Content Header (Page header) */}
+            <div className="content-header">
+              <div className="container-fluid">
+                <div className="row mb-2">
+                  <div className="col-sm-12">
+                    <h1 className="m-0 float-start">Edit/Update By SubAdmin</h1>
                     <section className="content-header">
-                        <div className="container-fluid">
-                            <div className="row mb-2">
-                                <div className="col-sm-6"></div>
-                            </div>
+                      <div className="container-fluid">
+                        <div className="row mb-2">
+                          <div className="col-sm-6"></div>
+                          <div className="col-sm-6">
+                            <ol className="breadcrumb float-sm-right">
+                              <li className="breadcrumb-item ">
+                                <Link to={"/admindashboard1"}>Home</Link>
+                              </li>
+                              <li className="breadcrumb-item">
+                                <Link to={"/subadmins"}>Back</Link>
+                              </li>
+                            </ol>
+                          </div>
                         </div>
+                      </div>
                     </section>
-                    <section className="content">
+                    <br />
+                  </div>
+
+                  {/* /.col */}
+                  <div className="col-sm-6">
+                    <ol className="breadcrumb float-sm-right"></ol>
+                  </div>
+                  {/* /.col */}
+                </div>
+                {/* /.row */}
+              </div>
+              {/* /.container-fluid */}
+            </div>
+            {/* /.content-header */}
+            {/* Main content */}
+            <section className="content">
+              <div className="container-fluid">
+                <div className="row">
+                  <div className="col-lg-3 col-6"></div>
+                </div>
+              </div>
+            </section>
+            {/* /.content */}
+
+            <section className="content">
                         <div className="container-fluid">
                             <div className="row">
-                                <div className="col-md-9">
+                                <div className="col-md-12">
                                     <div className="card card-primary">
                                         <div className="card-header">
                                             <h3 className="card-title" style={{ width: "100%", fontWeight: "bold" }}>Update Form</h3>
@@ -110,8 +165,14 @@ const SubAdminAddEdit = () => {
 
                                             </div>
                                             <div className="card-footer text-start">
-                                                <NotificationContainer />
-                                                 <button type="submit" className="btn btn-success">Update</button>
+                                                <ToastContainer />
+                                                {loading ? (
+                                                  <div>
+                                                    <button type="submit" className="btn btn-success" disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> Update </button>
+                                                     <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
+                                                ) : (
+                                                  <button type="submit" className="btn btn-success">Update</button>
+                                                )}
                                             </div>
                                         </form>
                                     </div>
@@ -119,8 +180,13 @@ const SubAdminAddEdit = () => {
                             </div>
                         </div>
                     </section>
-                </div>
-            </div>
+          </div>
+
+          {/* /.content-wrapper */}
+          <Footer />
+        </div>
+        {/* ./wrapper */}
+        </div>
         </div>
     )
 }

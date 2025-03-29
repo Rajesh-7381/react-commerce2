@@ -1,19 +1,26 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { NotificationContainer, NotificationManager } from 'react-notifications';
+import React, { useEffect, useMemo, useState } from 'react'
+import { NotificationContainer } from 'react-notifications';
 import { Link, useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2';
+
+import { DeleteEntity } from '../CRUDENTITY/DeleteEntity';
+import { StatusEntity } from '../CRUDENTITY/StatusEntity';
+import Footer from '../Components/Footer';
+import Header from '../Components/Header';
 
 const Products = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL
     const navigate=useNavigate();
     const [productdata,setproductdata]=useState([]);
+
     useEffect(()=>{
         document.title="Products";
         retrivedData();
     },[]);
+    
     const retrivedData= async()=>{
         try {
-           const response=await axios.get("http://localhost:8081/allproducts") ;
+           const response=await axios.get(`${BASE_URL}/api/getAllProducts`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}}) ;
            setproductdata(response.data);
         } catch (error) {
             console.error(error);
@@ -27,50 +34,21 @@ const Products = () => {
     // handle delete
     const handledelete=async(id)=>{
         // alert(1)
-        try {
-            const confirmed = await Swal.fire({
-                title: 'Are you sure?',
-                text: 'This action cannot be undone.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!',
-            });
-
-            if (confirmed.isConfirmed) {
-                // Delete the item
-                await axios.delete(`http://localhost:8081/productdelete/${id}`);
-                NotificationManager.success("successfully!  deleted data");
-                // Fetch the updated data from the server and update the local state
-                const response = await axios.get("http://localhost:8081/allproducts");
-
-                setproductdata(response.data);
-                // setFilterData(response.data);
-            } else {
-                // Do nothing
-                NotificationManager.error("Data not deletd  successfully!");
-            }
-        } catch (error) {
-            console.error(error);
-        }
+       const data=await DeleteEntity('Product',id);
+        // Fetch the updated data from the server and update the local state
+        const response = await axios.get(`${BASE_URL}/api/getAllProducts`,{headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}});
+        // console.log(response.data.products)
+        setproductdata(response.data);
+        // setFilterData(response.data);
     }
 
     const toggleclick = async (status, id) => {
-        // alert(status)
-        const newStatus = status === 'Active' ? 'Inactive' : 'Active';
         try {
-          await axios.put(`http://localhost:8081/updatestatus/${id}`, { status: newStatus });
-          const updatedData = productdata.map((item) => {
-            if (item.id === id) {
-              return { ...item, status: newStatus };
-            }
-            return item;
-          });
-          setproductdata(updatedData);
+            await StatusEntity('ProductStatus',id,status,setproductdata,productdata)
+            
         } catch (error) {
-          console.error(error);
-        }
+            alert(`Error: ${error.message}`)
+        }        
       };
       
     const [currentpage,setCurrentPage]=useState(1);
@@ -78,7 +56,9 @@ const Products = () => {
     const lastIndex=currentpage * recordsPerPage;
     const firstIndex=lastIndex - recordsPerPage;
     const totalPages= Math.ceil(productdata.length /recordsPerPage);
+    // console.log(totalPages)
     const numbers=[...Array(totalPages + 1).keys()].slice(1);
+    // console.log(numbers)
 
     const prepage =()=>{
         if(currentpage > 1){
@@ -96,7 +76,15 @@ const Products = () => {
     }
 
     // searching functionality
-    const searchfunction=(event)=>{
+    const debounce=(func,wait)=>{
+        let timerId;
+        return (...args)=>{
+            // console.log(args)
+            clearTimeout(timerId);
+            timerId=setTimeout(() => func(...args), wait);
+        }
+    }
+    const callApi=async(event)=>{
         const searchdata=event.target.value.toLowerCase().trim();
         // console.log(searchdata)
         if(searchdata === ""){
@@ -111,11 +99,55 @@ const Products = () => {
             );
             setproductdata(filtered);
         }
-    
     }
+    // console.log(callApi)
+    const debounceCallApi=useMemo(()=>debounce(callApi,1000),[])
   return (
     <div>
-        <section className="content">
+    <div>
+    <div className="wrapper">
+    {/* Preloader */}
+        <div className="preloader flex-column justify-content-center align-items-center">
+            <img
+            className="animation__shake"
+            src="dist/img/AdminLTELogo.png"
+            alt="AdminLTELogo"
+            height={60}
+            width={60}
+            />
+        </div>
+    {/* Navbar */}
+        <Header></Header>
+        <div className="content-wrapper">
+            {/* Content Header (Page header) */}
+            <div className="content-header">
+            <div className="container-fluid">
+                <div className="row mb-2">
+                    <div className="col-sm-12">
+                        <h1 className="m-0 float-start">Products Table</h1>
+                        <Link  className="breadcrumb-item float-right" to={"/admindashboard1"}>
+                            Home
+                        </Link>
+                        <br />
+                        
+                    </div>
+                </div>
+                {/* /.row */}
+            </div>
+            {/* /.container-fluid */}
+            </div>
+            {/* /.content-header */}
+            {/* Main content */}
+            <section className="content">
+            <div className="container-fluid">
+                <div className="row">
+                <div className="col-lg-3 col-6"></div>
+                </div>
+            </div>
+            </section>
+            {/* /.content */}
+
+            <section className="content">
         <div className="container-fluid">
             <div className="row">
                 <div className="col-12">
@@ -128,32 +160,19 @@ const Products = () => {
                         </div>
 
                         <div className="card-body">
-                            <section className="content-header">
-                                <div className="container-fluid">
-                                    <div className="row mb-2">
-                                        <div className="col-sm-6"></div>
-                                        <div className="col-sm-6">
-                                            <ol className="breadcrumb float-sm-right">
-                                                <li className="breadcrumb-item "><Link to={"/admindashboard1"}>Home</Link></li>
-                                                <li className="breadcrumb-item"><Link to={""}>Back</Link></li>
-                                            </ol>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
+                            
                             <form className='d-flex align-items-center justify-content-end'>
                                 <div className="input-group">
-                                    <input className="form-control mr-2" type="search" placeholder="Search using name, url, title etc..." aria-label="Search" onKeyUp={searchfunction}  />
+                                    <input className="form-control mr-2" type="search" placeholder="Search using name, url, title etc..." aria-label="Search" onChange={(e)=>{debounceCallApi(e)}}  />
                                     <div className="input-group-append">
                                         <button className="btn btn-outline-success mr-2" type="button">Search</button>
-                                        <button className='btn btn-primary ' onClick={()=>handleedit()}>Add</button>
+                                        <button className='btn btn-primary '  onClick={()=>handleedit()}>Add</button>
                                     </div>
                                 </div>
                             </form>
 
                             <div className="table-responsive">
-                                <table className="table table-bordered table-striped">
+                                <table className="table table-bordered table-striped ">
                                     <thead>
                                         <tr>
                                             <th className='bg-dark text-light'>SL NO.</th>
@@ -161,49 +180,39 @@ const Products = () => {
                                             <th className='bg-dark text-light'>CATEGORY</th>
                                             <th className='bg-dark text-light'>PARENT CATEGORY</th>
                                             <th className='bg-dark text-light'>PRODUCT CODE </th>
-                                            <th className='bg-dark text-light'>PRODUCT COLOR</th>
-                                            <th className='bg-dark text-light'>FAMILY COLOR </th>
                                             <th className='bg-dark text-light'>GROUP CODE</th>
                                             <th className='bg-dark text-light'>PRODUCT PRICE</th>
-                                            <th className='bg-dark text-light'>PRODUCT WEIGHT</th>
-                                            <th className='bg-dark text-light'>PRODUCT DISCOUNT </th>
                                             <th className='bg-dark text-light'>STATUS</th>
                                             <th className='bg-dark text-light'>ACTIONS</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {
-                                            productdata.slice((currentpage-1) * recordsPerPage , currentpage * recordsPerPage).map((item, index) => (
-                                                <tr key={item.id} className={item.status === 'Active' ? 'bg-primary' : ''}>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'} style={{ width: "1px" }}>{index + 1 + (currentpage - 1) * recordsPerPage}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_name}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>
-                                                        {item.category_name}
-                                                    </td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>
-                                                        {item.parent_category_name}
-                                                    </td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_code}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_color}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.family_color}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.group_code}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_price}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_weight}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>{item.product_discount}</td>
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}><span className={`badge badge-${item.status === 'Active' ? 'success' : 'danger'}`}>{item.status === 'Active' ? 'Active' : 'Inactive'}</span></td>
-                                                    
-                                                    <td className={item.status === 'Active' ? 'bg-primary' : 'bg-warning'}>
-                                                        <NotificationContainer />
-                                                        <button className='btn btn-success btn-sm ' onClick={()=>handleedit(item.id)}><i className='fas fa-pencil-alt'></i></button>
-                                                        <NotificationContainer />
-                                                        <button className='btn btn-danger btn-sm' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
-                                                        <NotificationContainer />
-                                                        <button className='btn btn-dark btn-sm' onClick={()=>toggleclick(item.status,item.id)}><i className={item.status === 'Active' ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
-                                                    </td>
+                                            {
+                                                productdata && productdata.length > 0 ?
+                                                productdata.slice((currentpage-1) * recordsPerPage , currentpage * recordsPerPage).map((item, index) => (
+                                                    <tr key={item.id} className={item.status === 'Active' ? 'bg-primary' : ''}>
+                                                        <td style={{ width: "1px" }}>{index + 1 + (currentpage - 1) * recordsPerPage}</td>
+                                                        <td>{item.product_name}</td>
+                                                        <td>{item.category_name}</td>
+                                                        <td><span className={`badge badge-${item.parent_category_name === 'No Parent Category' ? 'warning' : 'dark'}`}>{item.parent_category_name}</span></td>
+                                                        <td>{item.product_code}</td>
+                                                        <td>{item.group_code}</td>
+                                                        <td>{item.product_price}</td>
+                                                        <td><span className={`badge badge-${item.status === 1 ? 'success' : 'danger'}`}>{item.status === 1 ? 'Active' : 'Inactive'}</span></td>
+                                                        <td>
+                                                            <NotificationContainer />
+                                                            <button className='btn btn-success btn-sm mr-1' onClick={()=>handleedit(item.id)}><i className='fas fa-pencil-alt'></i></button>
+                                                            <button className='btn btn-danger btn-sm mr-1' onClick={()=>handledelete(item.id)}><i className='fas fa-trash'></i></button>
+                                                            <button className='btn btn-dark btn-sm' onClick={()=>toggleclick(item.status,item.id)}><i className={item.status === 1 ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}></i></button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                                :
+                                                <tr>
+                                                    <td colSpan={6}>No data found</td>
                                                 </tr>
-                                            ))
-                                        }
-                                    </tbody>
+                                            }
+                                        </tbody>
                                 </table>
                                 <br></br>
                                 <nav className='float-right'>
@@ -229,7 +238,19 @@ const Products = () => {
                 </div>
             </div>
         </div>
-        </section>
+            </section>
+        </div>
+
+    {/* /.content-wrapper */}
+        <Footer></Footer>
+    {/* Control Sidebar */}
+        <aside className="control-sidebar control-sidebar-dark">
+            {/* Control sidebar content goes here */}
+        </aside>
+    {/* /.control-sidebar */}
+    </div>
+    {/* ./wrapper */}
+    </div>
     </div>
   )
 }

@@ -1,0 +1,1479 @@
+# react-commerce2
+
+
+# react-commerce
+
+it have 4 parts i,e 
+    ->frontend
+    ->backend
+    ->bug
+    ->learning
+
+                        frontend::
+                        =========
+1.    <create-react-app foldername>
+create a new project in react ->npx create-react-app foldername create new file->echo. > file name create new folder->mkdir folder name open vs code using cmd -> code .
+
+2.   <npm i bootstrap>
+to install bottstarp in react -> npm i bootstrap add in index.js -> import "bootstrap/dist/css/bootstrap.css"; import "bootstrap/dist/js/bootstrap.bundle";
+
+3.   <npm install bootstrap-icons>
+install bootstarp icons ->npm install bootstrap-icons add in index.js-> import "bootstrap-icons/font/bootstrap-icons.css"
+
+4.  <npm i formik->form validtion >
+5.  <npm i yup->for data validation>
+6.  <npm i react-notifications>
+7.  <add in app.js  (import 'react-notifications/lib/notifications.css';)
+8.  <npm install react-helmet>
+9.  <to install fontawesome library>
+
+-> npm install react-helmet ->import React, { useEffect } from "react"; ->useEffect(() => { // Set document title when the component mounts document.title = "Register"; }, []);
+
+->When the component mounts, the useEffect hook runs the function to update the document title.
+->At the same time, the Helmet component renders the <title> tag with the specified title.
+->React Helmet then manages updating the document head with the content of the <Helmet> component.
+->This approach ensures that the document title is dynamically updated based on the component being rendered,       
+>providing a seamless user experience.
+
+->use of react useffct hook ::In React, useEffect is a hook that can be used to run side effects or manage state changes after 
+10. <npm i react-csv> to download csv format in table data
+11. <npm install jspdf jspdf-autotable> to download in pdf format
+    ->import {jsPDF} from "jspdf";
+    ->import 'jspdf-autotable'; import these file otheerwise not downloadable
+12. -><npm i reactstrap>
+12. -><npm install sweetalert2>
+12. -><npm i zxcvbn> (for progress bar(strong password))
+13. -><npm install react-hook-form>(for form validation and update purpose)
+14. -><npm install chart.js>(for pie chart data shown)
+14. -><npm install react-google-recaptcha>(google captch integration) //r..je..u...7...2@gm....c.m  // domain name->localhost 
+14. -><npm install react-image-magnify> (for image shown large or small size)
+15. ->npm install yup @hookform/resolvers (for validation input field)
+16. ->npm install spinners-react(for using loader)
+16. ->npm install qrcode.react(generate random qr code)
+
+
+abstract::
+=========
+->1st we configure both frontend and and backend.
+=>user registered 1st and after that 1st of all we define manually one user have admin thats why they acess admin page .
+->and register page validate using formik and yup also registered user shown after successfully submitng form i,e react notifications
+->after that we configure how manny user registered shown that shown by admin dynamically
+day-4::(addeditregister.jsx)
+======
+->to show data in tabular format
+->export csv download
+->pdf format data download
+->print data
+->searching functionality
+->modal data fuctionality and update button inside data shown modal inside form (using react-strap)
+->add pagination
+
+day-5::(addeditregister.jsx)
+======
+->add and show single data using eye icon 
+->edit functionality using formik(when click on toggle2 it is open for modal and inside this call onsubmit() function it set values    and   after that  handle submit able to edit the data)
+->deleted functionality using sweetalert2
+->show all types of notification
+->add subadmin
+->show password icon functionality
+->in registering time data goes to database (password) in hashing format
+
+day-6::
+======
+->show data in table format(subadmin.jsx)
+->eye functionality(subadmin.jsx)
+->csv download(subadmin.jsx)
+->searching functionality(subadmin.jsx)
+day-7::
+=======
+->update functionalty (using react-form-hook)(subadmin.jsx)
+->delete functionality(subadmin.jsx)
+->type column role data shown(subadmin.jsx)
+->add tracker functionality like if user or admin or subadmin without login they can not acess dashboard or any other page (user dashboard and admin dashboard using session)
+
+day-8::
+======
+->print page functionality(subadmin.jsx)
+->pdf format download(subadmin.jsx)
+->remember me functionalty in login page (add email and password store in cookies and expariry time)
+->count user,admin,and subadmin shown in admin dashboard
+->also data shown in pie chart format
+
+day-9::
+======
+->update and show category data also edit and update data and delete functionality
+->soft delte functionality both adminuser and categories table
+
+
+day-10::
+======
+->create cms page (to admin perform all functionality)
+->in category and register profile page image inserting
+->in categories toggle status on/off
+
+day-10::
+======
+->add,edit and delete functionality in cmspages
+->googgle recaptch integration in register.jsx
+
+
+day-11::
+========
+->create products page to add and update and show data 
+
+day-12::
+========
+lost password functionality and fallback routing
+day-13::
+========
+admin can search using particular date and from date to todate
+->set token in localstorage and protected route
+
+day-
+=====
+add global delete fuctionality(crudentity/deleteentity)
+
+
+                             backend::
+                             =========
+
+->create a backend folder
+    ->inside package.json to write("start":"nodemon server.js")
+    ->inside backend to run comand(npm init -y)->to install package.json
+    ->inside backend to run command(npm i mysql express nodemon cors)
+    ->if mysql not worked to expicitly install(npm install mysql2)
+    ->npm i bcrypt (for hashing password using sal and gensalt)
+    ->npm i multer (for file uploading)
+    ->npm i moment (for date)
+    ->npm i sharp (for image processing and image resizing in diff folder in my project)
+    ->in my system node 18 not compatiable with latest sharp library so we use  (npm install sharp@0.32.0) version  that compatiable with node 18
+    -> npm i dotenv
+    -> npm i sharp
+    -> npm i nodemailer
+    -> npm i morgan (for logging purpose)
+    ->npm i fs (for file system)
+    ->npm i joi (for validation)
+    ->npm install passport passport-facebook passport-google-oauth20 express-session(for googgle and facebook integration)(details below)
+    ->npm i cloudinary(to store image in cloudinary)
+    ->npm i uuid(for random id generateor) 802bb37b-961f-49c6-b280-9060a2bae041
+    -> npm i @google/generative-ai(to integrate gemini ai)
+
+
+->image related file define inside utils->multerconfig.js
+->db related  define inside config->dbconfig.js
+
+
+                                            bug::
+                                            ====
+->validation not worked in addeditregister.jsx(update form)
+->show user data like(ok,cancel,cross icon) not worked.   (bug fixed successfully!)
+->show user data like(ok,cancel,cross icon) not worked.(subadmin.jsx)  (bug fixed successfully!)
+->in my code subadmin cannot see all data we can set (fixable)
+->in update case products not editable only adding worked
+->in brands table searching not worked
+->product edit or update time select category not worked
+
+
+
+
+
+
+<!-- inbuilt changes -->
+in dashboard2.jsx  line number 1028 to 1068 comment out
+below code
+
+ <!-- {/*<div className="s-skeleton s-skeleton--h-600 s-skeleton--bg-grey">
+        <div className="owl-carousel primary-style-1" id="sitemakers-slider">
+        <div className="sitemakers-slide sitemakers-slide--1" style={{backgroundImage: `url("./frontend/images/banners/sitemaker-slider-banner-1.png")`}}>
+        <div className="container">
+              <div className="row">
+                <div className="col-12">
+                  <div className="slider-content slider-content--animation">
+                    <span className="content-span-2 u-c-secondary">10% Off on T-Shirts</span>
+                    <a className="shop-now-link btn--e-brand" href="shop-side-version-2.html">SHOP NOW</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="sitemakers-slide sitemakers-slide--2" style={{backgroundImage: `url("./frontend/images/banners/sitemaker-slider-banner-2.png")`}}>
+            <div className="container">
+              <div className="row">
+                <div className="col-12">
+                  <div className="slider-content slider-content--animation">
+                    <span className="content-span-2 u-c-secondary">20% Off on T-Shirts</span>
+                    <a className="shop-now-link btn--e-brand" href="shop-side-version-2.html">SHOP NOW</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="sitemakers-slide sitemakers-slide--3" style={{backgroundImage: `url("./frontend/images/banners/sitemaker-slider-banner-3.png")`}}>
+            <div className="container">
+              <div className="row">
+                <div className="col-12">
+                  <div className="slider-content slider-content--animation">
+                    <span className="content-span-2 u-c-secondary">15% Off on Jackets</span>
+                    <a className="shop-now-link btn--e-brand" href="shop-side-version-2.html">SHOP NOW</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>*/} -->
+
+
+
+2.also change in app.css line number 989
+before
+.aspect__img {
+  position: absolute;
+  width: 100%;
+  height: 100%; }
+
+  after change
+.aspect__img {
+  position: relative;
+  width: 100%;
+  height: 100%; }      
+
+
+=================================================LEARNING=================================================================================================================
+==========================================================================================================================================================================
+
+
+
+=================================================BACKEND=================================================================================================================
+==========================================================================================================================================================================
+A) multer::    Multer is a middleware for handling multipart/form-data, which is primarily used for uploading files in Node.js applications
+          ->It simplifies the process of receiving files through HTTP requests by parsing incoming request bodies and storing the files either in memory or on disk
+     features of multer
+     ==================
+          ->1) file handling::  multer handles multiple "multipart/form-data"   for form submission. also it allows single file or multiple file uploads.
+          ->2) storeage configuration:: Multer provides flexible storage options. You can store files on disk or in memory.
+                -You can configure storage locations, filenames, and other parameters using the diskStorage or memoryStorage options.
+
+
+               A. Disk Storage
+                ============
+                ->The diskStorage option lets you store files directly on your server's file system. This is useful for persistent storage where files need to be saved and accessed later
+                ->Destination:: Defines the folder where the uploaded files will be stored.
+                ->Filename:: Specifies how the uploaded files should be named. ex-const ext=path.extname(file.originalname);   Date.now()+ext->mean with date time and extension
+
+                ex-
+                  app.post('/upload', upload.single('file'), (req, res) => {
+                  res.send('File uploaded successfully');
+                });
+              B.Memory Storage
+              ================
+                ->The memoryStorage option stores files in memory as Buffer objects. 
+                ->This is useful for short-term processing or when you need to handle files in memory before saving them elsewhere (e.g., cloud storage).
+                const storage = multer.memoryStorage();
+
+                ex-
+                    app.post('/upload', upload.single('file'), (req, res) => {
+                    console.log(req.file.buffer); // Access the file as a Buffer object
+                    res.send('File uploaded successfully');
+                  });
+              Summary
+              =======
+              ->diskStorage: Saves files to a specified directory on the server with customizable filenames.
+              ->memoryStorage: Stores files in memory as Buffer objects, suitable for temporary storage and processing.     
+
+
+          3.File Filtering::
+              ->You can filter files based on their type, size, and other criteria to ensure that only valid files are processed and stored.  
+          4.Error Handling:
+              ->Multer provides built-in error handling for various issues that might arise during file uploads, such as file size limits or invalid file types.  
+
+
+B) morgan
+=========
+To integrate logging into your Node.js application using Morgan, a popular HTTP request logger middleware for Node.js
+
+use case::
+==========
+// Use Morgan middleware for logging HTTP requests
+app.use(morgan('dev'));
+
+  1.dev::
+  ======
+    ->This format is designed for development purposes.
+    ->It provides concise output that includes the HTTP method, response status code, response time in milliseconds, and the requested URL.
+    ->Example: GET /api/users 200 15.635 ms - 285
+  2.combined::
+  ============
+    ->This format is similar to the Apache combined log format.
+    ->It provides detailed output that includes the remote IP address, remote user, date and time of the request, HTTP method, requested URL, HTTP version, response status code, response size in bytes, and the referrer and user-agent headers.
+    ->Example: 127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 "http://www.example.com/start.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"  
+  3.common::
+  =========
+    ->This format is similar to the Apache common log format.
+    ->It provides less detailed output compared to the combined format.
+    ->It includes the remote IP address, remote user, date and time of the request, HTTP method, requested URL, HTTP version, response status code, and response size in bytes.
+    ->Example: 127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326  
+  4.short::
+  =======  
+    ->This format is a shorter version of the predefined formats.
+    ->It includes the remote IP address, HTTP method, requested URL, response status code, and response time in milliseconds.
+    ->Example: ::1 - GET /api/users 200 15.635 ms
+  5.tiny:
+  ======
+    -> This format is even shorter and more minimalistic.
+    ->It includes only the HTTP method, response status code, response size in bytes, and response time in milliseconds.
+    ->Example: GET /api/users 200 - - 15.635 ms  
+
+c)bodyparser::
+==============
+  1)app.use():
+    ->This is a method in Express.js that allows you to add middleware functions to the application.
+    ->Middleware functions are functions that have access to the entire request object (req) and can execute any code, make changes to the request and response objects, and even end the request-response cycle.
+  2)bodyParser:
+    -> This is a middleware function that parses the request body and makes it available in the req.body property.  
+  3)urlencoded():
+    -> This is a method of the bodyParser object that specifies the type of parsing to be done. In this case, it's URL-encoded parsing.  
+  4){ extended: true }:
+    -> This is an options object that is passed to the urlencoded() method. 
+    ->The extended property is a boolean that indicates whether to use the qs library to parse the URL-encoded data. When extended is true, the qs library is used, which allows for more advanced parsing like(multipart/formdata) of URL-encoded data, including support for arrays and objects. 
+    ->When extended is false, the built-in querystring library is used, which only supports simple key-value pairs.  
+d)require('dotenv').config();
+============================
+   1)require('dotenv'):
+    -> This is a Node.js module that allows you to load environment variables from a .env file into the process.env object.
+  2).config(): 
+    ->This is a method of the dotenv module that reads the .env file and loads the environment variables into the process.env object.   
+e)jwt::
+======
+  -> you can generate a new JWT using jwt.sign(), verify a JWT using jwt.verify(), or decode a JWT using jwt.decode().
+  ex//
+  ====  
+    1).Generating a new JWT:
+    ========================
+      ->const token = jwt.sign({ userId: 1, username: 'john' }, 'secretkey', { expiresIn: '1h' });
+    2)Verifying a JWT:
+    =================
+      ->const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoiam9obiIsImlhdCI6MTYyMzkwMDAwMH0.XXXXXX';
+          const decoded = jwt.verify(token, 'secretkey');
+          console.log(decoded); // { userId: 1, username: 'john', iat: 1623900000 }
+    3)Decoding a JWT:
+    =================   
+      ->const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoiam9obiIsImlhdCI6MTYyMzkwMDAwMH0.XXXXXX';
+          const decoded = jwt.decode(token);
+          console.log(decoded); // { userId: 1, username: 'john', iat: 1623900000 }    
+
+
+f).joi(JavaScript object interface)
+===================================
+j-oi is powerful scema description language  and data validator for JavaScript and commonly used with node js .
+-it allows to developer to define and validate comples data strcture in clear and concise manner.
+    a).minDomainSegments: 2:
+    =====================
+
+        ->This specifies the minimum number of segments required in the domain part of the email address.
+        ->For example, in example.com, there are two segments: example and com.
+        ->This rule helps ensure that the domain part of the email address is structured correctly and is not too short (e.g., example.c would be invalid).
+
+    b).tlds: { allow: ['com', 'net', 'org'] }:
+    ========================================
+
+        ->This specifies the allowed top-level domains (TLDs) for the email address.
+        ->A TLD is the last part of the domain name, such as com, net, or org.
+        ->By providing this option, you restrict valid email addresses to only those that end with the specified TLDs.
+        ->For example, example@example.com, example@example.net, and example@example.org would be valid, but example@example.edu would be invalid.
+
+g).mimetype:
+========
+    Mimetype, also known as Media Type or MIME Type, is a standard way to identify the format of a file or a data stream on the internet. It is a string that is sent in the HTTP headers of a request or response to indicate the type of data being transmitted.
+
+    A mimetype consists of two parts: a type and a subtype, separated by a slash (/). The type can be one of the following:
+
+    application: used for files that are not images, audio, or video, such as documents, spreadsheets, and executables.
+    audio: used for audio files, such as music and sound effects.
+    image: used for image files, such as photos and graphics.
+    message: used for email messages and other types of messages.
+    model: used for 3D models and other types of models.
+    multipart: used for files that contain multiple parts, such as email attachments.
+    text: used for plain text files, such as documents and source code.
+    video: used for video files, such as movies and animations.
+    The subtype is a more specific identifier for the type of file. For example:
+
+    application/pdf: a PDF document
+    ===============================
+    audio/mpeg: an MP3 audio file
+    image/jpeg: a JPEG image file
+    text/html: an HTML document
+    video/mp4: an MP4 video file
+
+    Here are some common mimetypes:
+    ==============================
+    application/json: JSON data
+    application/xml: XML data
+    application/zip: a ZIP archive file
+    audio/wav: a WAV audio file
+    image/gif: a GIF image file
+    image/png: a PNG image file
+    text/css: a CSS stylesheet
+    text/javascript: a JavaScript file
+    video/avi: an AVI video file
+    video/webm: a WebM video file
+
+    Mimetypes are used in various ways, such as:
+    ===========================================
+    In HTTP headers: to indicate the type of data being transmitted in a request or response.
+    In file systems: to determine the type of file and how to handle it.
+    In web browsers: to determine how to display or handle a file.
+    In email clients: to determine how to display or handle attachments.
+
+
+h).passport and express-session
+================================
+  passport is an authentication middleware for Node.js that simplifies the process of integrating multiple authentication strategies, including social logins (e.g., Google, Facebook). Here's why it's beneficial:
+
+  Ease of Integration: passport provides a wide variety of authentication strategies, allowing you to easily integrate different authentication methods into your application.
+  Extensibility: It supports custom authentication strategies, making it highly extensible.
+  Middleware: As middleware, passport integrates seamlessly with Express.js, allowing for clean, modular authentication code.
+  Session Management: It works well with express-session to manage user sessions after authentication, maintaining user state across requests.
+
+
+i).express-session
+==================
+  express-session is a middleware for managing sessions in Express applications. Here's why it is important:
+
+  Session Management: It creates and manages user sessions, storing session data on the server.
+  Persistence: Sessions can be stored in memory, databases, or other storage solutions, allowing persistent sessions across server restarts.
+  Security: Provides features to enhance session security, such as cookie settings and session expiry.    
+
+
+  How They Work Together
+  =====================
+    User Authentication Flow:
+
+    When a user attempts to authenticate using a social provider, passport handles the OAuth flow.
+    Upon successful authentication, passport receives user information from the social provider.
+    Session Creation:
+
+    express-session generates a session for the authenticated user.
+    passport serializes user information into the session, allowing the user's authenticated state to be maintained across multiple requests.
+    Maintaining User State:
+
+    For subsequent requests, express-session retrieves the session data.
+    passport deserializes the user information from the session, making it available in the request object (req.user).
+
+
+    steps provide to open and create googgle console and create account after that get id and secret key
+    ====================================================================================================
+      1.)https://console.cloud.google.com/apis/dashboard?project=e-com-429709  (for google console developer dashboard)
+      2).after that click on credentials on left side bar and it shown a option like "application"(previously created) and click on new project
+      3).to create a project name like "e-com" and click on create button
+      4).after that click on 3 dot on left side side bar (go for enable api and service) and choose more products and click on api and service(to click enable and api service)
+      5).after that open a new page shoen "enable api and service"
+      6).search for "google+ api" on search bar and select it and click on "google+ api" and "enable" it  and their status shown "enabled"  
+      7).after that click on credentials on left side bar and click on "create credentials" and various option shown to choose create "OAUTH CLIENT ID" AND click ON "configure consent screen"
+      8).after that choose radio button like "EXTERNAL"  and click on create
+      9).to write your app name  like "e-com" and choose corresponding email  and also write same email provide in "developer contact information"  and click save and contine and again click save and continue.
+      10).after that click on credentials on left side bar  and choose web applicaton as application type and also write app name  lke "e-com"
+      11).and choose authorzed javascript origins add url1->http://localhost and add url2 http://localhost:3000   and after that click on authorized redirect url "http://localhost:8081/auth/googgle/callback" and click on create
+      12).to complete all these steps it shown "client id and client secret"
+
+      below steps to integrate googgle
+      ===================================
+      const passport = require('passport');
+      const session=require("express-session")
+      const GoogleOauthStrategy = require('passport-google-oauth20').Strategy;
+      app.use(passport.initialize());
+      app.use(passport.session());
+
+      app.use(session({ //it create encrypted session id and when i decode that it shown user details
+        secret: process.env.JWT_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours session
+      }));
+
+      passport.use(new GoogleOauthStrategy({
+          clientID:process.env.GOOGLE_CLIENT_ID, //These are obtained from the Google Cloud Console.
+          clientSecret:process.env.GOOGLE_CLIENT_SECRET, //These are obtained from the Google Cloud Console.
+          callbackURL: "http://localhost:8081/auth/google/callback", // Ensure this matches your Google Cloud Console
+          scope: ["profile", "email"] //scope: Specifies the data your application wants to access from the user's Google profile.
+        },
+        async (accessToken, refreshToken, profile, done) => {
+          try { //Contains user profile information retrieved from Google.
+            const email = profile.emails[0].value;
+            const userQuery = "SELECT * FROM AdminUser WHERE email = ?";
+            const insertQuery = `INSERT INTO AdminUser (name, email, image, mobile, password) VALUES (?, ?, ?, ?, ?)`;
+
+            db.query(userQuery, [email], (err, results) => {
+              if (err) {
+                console.error('Error querying database: ', err);
+                return done(err, null);
+              }
+
+              if (results.length > 0) {
+                // User already exists
+                return done(null, results[0]);
+              } else {
+                // User does not exist, create new user
+                const user = {
+                  name: profile.displayName,
+                  email: email,
+                  image: profile.photos[0] ? profile.photos[0].value : null,
+                  mobile: null, 
+                  password: null 
+                };
+
+                db.query(insertQuery, [user.name, user.email, user.image, user.mobile, user.password], (err, results) => {
+                  if (err) {
+                    console.error('Error inserting into database: ', err);
+                    return done(err, null);
+                  }
+
+                  // Add the newly created user ID to the `user` object
+                  user.id = results.insertId;
+                  return done(null, user);
+                });
+              }
+            });
+          } catch (error) {
+            console.error('Error in passport strategy: ', error);
+            return done(error, null);
+          }
+        }
+        ));
+
+        passport.serializeUser((user, done) => {
+        done(null, user.id);
+        });
+
+  serializeUser: Determines which data of the user object should be stored in the session. Here, only the user ID is serialized.
+  deserializeUser: Fetches the full user information from the database using the serialized user ID.
+
+        passport.deserializeUser((id, done) => {
+        const query = "SELECT * FROM AdminUser WHERE id = ?";
+        db.query(query, [id], (err, results) => {
+          if (err) {
+            return done(err, null);
+          }
+          return done(null, results[0]);
+        });
+        });
+
+      secret:
+      =======
+        Purpose: The secret is used to sign the session ID cookie, ensuring the integrity and confidentiality of the session data.
+        Details: This value should be a long, random string for security purposes. It is crucial to keep this value secret and never expose it publicly.
+      resave:
+      =======
+        Purpose: Determines whether the session should be saved back to the session store, even if it was never modified during the request.
+        Details: Setting this to false helps reduce unnecessary session store operations, improving performance. If set to true, the session will be saved on every request regardless of whether it was modified.  
+      saveUninitialized:
+      ==================
+        Purpose: Controls whether to save uninitialized sessions to the session store.
+        Details:
+          If set to true, new sessions that are uninitialized (i.e., sessions that are new but have not been modified) will be saved to the session store. This can be useful for login forms, where you might want to track new but unauthenticated users.
+          If set to false, uninitialized sessions will not be saved, which can help comply with laws that require consent before tracking user activity (e.g., GDPR).  
+
+      cookie:
+      =======
+        Purpose: Configures the session ID cookie.
+        Details:
+            secure: Ensures that the cookie is only sent over HTTPS.
+            When set to false, the cookie can be sent over both HTTP and HTTPS. This is typically used during development.
+            When set to true, the cookie is only sent over HTTPS, enhancing security by preventing transmission over unencrypted connections. This should be enabled in production environments.
+
+------------------------------
+ACTUALLY PROMISE RETURNED below
+
+ResultSetHeader { fieldCount: 0, affectedRows: 0, insertId: 0, info: 'Rows matched: 0 Changed: 0 Warnings: 0', serverStatus: 34, warningStatus: 0, changedRows: 0 }EXPLAIN IT PROMISE RETURN
+
+
+A MySQL result set header!
+
+This is an object that contains metadata about the result of a MySQL query. Here's a breakdown of each property:
+
+fieldCount: The number of columns in the result set. In this case, it's 0, which means the query didn't return any columns (e.g., it was an UPDATE or DELETE statement).
+affectedRows: The number of rows affected by the query. In this case, it's 0, which means no rows were updated, inserted, or deleted.
+insertId: The ID of the last inserted row, if the query was an INSERT statement. In this case, it's 0, which means no row was inserted.
+info: A string containing additional information about the query execution. In this case, it indicates that:
+Rows matched: 0 rows were matched by the query (e.g., no rows were found that matched the WHERE clause).
+Changed: 0 rows were changed by the query (e.g., no rows were updated).
+Warnings: 0 warnings were generated during query execution.
+serverStatus: A bit field indicating the server status. The value 34 is a combination of several flags, which can be broken down as follows:
+32 (0x20): SERVER_STATUS_AUTOCOMMIT: The server is in autocommit mode.
+2 (0x02): SERVER_STATUS_NO_INDEX_USED: No index was used to execute the query.
+warningStatus: The number of warnings generated during query execution. In this case, it's 0, which means no warnings were generated.
+changedRows: The number of rows changed by the query. This is similar to affectedRows, but only counts rows that were actually changed (e.g., updated).
+In summary, this result set header indicates that the query:
+
+Didn't return any columns (fieldCount=0)
+Didn't affect any rows (affectedRows=0)
+Didn't insert any rows (insertId=0)
+Didn't generate any warnings (warningStatus=0)
+Was executed in autocommit mode (serverStatus=34)
+Didn't use an index (serverStatus=34)
+=================================================GIT=================================================================================================================
+==========================================================================================================================================================================================================================================
+1)).CREATE A NEW BRANCH               ==>git checkout -b branchname
+2)).SWITCHED TO EXISTING BRANCH       ==>git checkout branchname   
+
+3)).TO CREATE NEW FILE AND PUSH CODE IN BRANCH ====>HERE IS EXAMPLE (git add react-commerce/frontend/src/admin/Brands/Brands.jsx)
+
+4)).git diff
+============
+Git diff is a command that is used to compare the differences between two different versions of a file or set of files.
+->This command shows the file differences which are not yet staged.
+
+5)).git diff [first branch] [second branch]                     ex- git diff main userdashboard
+============================================
+This command shows the differences between the two branches mentioned.
+
+6)).git log
+===========
+this command is used list of version history for current branch.
+
+DIFFERENCE BETWEEN GIT AND GITHUB
+=================================================================================================================================
+                                          GIT        |                                 GITHUB
+=================================================================================================================================                                                     |                                 
+1) Git is a software.                                |1) GitHub is a service.                                 
+2) Git is installed locally on the system            |2) GitHub is hosted on the web                                 
+3) it is focused on version control and code sharing.|3) GitHub is focused on centralized source code hosting.                               
+4) Git has no user management feature.               |4) GitHub has a built-in user management feature.                                 
+5) Git provides a Desktop interface named Git Gui.   |5) GitHub provides a Desktop interface named GitHub Desktop                                 
+6) Git is a version control system to manage          6) GitHub is a hosting service for Git repositories.
+   source code history.                              |                                 
+
+
+7)./Git Stash
+=============
+ --- Let we have some changes in our local asumming in base url.ts ,we want to take latested pull from github then 
+it will ask in your local has some changes so I can't take the pull. Now we have to stash means keep aside our changes for a while
+then again need to hit the git pull, now we will have the latest code of remote.
+But current we base url.ts file is in aside we we need to take in working directory for that we need to use cammand "git stash apply"
+using this we will be able to merged the changes together. Sometimes it will create conflict as in local only then we need to resolved manually.
+
+8).What is Git Cherry-Pick?
+==========================
+Git Cherry-Pick is a Git command that allows you to apply a specific commit from one branch to another. It "cherry-picks" a single commit and applies it to the current branch, rather than merging the entire branch.
+** Syntax **
+============
+git cherry-pick <commit-hash>          ex-git cherry-pick 7fafca64c0990d018712b26645ea7cbfd7534233
+
+steps provide get this id 
+------------------------
+->open github
+->then goto specific repositories
+->then click on commits 
+->please choose an id the right side  any one commit 
+->copy it
+
+How does it work?
+=================
+
+1).You specify the commit hash you want to cherry-pick using the git cherry-pick command.
+2).Git creates a new commit on the current branch that is a duplicate of the specified commit.
+3).The new commit has the same changes, author, and commit message as the original commit.
+3).The original commit remains unchanged on its original branch.
+Use Cases
+
+1).Backporting fixes: Cherry-pick a bug fix from a newer branch to an older branch, without merging the entire branch.
+2).Reverting a commit: Cherry-pick a commit that reverts a previous commit, effectively undoing the changes.
+3).Applying a specific feature: Cherry-pick a commit that adds a specific feature to the current branch, without merging the entire feature branch.
+
+
+9).git cherry-pick --abort
+==========================
+ git cherry-pick --abort is used to abort a cherry-pick operation. 
+ This command will stop the cherry-pick and return your branch to the previous state before the cherry-pick started.
+
+10).git restore --staged . (if you mistakely run " git add . " command now it goes to stagging area  and use " git restore --staged . " command moves to unstagging area )
+==========================
+->The dot (.) at the end of the command represents the current directory.
+->This command restores all files in the current directory and its subdirectories from the index (staging area) to the working directory.
+->It's equivalent to git reset -- <. (note the space between -- and .), but git restore is a more modern and safer way to achieve this.
+
+
+11).git restore --staged <filename>               ex-git restore --staged register.jsx
+===================================
+-><filename> should be replaced with the actual name of the file you want to restore.
+->This command restores only the specified file from the index (staging area) to the working directory.
+->It's equivalent to git reset -- <filename> (note the space between -- and <filename>), but again, git restore is a more modern and safer way to achieve this.
+
+12).git reset --hard:
+=====================
+ Resets the repository to the last commit, discarding all changes.
+
+13).git clean:
+==============
+ Removes untracked files and directories.
+
+14).gitk --all:
+===============
+ Displays a graphical representation of the commit history.
+
+15).gitk:
+========
+ A graphical Git repository viewer, which can help you visualize the commit history.
+
+
+16).git gui:
+============
+ A graphical Git interface, which provides a user-friendly way to interact with Git.
+
+
+
+
+
+
+=================================================FRONTEND=================================================================================================================
+==========================================================================================================================================================================
+1).Short-Circuit Evaluation in JavaScript
+========================================
+example->    <img src={`http://localhost:8081/profile/${userData && userData.image}`} className="img-circle elevation-2" alt={userData && userData.name} />
+  JavaScript have 2 types of logical operator i, logical AND and logical OR
+  ->IN JS "LOGICAL AND" MEANS THE SECOND OPERAND IS ONLY EVALUATED IF THE 1ST OPERAND IS TRUE.
+  ->(above example) if "userData" is "null" or "undefined" the expression will short-Circuit and return "null " or "undefined" .The userData.image part will not be evaluated.
+  ->If userData is an object, the expression will evaluate userData.image and return its value.
+  ->If we didn't use short-circuit evaluation, we might get errors like Cannot read property 'image' of null or Cannot read property 'name' of null.
+
+  
+2).USECONTEXT
+==========
+    ->The useContext hook is a powerful feature in React that allows you to access and share data across your component tree without 
+      passing props down manually at every level. This can help to avoid "prop drilling" and make your code cleaner and more maintainable.
+
+    Context:
+    =======
+     Provides a way to pass data through the component tree without having to pass props down manually at every level.  
+
+    useContext:
+    ===========
+     A hook that lets you subscribe to React context and access its value directly. 
+
+     Steps to Use useContext
+     =======================
+        Create a Context: Use React.createContext to create a context object.( This function returns a context object with two components: Provider and Consumer.)
+        Provide a Context Value: Use a context provider component to wrap parts of your component tree and provide the context value.
+        Consume the Context Value: Use the useContext hook in a component to access the context value.                                                                                    
+
+  EXAMPLE->TO USE USECONTEXT (USER AUTHENTICATION AND THEME CHANGE(DARK AND LIGHT))
+
+
+3).USEREF: For referencing DOM elements.
+=======================================
+    ->The useRef hook in React is primarily used to directly reference a DOM element or to persist a mutable value that doesn't trigger a re-render when updated.
+    Workflow of useRef
+    =================
+        Initialization:
+        ===============
+
+        When you call useRef in a component, it returns a mutable object.
+        The returned object persists throughout the lifecycle of the component.
+        The object has a current property that can be used to store a reference to a DOM element or any value.
+        Accessing DOM Elements:
+        =======================
+
+        Attach the ref object to a DOM element using the ref attribute.
+        React assigns the DOM element to the current property of the ref object once the component mounts.
+        Manipulating the DOM:
+        ======================     
+
+        You can access the DOM element through the current property and perform manipulations or read properties.
+    Step-by-Step Implementation
+    ===========================
+      1.Initialize the Ref:
+      ==================
+
+      Create a ref object for the input element.
+      2.Attach the Ref to the DOM Element:
+      =====================================
+
+      Use the ref attribute to bind the ref object to the input element.
+      3.Use useEffect to Focus on Mount:
+      ================================
+
+      Use useEffect to focus the input element when the component mounts.    
+
+4).USEMEMEO
+===========
+    useMemo is a React hook used for memoizing expensive computations so that they are only recomputed when necessary. 
+    It is particularly useful when you have a computation that is intensive or needs to be done frequently in a component,
+    but its result doesn't change every time the component re-renders
+
+    Explanation
+      Real-life Example:
+      =================
+        Imagine you have a component that displays a list of products.
+        Each product has a price and a quantity, and you want to calculate the total price for all products displayed. 
+        This calculation involves iterating over the list of products and multiplying each product's price by its quantity to get the subtotal, and then summing all subtotals to get the total price.
+
+    Workflow:
+    ========
+
+    1.Initial Setup:
+    =============
+
+      Define a React component (ProductList) that receives a list of products as a prop.
+    2.Memoizing Expensive Calculation:
+    ================================
+
+      Use useMemo to memoize the calculation of the total price. This ensures that the calculation is only performed when the list of products changes, not on every render of the component.
+    Dependency Array:
+    ================
+
+      Pass the list of products as a dependency to useMemo. React will recompute the memoized value whenever the dependency (list of products) changes.
+    Rendering:
+    =========
+
+      Use the memoized value (totalPrice) in the JSX to display the total price to the user.
+
+5)react hook form
+=================
+const { register, handleSubmit, setValue } = useForm();
+
+  a).useForm():
+  =============
+    This is a hook provided by React Hook Form. It returns an object with several properties that help you manage your form. The useForm() hook is the core of React Hook Form, and it's used to create a form instance.
+  b).register:
+  ============
+     This is a function returned by useForm(). It's used to register an input field with the form instance. When you call register and pass an input field as an argument, React Hook Form will track the field's value, validation, and errors. 
+  c).handleSubmit:
+  ===============
+     This is another function returned by useForm(). It's used to handle form submissions. When you call handleSubmit and pass a function as an argument, React Hook Form will call that function when the form is submitted.
+  d).setValue:
+  ============
+     This is a function returned by useForm(). It's used to set the value of a registered input field programmatically.   
+
+
+
+======================================REGEX======================================
+Basic Concepts
+=============
+    Patterns: Regex patterns are a sequence of characters that define a search criteria.
+    Matching: The process of searching for a pattern in a string.
+    Groups: A group is a part of a pattern that can be referred to later in the pattern or in the replacement string.
+Character Classes
+================
+A character class is a set of characters that can be matched. There are several types of character classes:
+
+    Literal Characters: Matches the exact character. For example, a matches the character "a".
+    Character Ranges: Matches a range of characters. For example, a-z matches any character between "a" and "z" (inclusive).
+    Character Classes: Matches a set of characters. For example, [abc] matches any of the characters "a", "b", or "c".
+    Negated Character Classes: Matches any character that is not in the set. For example, [^abc] matches any character that is not "a", "b", or "c".
+Quantifiers
+===========
+Quantifiers specify how many times a pattern should be matched.
+
+  Greedy Quantifiers:
+  ===================
+      * matches 0 or more occurrences.
+      + matches 1 or more occurrences.
+      ? matches 0 or 1 occurrence.
+      {n} matches exactly n occurrences.
+      {n,} matches n or more occurrences.
+      {n,m} matches at least n and at most m occurrences.
+Lazy Quantifiers:
+================
+    *? matches 0 or more occurrences, but as few as possible.
+    +? matches 1 or more occurrences, but as few as possible.
+    ?? matches 0 or 1 occurrence, but as few as possible.
+    {n}? matches exactly n occurrences, but as few as possible.
+    {n,}? matches n or more occurrences, but as few as possible.
+    {n,m}? matches at least n and at most m occurrences, but as few as possible.
+Anchors
+=======
+
+Anchors specify the position of the match in the string.
+
+    Start of String: ^ matches the start of the string.
+    End of String: $ matches the end of the string.
+    Word Boundary: \b matches a word boundary (either the start or end of a word).
+    Non-Word Boundary: \B matches a non-word boundary (i.e., not the start or end of a word).
+Groups and Capturing
+===================
+Groups allow you to capture parts of the match and refer to them later.
+
+    Capturing Groups: (pattern) captures the match and creates a group.
+    Non-Capturing Groups: (?:pattern) creates a group, but does not capture the match.
+    Named Groups: (?<name>pattern) creates a named group that can be referred to later.
+    Backreferences: \1, \2, etc. refer to the corresponding capturing group.
+Escaping
+=======
+Some characters have special meanings in regex. To match these characters literally, you need to escape them using a backslash (\).
+
+    Special Characters: ., *, +, ?, {, }, (, ), |, \, /, etc.
+    Escaping: \. matches a literal period, \* matches a literal asterisk, etc.
+Modifiers
+=========
+Modifiers change the behavior of the regex engine.
+
+    Case Insensitivity: (?i) makes the regex engine case-insensitive.
+    Multiline Mode: (?m) makes the regex engine treat the string as multiple lines.
+    Dot Matches Newline: (?s) makes the dot (.) match newline characters.
+    Unicode Properties: (?u) enables Unicode property support.
+=============================================================================REGEX END===========================================================
+what to do?
+==========
+if user put correct data but database not accept these data this time user contineously try to send data but nothing error shown .
+if user exceed trying to insert like 4-5 times this time alert shown 
+
+->in backend validation perform  useing joi library
+->and also add searching functionality like select * from AdminUser where name like '%a';
+
+->register.jsx (i want when level not becomes 100% that time we shown create disabled) and level wise worked means find @As89uy7272 otherwise level not increased
+
+
+
+
+======================================================================================================
+app.get("/editdata/:id", (req, res) => {
+  const id = req.params.id;
+  // console.log(id);
+  const query = "select * from AdminUser where id=?";
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error("🚫 error fetching data", err);
+      return res.status(500).json({ message: "🚫 internal server error" });
+    }
+    if (result.length === 0) {
+      return res.status(404).json({ message: "🚫 data not found!" });
+    }
+    return res
+      .status(200)
+      .json({ message: "✅ data fetched successfully!", data: result[0] });
+  });
+});
+
+======================================================================================================
+
+i have category page when i choose on category it redirect listing page with category url 
+                            <Link to={`/listing` + "/" +category.url}>{category.category_name}<i className="fas fa-angle-down i-state-right u-s-m-l-6" /></Link>
+
+i want whatever url clicked this url passed in url bar and that url get in my backend and using this url we shown url related data
+
+
+
+add pass ="xevvmztlmdirkjtm" ->for email.js(backend) 
+
+
+
+
+
+when we pass id in productdetails page it was not worked .pleas use {state:{id:id}} and other page to get their id use uselocation() hook.
+
+in checkout page when user entered pincode it respective pincode through state and city automatically filledz
+
+app.get("/checkemail/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+    const query = "SELECT * FROM AdminUser WHERE email=?";
+    const result = await db.promise().query(query, [email]);
+
+    const emailExists = result[0].length > 0;
+    res.json({ emailExists });
+  } catch (error) {
+    console.error("Error checking email:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+app.post("/passwordforgot/:email", async (req, res) => {
+  const { error } = passwordForgotSchema.validate(req.body);
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: "🚫 invalid request body", error: error.details });
+  }
+  const email = req.params.email;
+  const newPassword = req.body.password;
+  try {
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+    const query = "UPDATE AdminUser SET password=? WHERE email=?";
+    db.query(query, [hashedNewPassword, email], (err, result) => {
+      if (err) {
+        console.error("🚫 Internal server error");
+        return res.status(500).json({ error: "🚫 Internal server error" });
+      }
+      return res
+        .status(200)
+        .json({ message: "✅ Password updated successfully!" });
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "🚫 Internal server error" });
+  }
+});
+
+
+import debounce from 'lodash.debounce';
+
+const debouncedSearchFunction = debounce(async (event, searchEntity) => {
+  const searchTerm = event.target.value.toUpperCase().trim();
+  try {
+    const response = await axios.get(`http://localhost:8081/SearchAdminSubAdminUser/${searchTerm}`);
+    let filteredData = response.data;
+    if (searchTerm !== "") {
+      filteredData = filteredData.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.role.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    setFilterData(filteredData);
+  } catch (error) {
+    console.error(error);
+  }
+}, 500); // debounce for 500ms
+
+// Call the debounced function on input change
+<input onChange={(event) => debouncedSearchFunction(event, searchEntity)} />
+
+
+
+
+
+
+
+
+````````````````---------------------------------------------------for global error handling in react application 
+-> need to create errorbounddary file to load error acrross entire file have any error occuurs
+
+  // ErrorBoundary.jsx
+
+
+import React from "react";
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Error caught by ErrorBoundary:", error, errorInfo);
+    this.setState({ errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          <h1>Oops! Something went wrong.</h1>
+          <details style={{ whiteSpace: "pre-wrap" }}>
+            {this.state.error && this.state.error.toString()}
+            <br />
+            {this.state.errorInfo && this.state.errorInfo.componentStack}
+          </details>
+          <button onClick={() => window.location.reload()}>Reload</button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default ErrorBoundary;
+
+-------------------
+-> it runs 1st constuctor load set haserror false
+if any error occurs that catch by child componenet like -> static getDerivedStateFromError
+if it contain any error then it haserror now true render method now satisfy the condition and show user friendly error instaed of application crash
+->in devolopement server not works correctkly but need to build it 
+  steps to build react application 
+    ->npm run build 
+    ->npx serve -s build 
+
+// for column swap
+
+
+
+// For column swapping
+const handleColumnDragStart = (e, index) => {
+  e.dataTransfer.setData("columnIndex", index.toString());
+};
+
+const handleColumnDrop = (e, index) => {
+  const draggedColumnIndex = e.dataTransfer.getData("columnIndex"); // Get the dragged column index
+  const newColumns = [...columns];
+
+  // Swap columns
+  const [draggedColumn] = newColumns.splice(draggedColumnIndex, 1); // Remove dragged column
+  newColumns.splice(index, 0, draggedColumn); // Insert dragged column at drop position
+
+  // Reorder the row data to match the new column order
+  const newFilteredData = filterData.map(item => {
+    const reorderedItem = {};
+    newColumns.forEach(column => {
+      reorderedItem[column.key] = item[column.key]; // Map the reordered columns to their respective values
+    });
+    return reorderedItem;
+  });
+
+  // Update state with the new column order and reordered data
+  setColumns(newColumns);    // Update column state
+  setFilterData(newFilteredData); // Update row data according to new column order
+};
+
+
+
+searching
+
+ const searchFunction = (event) => {
+        const searchData = event.target.value.toLowerCase().trim();
+        const queryparms=new URLSearchParams(window.location.search)
+        queryparms.set('q',searchData)
+        const newURL=`${window.location.pathname}?${queryparms.toString()}`
+        window.history.pushState({},'',newURL)
+        // console.log(searchData)
+        if (searchData === '') {
+            setFilterData(data);
+        } else {
+            const filtered = data.filter(item =>
+              item &&  item.name.toLowerCase().includes(searchData) 
+            );
+            setFilterData(filtered);
+        }
+    };
+
+
+
+    
+                                                               // for quick sort 
+    // Choose a Pivot: Select an element from the array to be the pivot (commonly the last element, first element, or a random element).
+
+// Partitioning:
+
+// Rearrange the array so that all elements less than the pivot are on the left, and all elements greater than the pivot are on the right.
+// Place the pivot in its correct position in the sorted array.
+// Recursively Apply:
+
+// Recursively apply the above steps to the sub-arrays (left and right of the pivot).
+// Base Case: If the array has one or zero elements, it is already sorted.
+
+// Combine: Since the sub-arrays are sorted in place, no additional steps are needed to combine them.
+function quicksort(arr){
+  if(arr.length <=1){
+    console.log(arr)
+    return arr;
+  }
+
+  const pivot=arr[0];
+  const left=[];
+  const right=[];
+
+  for(var i=1;i<arr.length;i++){
+    if(arr[i] <= pivot){
+      left.push(arr[i])
+    }else{
+      right.push(arr[i])
+    }
+  }
+  const sortedLeft=quicksort(left)
+  const sortedRight=quicksort(right)
+
+  return [...sortedLeft,pivot,...sortedRight]
+}
+
+
+const arr=[23,45,5,22,11,899,78];
+const sortarr=quicksort(arr);
+console.log(sortarr)
+
+
+
+--------------------------------for random pivot choosen--------------------------------------------
+function quickSort(arr) {
+  // Base case: if the array has 1 or 0 elements, it is already sorted
+  if (arr.length <= 1) {
+    return arr;
+  }
+
+  // Step 1: Choose a random pivot
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  const pivot = arr[randomIndex];
+
+  // Remove the pivot from the array (optional but helps with partitioning)
+  arr.splice(randomIndex, 1);
+
+  let left = [];   // Elements less than or equal to the pivot
+  let right = [];  // Elements greater than the pivot
+
+  // Step 2: Partition the array
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] <= pivot) {
+      left.push(arr[i]);
+    } else {
+      right.push(arr[i]);
+    }
+  }
+
+  // Step 3: Recursively sort the left and right arrays
+  const sortedLeft = quickSort(left);
+  const sortedRight = quickSort(right);
+
+  // Step 4: Combine sorted left, pivot, and sorted right arrays
+  return [...sortedLeft, pivot, ...sortedRight];
+}
+
+// Example usage:
+const arr = [81, 45, 53, 32, 4, 677, 3];
+const sortedArr = quickSort(arr);
+console.log("Sorted Array:", sortedArr);
+
+
+
+
+
+
+
+
+
+
+
+
+// selection sort
+
+const arr=[23,75,34,45,98,8,11];
+const sortedArray=selectionSort(arr)
+console.log(sortedArray)
+function selectionSort(arr){
+  for(var i=0;i<arr.length-1;i++){
+    var minIndex=i;
+    for(var j=i+1;j<arr.length;j++){
+      if(arr[j] < arr[minIndex]){
+        minIndex=j
+      }
+    }
+    if(minIndex != i){
+      [arr[i],arr[minIndex]]=[arr[minIndex],arr[i]]
+    }
+    // console.log(`Pass ${i + 1}:`, arr);6
+  }
+  return arr;
+}
+
+
+const arr= [1, 4, 3, 2, 6, 5]
+const sortedarr=selectionAndquicksort(arr)
+console.log(sortedarr)
+
+function selectionAndquicksort(arr) {
+  if (arr.length <= 1) {
+    return arr;
+  }
+
+  var pivot = arr[0];
+  var left = [];
+  var right = [];
+  for (var i = 1; i < arr.length; i++) {
+    if (arr[i] <= pivot) {
+      left.push(arr[i]);
+    } else {
+      right.push(arr[i]);
+    }
+  }
+  
+  var sortedleft = selectionAndquicksort(left);
+  var sortedright = selectionAndquicksort(right);
+
+  return [...sortedleft, pivot, ...sortedright];
+}
+
+
+
+
+
+
+
+
+// merge  sort working(to divide subarrays with end termination and then conquer in conquer time to compare with them it will be automatically sorted)
+const arr=[1,56,34,23,5,98,45,6];
+
+const sortedarr=mergesort(arr)
+console.log(sortedarr)
+function mergesort(arr){
+  if(arr.length <= 1){
+    return arr;
+  }
+
+  var mid=Math.floor(arr.length/2)
+  var left=arr.slice(0,mid);
+  var right=arr.slice(mid)
+
+  const sortedLeft=mergesort(left);
+  const sortedRight=mergesort(right)
+
+  return merge(sortedLeft,sortedRight)
+}
+
+function merge(left,right){
+  const result=[];
+  var i=0; var j=0;
+  while(i < left.length && j < right.length){
+    if(left[i] < right[j]){
+      result.push(left[i])
+      i++
+    }else{
+      result.push(right[j]);
+      j++
+    }
+  }
+  
+  while (i < left.length) {
+    result.push(left[i]);
+    i++;
+  }
+
+
+  while (j < right.length) {
+    result.push(right[j]);
+    j++;
+  }
+
+  return result;
+}
+
+
+
+
+
+
+
+
+
+Firebase Cloud Messaging (FCM) Setup Guide for a React Project  (video refernce ->  "https://www.youtube.com/watch?v=IK8x7qc9ZsA")
+This guide provides step-by-step instructions to integrate Firebase Cloud Messaging (FCM) into your React application.
+
+1. Create a Firebase Project
+Open Firebase Console.
+Click on "Go to console" in the top right corner.
+Click "Create a project", follow the setup steps, and enable Google Analytics.
+2. Enable Cloud Messaging
+In the Firebase Console, navigate to Cloud Messaging in the left sidebar.
+Click on the Web (</>) button.
+Wait for Firebase to generate the configuration.
+3. Install Firebase in Your React Project
+Open your project in VS Code.
+Inside the src folder, create a new file named firebase.js.
+Install the Firebase SDK:
+bash
+Copy
+Edit
+npm install firebase
+4. Configure Firebase in Your React App
+Open firebase.js and paste the Firebase configuration from the console.
+
+Import Firebase Messaging:
+
+javascript
+Copy
+Edit
+import { initializeApp } from "firebase/app";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID",
+  measurementId: "YOUR_MEASUREMENT_ID",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+export const messaging = getMessaging(app);
+
+// Function to request permission and get token
+export const generateToken = async () => {
+  const permission = await Notification.requestPermission();
+  console.log("Notification Permission:", permission);
+  if (permission === "granted") {
+    const token = await getToken(messaging, {
+      vapidKey: "YOUR_VAPID_KEY",
+    });
+    console.log("FCM Token:", token);
+    return token;
+  }
+};
+Comment out Google Analytics in firebase.js if it is not needed.
+
+5. Generate VAPID Key for Cloud Messaging
+In Firebase Console, go to Project Settings (gear icon on the left sidebar).
+Click on Cloud Messaging.
+Generate and copy the VAPID Key Pair.
+Add the VAPID key to the generateToken function in firebase.js.
+6. Request Notification Permission in App.js
+Open App.js and import generateToken from firebase.js:
+
+javascript
+Copy
+Edit
+import { useEffect } from "react";
+import { generateToken, messaging } from "./firebase";
+import { onMessage } from "firebase/messaging";
+
+function App() {
+  useEffect(() => {
+    generateToken();
+
+    // Handle incoming messages in the foreground
+    onMessage(messaging, (payload) => {
+      console.log("Message received:", payload);
+    });
+  }, []);
+
+  return <div>My App</div>;
+}
+
+export default App;
+Open the browser console to check if "Notification Permission: granted" is displayed.
+
+7. Fix the Firebase Messaging Error
+If you see an error related to Firebase Messaging, follow these steps:
+
+Create a Service Worker File
+
+Inside the public folder, create a new file named firebase-messaging-sw.js.
+Add the following code:
+javascript
+Copy
+Edit
+importScripts("https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js");
+
+// Initialize Firebase inside the service worker
+firebase.initializeApp({
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID",
+  measurementId: "YOUR_MEASUREMENT_ID",
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {
+  console.log("Background message received:", payload);
+
+  self.registration.showNotification(payload.notification.title, {
+    body: payload.notification.body,
+    icon: "/firebase-logo.png",
+  });
+});
+8. Create Your First Firebase Campaign
+Go to Firebase Console and click "Continue to Console" after dependencies are installed.
+Before creating a campaign, click "View FCM Reporting Dashboard".
+Click "Create your first campaign" and follow the instructions.
+9. Test Your Notifications
+Send a test notification from Firebase Console → Cloud Messaging.
+Check your browser’s console and notification tray for messages.
+✅ Your Firebase Cloud Messaging setup for React is now complete! 🚀

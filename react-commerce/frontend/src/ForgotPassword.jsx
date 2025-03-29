@@ -1,48 +1,67 @@
 import axios from 'axios';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { NotificationManager, NotificationContainer } from 'react-notifications';
+import zxcvbn from 'zxcvbn';
 
 const ForgotPassword = () => {
+    const BASE_URL=process.env.REACT_APP_BASE_URL;
     const navigate=useNavigate();
+    const [passwordStrength, setPasswordStrength] = useState(0);
+    const [loading,setloading]=useState(false)
+    // console.log(passwordStrength)
+
+    useEffect(()=>{
+        document.title="forgotPassword";
+    })
     const initialValues = {
         email: '',
         password: ''
     };
-
+    // console.log(initialValues.email)
+    // console.log(initialValues.password)
     const validationSchema = Yup.object({
         email: Yup.string().email('Invalid email format').required('Email is required'),
-        password: Yup.string().max(30).min(6).required("Please enter your password!"),
+        password: Yup.string().max(25).min(8)
+            .matches(/^[a-zA-Z0-9#?!@$%^&*\\-]{8,25}$/, "Password must be 8-25 characters and can contain letters, numbers, and special characters").required("Please enter your password!"),
     });
 
     const onSubmitForm = async (values) => {
-        const { email, password } = values; // Destructuring values
+        // alert(values)
+        if (passwordStrength !== 4) {
+            NotificationManager.error("Password strength is not strong enough!");
+            return;
+        }
+        setloading(true)
+        const { email, password } = values; 
+        // console.log(values)
         try {
-          const response = await axios.get(`http://localhost:8081/checkemail/${email}`);
-          if (response.data.exists) {
+          const response = await axios.get(`${BASE_URL}/api/checkemail/${email}`);
+        //   console.log(response.data)
+          if (response.data.emailExists) {
             try {
-              const response = await axios.post(`http://localhost:8081/passwordforgot/${email}`, { password });
-              console.log(response.data.message);
-              NotificationManager.success("Password Updated Successfully!")
-              setTimeout(()=>{
-                navigate("/");
-              },3000);
-            //   navigate("/");
-            } catch (error) {
-                NotificationManager.danger("Password Updated not Successfully!")
+              setTimeout(async() => {
+                const response = await axios.post(`${BASE_URL}/api/passwordforgot/${email}`, { password });
+                NotificationManager.success("Password updated successfully!")
+                setloading(false)
+                navigate("/")
+              }, 3000);
 
-              console.error(error);
+            } catch (error) {
+                setloading(false)
+                NotificationManager.error("Password Updated not Successfully!")
+                console.error(error);
             }
           } else {
             NotificationManager.error("This email is not registered!")
-
-            // alert('This email is not registered!');
+            setloading(false)
           }
         } catch (error) {
           console.error(error);
         }
+        
       }
       
 
@@ -51,6 +70,11 @@ const ForgotPassword = () => {
         validationSchema: validationSchema,
         onSubmit: onSubmitForm
     });
+    const calculatePasswordStrength=(password)=>{
+        const result=zxcvbn(password);
+        // console.log(result.score)
+        setPasswordStrength(result.score);
+    }
 
     return (
         <div>
@@ -120,23 +144,46 @@ const ForgotPassword = () => {
                                                     </div>
                                                     <div className="u-s-m-b-30">
                                                         <label className="gl-label float-start" htmlFor="reset-email">PASSWORD <span className='text-danger'>*</span></label>
-                                                        <input
+                                                        <div className="position-relative">
+                                                            <input
                                                             className={`input-text input-text--primary-style ${formik.errors.password && formik.touched.password && 'is-invalid'}`}
                                                             type="password"
                                                             name='password'
                                                             id="reset-password"
                                                             placeholder="Enter Password"
-                                                            onChange={formik.handleChange}
+                                                            onChange={(e)=>{formik.handleChange(e);
+                                                                 calculatePasswordStrength(e.target.value)}}
                                                             onBlur={formik.handleBlur}
                                                             value={formik.values.password}
                                                             autoComplete='current-password'
-                                                        />
+                                                             /> 
+                                                        </div>
                                                         {formik.touched.password && formik.errors.password ? <div className="invalid-feedback">{formik.errors.password}</div> : null}
+                                                        <div className="progress mt-2">
+                                                    <div
+                                                        className={`progress-bar ${passwordStrength === 0 ? 'bg-danger' : passwordStrength === 1 ? 'bg-warning' : passwordStrength === 2 ? 'bg-info' : passwordStrength === 3 ? 'bg-primary' : 'bg-success'}`}
+                                                        role="progressbar"
+                                                        style={{ width: `${(passwordStrength + 1) * 25}%` }}
+                                                        aria-valuenow={(passwordStrength + 1) * 25}
+                                                        aria-valuemin="0"
+                                                        aria-valuemax="100">
+                                                        {passwordStrength === 0 && "0%"}
+                                                        {passwordStrength === 1 && "25%"}
+                                                        {passwordStrength === 2 && "50%"}
+                                                        {passwordStrength === 3 && "75%"}
+                                                        {passwordStrength === 4 && "100%"}
+                                                    </div>
+                                                </div>
                                                     </div>
                                                     <div className="u-s-m-b-30">
                                                     <NotificationContainer />
-                                                        <button className="btn btn--e-transparent-brand-b-2 btn-outline-primary float-left" type="submit">SUBMIT</button>
-                                                    </div>
+                                                    {loading ? (
+                                                        <div>
+                                                          <button type="submit" className="btn btn-success" disabled  style={{ position: 'relative', zIndex: 0 }} >   <i className="fas fa-spinner fa-spin" /> Submit </button>
+                                                           <div style={{   position: 'absolute',   top: 0,   left: 0,   width: '100%',   height: '100%',   zIndex: 1,   cursor: 'not-allowed' }} /> </div>
+                                                      ) : (
+                                                        <button type="submit" className="btn btn-success">Submit</button>
+                                                      )}                                                    </div>
                                                     <div className="u-s-m-b-30">
                                                         <Link className="gl-link" to={"/"}>Back to Login</Link>
                                                     </div>

@@ -45,3 +45,205 @@
   .closebtn:hover {
     color: black;
   }
+
+  .listing_productImage{
+    height: 120px;
+  }
+
+
+  /* productDetails.jsx */
+  .input-group .btn {
+    min-width: 40px;
+  }
+  
+  /* Custom styles for social login buttons */
+  .circle-bg {
+    background-color: blue;
+    border-radius: 50;
+    cursor: pointer;
+    display: table;
+    left: 50%;
+    top: 99%;
+    height: 30px;
+    width: 120px;
+    position: absolute;
+    vertical-align: middle;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+  
+  .icon {
+    color: white;
+    display: table-cell;
+    font-size: 20px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  
+  .outer-icons {
+    left: 50%;
+    top: 90%;
+    position: absolute;
+    opacity: 0;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+  
+  .outer-icons i {
+    color: white;
+    border-radius: 50%;
+    font-size: 30px;
+    line-height: 50px;
+    height: 50px;
+    width: 50px;
+    text-align: center;
+    vertical-align: middle;
+    position: absolute;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+  
+  .one {
+    background-color: #55acee;
+    left: -50px;
+    bottom: -150px
+  }
+  
+  .two {
+    background-color: black;
+    left: -120px;
+    bottom: -150px;
+  }
+  
+  .three {
+    background-color: #dc4e41;
+    left: 90px;
+    bottom: -150px;
+  }
+  
+  .four {
+    background-color: #0077b5;
+    left: 20px;
+    bottom: -150px
+  }
+
+  /* for success.jsx */
+  .success-page{
+    text-align: center;
+    padding: 120px 0;
+    background: #EBF0F5;
+  }
+  .success-tick {
+    color: #88B04B;
+    font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
+    font-weight: 900;
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+  .recived-msg {
+    color: #404F5E;
+    font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
+    font-size:20px;
+    margin: 0;
+  }
+  .checkmark-tick {
+  color: #9ABC66;
+  font-size: 100px;
+  line-height: 200px;
+  margin-left:-15px;
+}
+.success-card {
+  background: white;
+  padding: 60px;
+  border-radius: 4px;
+  box-shadow: 0 2px 3px #C8D0D8;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* cancel.jsx */
+
+.cancel-page{
+  text-align: center;
+  padding: 120px 0;
+  background: #EBF0F5;
+}
+.cancel-tick {
+  color: #b0664b;
+  font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
+  font-weight: 900;
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.checkmark-tick {
+color: red;
+font-size: 100px;
+line-height: 200px;
+margin-left:-15px;
+}
+.cancel-card {
+background: white;
+padding: 60px;
+border-radius: 4px;
+box-shadow: 0 2px 3px #C8D0D8;
+display: inline-block;
+margin: 0 auto;
+}
+/* login form */
+.container {
+  max-width: 1200px;
+  padding: 20px;
+}
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+h3 {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #333;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-outline-primary {
+  border-color: #007bff;
+  color: #007bff;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+@media (max-width: 767px) {
+  .card-body {
+    padding: 1rem;
+  }
+}
